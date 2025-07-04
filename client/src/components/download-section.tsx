@@ -1,14 +1,29 @@
+import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, RotateCcw, CheckCircle } from 'lucide-react';
+import { ProcessedImage } from '@/lib/image-utils';
 
 interface DownloadSectionProps {
+  processedImage: ProcessedImage | null;
   onDownload: () => void;
   onShare: () => void;
   onStartOver: () => void;
 }
 
-export function DownloadSection({ onDownload, onShare, onStartOver }: DownloadSectionProps) {
+export function DownloadSection({ processedImage, onDownload, onShare, onStartOver }: DownloadSectionProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (processedImage && canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, 180, 180);
+        ctx.drawImage(processedImage.canvas, 0, 0);
+      }
+    }
+  }, [processedImage]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2 mb-4">
@@ -17,6 +32,32 @@ export function DownloadSection({ onDownload, onShare, onStartOver }: DownloadSe
         </div>
         <h2 className="text-lg font-semibold text-gray-800">Ready to Download</h2>
       </div>
+
+      {/* Show the processed image */}
+      <Card className="p-6">
+        <div className="bg-gray-100 rounded-lg p-6 text-center">
+          <div className="relative inline-block">
+            <div className="w-48 h-48 mx-auto relative">
+              {processedImage ? (
+                <canvas
+                  ref={canvasRef}
+                  width={180}
+                  height={180}
+                  className="w-full h-full rounded-full shadow-lg"
+                  style={{ imageRendering: 'crisp-edges' }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 rounded-full animate-pulse" />
+              )}
+            </div>
+          </div>
+          
+          <div className="mt-4 text-sm text-gray-600">
+            <p>Perfect for Facebook profile picture!</p>
+            <p className="text-xs mt-1">180x180px • EYV branding included</p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-4 bg-green-50 border-green-200">
         <div className="flex items-center space-x-3">

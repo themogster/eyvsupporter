@@ -47,6 +47,7 @@ export default function Home() {
 
         {currentStep === 'download' && (
           <DownloadSection
+            processedImage={processedImage}
             onDownload={downloadProcessedImage}
             onShare={shareImage}
             onStartOver={startOver}

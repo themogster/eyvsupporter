@@ -23,16 +23,7 @@ export function PreviewSection({ processedImage, onProceedToDownload, isProcessi
     }
   }, [processedImage]);
 
-  // Auto-proceed to download after preview
-  useEffect(() => {
-    if (processedImage && !isProcessing) {
-      const timer = setTimeout(() => {
-        onProceedToDownload();
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [processedImage, isProcessing, onProceedToDownload]);
+  // Remove auto-proceed - let user manually continue
 
   return (
     <div className="space-y-4">
@@ -72,12 +63,11 @@ export function PreviewSection({ processedImage, onProceedToDownload, isProcessi
           </div>
           
           <Button
-            variant="outline"
-            className="w-full touch-manipulation"
-            disabled={true}
+            onClick={onProceedToDownload}
+            className="w-full bg-deep-purple hover:bg-purple-700 text-white touch-manipulation"
+            disabled={!processedImage}
           >
-            <Move className="w-4 h-4 mr-2" />
-            Reposition Image
+            Continue to Download
           </Button>
         </div>
       </Card>
