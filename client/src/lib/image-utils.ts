@@ -92,9 +92,12 @@ export class ImageProcessor {
       img.src = objectUrl;
       
       // Clean up object URL when done
-      img.onload = () => {
+      const originalOnLoad = img.onload;
+      img.onload = (event) => {
         URL.revokeObjectURL(objectUrl);
-        img.onload();
+        if (originalOnLoad) {
+          originalOnLoad.call(img, event);
+        }
       };
     });
   }
