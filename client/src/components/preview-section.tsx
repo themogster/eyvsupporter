@@ -1,16 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Move } from 'lucide-react';
-import { ProcessedImage } from '@/lib/image-utils';
+import { ProcessedImage, ImageTransform } from '@/lib/image-utils';
+import { ImageTransformControls } from './image-transform-controls';
 
 interface PreviewSectionProps {
   processedImage: ProcessedImage | null;
+  transform: ImageTransform;
+  onTransformChange: (transform: ImageTransform) => void;
   onProceedToDownload: () => void;
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, onProceedToDownload, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, onTransformChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -22,8 +24,6 @@ export function PreviewSection({ processedImage, onProceedToDownload, isProcessi
       }
     }
   }, [processedImage]);
-
-  // Remove auto-proceed - let user manually continue
 
   return (
     <div className="space-y-4">
@@ -61,16 +61,25 @@ export function PreviewSection({ processedImage, onProceedToDownload, isProcessi
             <span className="text-sm font-medium text-gray-700">Border Color</span>
             <div className="w-8 h-8 bg-deep-purple rounded-full border-2 border-white shadow-sm"></div>
           </div>
-          
-          <Button
-            onClick={onProceedToDownload}
-            className="w-full bg-deep-purple hover:bg-purple-700 text-white touch-manipulation"
-            disabled={!processedImage}
-          >
-            Continue to Download
-          </Button>
         </div>
       </Card>
+
+      {/* Transform Controls */}
+      <ImageTransformControls
+        transform={transform}
+        onTransformChange={onTransformChange}
+        isProcessing={isProcessing}
+      />
+
+      {/* Continue Button */}
+      <Button
+        onClick={onProceedToDownload}
+        className="w-full bg-deep-purple hover:bg-purple-700 text-white touch-manipulation"
+        disabled={!processedImage}
+        size="lg"
+      >
+        Continue to Download
+      </Button>
     </div>
   );
 }

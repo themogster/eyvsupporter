@@ -3,9 +3,16 @@ export interface ProcessedImage {
   blob: Blob;
 }
 
+export interface ImageTransform {
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+}
+
 export class ImageProcessor {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private originalImage: HTMLImageElement | null = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -14,19 +21,32 @@ export class ImageProcessor {
     this.ctx = this.canvas.getContext('2d')!;
   }
 
-  async processImage(imageFile: File): Promise<ProcessedImage> {
+  async processImage(imageFile: File, transform?: ImageTransform): Promise<ProcessedImage> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       
       img.onload = () => {
         try {
+          // Store original image for repositioning
+          this.originalImage = img;
+          
           // Clear canvas
           this.ctx.clearRect(0, 0, 180, 180);
           
+          // Use transform values or defaults
+          const scale = transform?.scale || 1;
+          const userOffsetX = transform?.offsetX || 0;
+          const userOffsetY = transform?.offsetY || 0;
+          
           // Calculate dimensions to crop to square and center the image
           const size = Math.min(img.width, img.height);
-          const offsetX = (img.width - size) / 2;
-          const offsetY = (img.height - size) / 2;
+          const baseCenterX = (img.width - size) / 2;
+          const baseCenterY = (img.height - size) / 2;
+          
+          // Apply user transforms
+          const sourceSize = size / scale;
+          const sourceX = baseCenterX + userOffsetX - (sourceSize - size) / 2;
+          const sourceY = baseCenterY + userOffsetY - (sourceSize - size) / 2;
           
           // Save context for clipping
           this.ctx.save();
@@ -36,11 +56,11 @@ export class ImageProcessor {
           this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
           this.ctx.clip();
           
-          // Draw the image, cropped to square and scaled to fit
+          // Draw the image with transforms applied
           this.ctx.drawImage(
             img,
-            offsetX, offsetY, size, size,  // Source rectangle (square crop)
-            8, 8, 164, 164                 // Destination rectangle (leave space for border)
+            sourceX, sourceY, sourceSize, sourceSize,  // Source rectangle (transformed)
+            8, 8, 164, 164                             // Destination rectangle (leave space for border)
           );
           
           // Restore context to remove clipping
@@ -104,6 +124,88 @@ export class ImageProcessor {
 
   getCanvas(): HTMLCanvasElement {
     return this.canvas;
+  }
+
+  async reprocessWithTransform(transform: ImageTransform): Promise<ProcessedImage> {
+    if (!this.originalImage) {
+      throw new Error('No original image available for reprocessing');
+    }
+
+    const img = this.originalImage;
+    return new Promise((resolve, reject) => {
+      try {
+        // Clear canvas
+        this.ctx.clearRect(0, 0, 180, 180);
+        
+        // Use transform values
+        const scale = transform.scale;
+        const userOffsetX = transform.offsetX;
+        const userOffsetY = transform.offsetY;
+        
+        // Calculate dimensions to crop to square and center the image
+        const size = Math.min(img.width, img.height);
+        const baseCenterX = (img.width - size) / 2;
+        const baseCenterY = (img.height - size) / 2;
+        
+        // Apply user transforms
+        const sourceSize = size / scale;
+        const sourceX = baseCenterX + userOffsetX - (sourceSize - size) / 2;
+        const sourceY = baseCenterY + userOffsetY - (sourceSize - size) / 2;
+        
+        // Save context for clipping
+        this.ctx.save();
+        
+        // Create circular clipping path
+        this.ctx.beginPath();
+        this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+        this.ctx.clip();
+        
+        // Draw the image with transforms applied
+        this.ctx.drawImage(
+          img,
+          sourceX, sourceY, sourceSize, sourceSize,  // Source rectangle (transformed)
+          8, 8, 164, 164                             // Destination rectangle (leave space for border)
+        );
+        
+        // Restore context to remove clipping
+        this.ctx.restore();
+        
+        // Draw circular border
+        this.ctx.beginPath();
+        this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.lineWidth = 8;
+        this.ctx.stroke();
+        
+        // Draw EYV logo background circle
+        this.ctx.beginPath();
+        this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'white';
+        this.ctx.fill();
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        
+        // Draw EYV text
+        this.ctx.font = 'bold 12px Inter, sans-serif';
+        this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('EYV', 146, 146);
+        
+        // Convert to blob
+        this.canvas.toBlob((blob) => {
+          if (blob) {
+            resolve({ canvas: this.canvas, blob });
+          } else {
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        }, 'image/png', 0.9);
+        
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
 

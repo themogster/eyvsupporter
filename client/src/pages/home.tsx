@@ -10,10 +10,12 @@ export default function Home() {
     currentStep,
     processedImage,
     isProcessing,
+    transform,
     processImage,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
+    updateTransform,
     startOver
   } = useImageProcessor();
 
@@ -40,6 +42,8 @@ export default function Home() {
         {currentStep === 'preview' && (
           <PreviewSection
             processedImage={processedImage}
+            transform={transform}
+            onTransformChange={updateTransform}
             onProceedToDownload={proceedToDownload}
             isProcessing={isProcessing}
           />

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ImageProcessor, ProcessedImage, validateImageFile, downloadImage } from '@/lib/image-utils';
+import { ImageProcessor, ProcessedImage, ImageTransform, validateImageFile, downloadImage } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
 
 export type Step = 'upload' | 'preview' | 'download';
@@ -9,6 +9,7 @@ export function useImageProcessor() {
   const [originalImage, setOriginalImage] = useState<File | null>(null);
   const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
   const { toast } = useToast();
 
   const processor = new ImageProcessor();
@@ -63,14 +64,22 @@ export function useImageProcessor() {
   const shareImage = useCallback(async () => {
     if (!processedImage) return;
 
-    if (navigator.share && navigator.canShare) {
+    if (navigator.share) {
       try {
         const file = new File([processedImage.blob], 'eyv-profile-picture.png', { type: 'image/png' });
-        await navigator.share({
+        const shareData = {
           title: 'My EYV Profile Picture',
           text: 'Check out my new profile picture created with EYV Support!',
           files: [file]
-        });
+        };
+        
+        // Check if files can be shared before attempting
+        if ('canShare' in navigator && navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback if files cannot be shared
+          downloadProcessedImage();
+        }
       } catch (error) {
         // Fallback to download if sharing fails
         downloadProcessedImage();
@@ -81,11 +90,31 @@ export function useImageProcessor() {
     }
   }, [processedImage, downloadProcessedImage]);
 
+  const updateTransform = useCallback(async (newTransform: ImageTransform) => {
+    if (!originalImage) return;
+
+    setIsProcessing(true);
+    try {
+      const result = await processor.reprocessWithTransform(newTransform);
+      setProcessedImage(result);
+      setTransform(newTransform);
+    } catch (error) {
+      toast({
+        title: "Transform Failed",
+        description: error instanceof Error ? error.message : "Failed to apply transform",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [originalImage, toast]);
+
   const startOver = useCallback(() => {
     setCurrentStep('upload');
     setOriginalImage(null);
     setProcessedImage(null);
     setIsProcessing(false);
+    setTransform({ scale: 1, offsetX: 0, offsetY: 0 });
   }, []);
 
   return {
@@ -93,10 +122,12 @@ export function useImageProcessor() {
     originalImage,
     processedImage,
     isProcessing,
+    transform,
     processImage,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
+    updateTransform,
     startOver
   };
 }
