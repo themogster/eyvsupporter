@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -25,6 +25,7 @@ export function ImageTransformControls({ transform, onTransformChange, isProcess
   }, [onTransformChange]);
 
   const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
     setIsDragging(true);
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -34,14 +35,15 @@ export function ImageTransformControls({ transform, onTransformChange, isProcess
   const handleDragMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return;
     
+    e.preventDefault();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     
     const deltaX = clientX - dragStart.x;
     const deltaY = clientY - dragStart.y;
     
-    // Scale sensitivity based on zoom level
-    const sensitivity = 0.5 / transform.scale;
+    // Scale sensitivity - make it more responsive
+    const sensitivity = 2.0 / transform.scale;
     
     const newTransform = {
       ...transform,
@@ -56,6 +58,62 @@ export function ImageTransformControls({ transform, onTransformChange, isProcess
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
   }, []);
+
+  // Add global event listeners for better drag handling
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      
+      const sensitivity = 2.0 / transform.scale;
+      
+      const newTransform = {
+        ...transform,
+        offsetX: transform.offsetX + deltaX * sensitivity,
+        offsetY: transform.offsetY + deltaY * sensitivity
+      };
+      
+      onTransformChange(newTransform);
+      setDragStart({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleGlobalTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - dragStart.x;
+      const deltaY = touch.clientY - dragStart.y;
+      
+      const sensitivity = 2.0 / transform.scale;
+      
+      const newTransform = {
+        ...transform,
+        offsetX: transform.offsetX + deltaX * sensitivity,
+        offsetY: transform.offsetY + deltaY * sensitivity
+      };
+      
+      onTransformChange(newTransform);
+      setDragStart({ x: touch.clientX, y: touch.clientY });
+    };
+
+    const handleGlobalEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalEnd);
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+    document.addEventListener('touchend', handleGlobalEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalEnd);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalEnd);
+    };
+  }, [isDragging, dragStart, transform, onTransformChange]);
 
   return (
     <Card className="p-4 space-y-4">
@@ -103,12 +161,7 @@ export function ImageTransformControls({ transform, onTransformChange, isProcess
         <div
           className="bg-gray-100 rounded-lg p-4 touch-manipulation select-none cursor-move"
           onMouseDown={handleDragStart}
-          onMouseMove={handleDragMove}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
           onTouchStart={handleDragStart}
-          onTouchMove={handleDragMove}
-          onTouchEnd={handleDragEnd}
         >
           <div className="text-center text-sm text-gray-500">
             {isDragging ? 'Repositioning...' : 'Touch and drag to move image'}
