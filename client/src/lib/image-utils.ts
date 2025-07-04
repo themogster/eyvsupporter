@@ -27,7 +27,7 @@ export class ImageProcessor {
       
       img.onload = () => {
         try {
-          // Store original image for repositioning
+          // Store original image for repositioning after it loads
           this.originalImage = img;
           
           // Clear canvas

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { ImageProcessor, ProcessedImage, ImageTransform, validateImageFile, downloadImage } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,7 +12,8 @@ export function useImageProcessor() {
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
   const { toast } = useToast();
 
-  const processor = new ImageProcessor();
+  // Create a stable processor instance
+  const processor = useMemo(() => new ImageProcessor(), []);
 
   const processImage = useCallback(async (file: File) => {
     const validation = validateImageFile(file);
@@ -91,7 +92,14 @@ export function useImageProcessor() {
   }, [processedImage, downloadProcessedImage]);
 
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
-    if (!originalImage) return;
+    if (!originalImage) {
+      toast({
+        title: "Transform Failed",
+        description: "No original image available for reprocessing",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsProcessing(true);
     try {
@@ -107,7 +115,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [originalImage, toast]);
+  }, [originalImage, processor, toast]);
 
   const startOver = useCallback(() => {
     setCurrentStep('upload');
