@@ -1,18 +1,21 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ProcessedImage, ImageTransform } from '@/lib/image-utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProcessedImage, ImageTransform, CurvedTextOption } from '@/lib/image-utils';
 import { ImageTransformControls } from './image-transform-controls';
 
 interface PreviewSectionProps {
   processedImage: ProcessedImage | null;
   transform: ImageTransform;
+  curvedText: CurvedTextOption;
   onTransformChange: (transform: ImageTransform) => void;
+  onCurvedTextChange: (option: CurvedTextOption) => void;
   onProceedToDownload: () => void;
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, transform, onTransformChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, curvedText, onTransformChange, onCurvedTextChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -54,6 +57,23 @@ export function PreviewSection({ processedImage, transform, onTransformChange, o
             <p>Optimized for Facebook (180x180px)</p>
             <p className="text-xs mt-1">Circular frame with EYV branding applied</p>
           </div>
+        </div>
+
+        {/* Curved Text Selector */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Curved Text
+          </label>
+          <Select value={curvedText} onValueChange={onCurvedTextChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Choose text option" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No text</SelectItem>
+              <SelectItem value="supporting">I'M SUPPORTING EARLY YEARS VOICE</SelectItem>
+              <SelectItem value="donated">I'VE DONATED</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-3 mt-4">

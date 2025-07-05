@@ -14,12 +14,14 @@ export default function Home() {
     isProcessing,
     transform,
     logoFile,
+    curvedText,
     processImage,
     setLogo,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
     updateTransform,
+    setCurvedTextOption,
     startOver
   } = useImageProcessor();
 
@@ -58,7 +60,9 @@ export default function Home() {
           <PreviewSection
             processedImage={processedImage}
             transform={transform}
+            curvedText={curvedText}
             onTransformChange={updateTransform}
+            onCurvedTextChange={setCurvedTextOption}
             onProceedToDownload={proceedToDownload}
             isProcessing={isProcessing}
           />

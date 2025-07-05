@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { ImageProcessor, ProcessedImage, ImageTransform, validateImageFile, downloadImage } from '@/lib/image-utils';
+import { ImageProcessor, ProcessedImage, ImageTransform, ProcessingOptions, CurvedTextOption, validateImageFile, downloadImage } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
 
 export type Step = 'upload' | 'preview' | 'download';
@@ -11,6 +11,7 @@ export function useImageProcessor() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
   const { toast } = useToast();
 
   // Create a stable processor instance
@@ -48,7 +49,7 @@ export function useImageProcessor() {
       // Reprocess current image with new logo if one exists
       if (originalImage) {
         setIsProcessing(true);
-        const result = await processor.processImage(originalImage, transform);
+        const result = await processor.processImage(originalImage, { transform, curvedText });
         setProcessedImage(result);
         setIsProcessing(false);
       }
@@ -74,7 +75,7 @@ export function useImageProcessor() {
 
     setIsProcessing(true);
     try {
-      const result = await processor.processImage(file);
+      const result = await processor.processImage(file, { transform, curvedText });
       setOriginalImage(file);
       setProcessedImage(result);
       setCurrentStep('preview');
@@ -137,6 +138,28 @@ export function useImageProcessor() {
     }
   }, [processedImage, downloadProcessedImage]);
 
+  const setCurvedTextOption = useCallback(async (option: CurvedTextOption) => {
+    setCurvedText(option);
+    
+    // Reprocess current image with new curved text if one exists
+    if (originalImage && processedImage) {
+      setIsProcessing(true);
+      try {
+        const result = await processor.processImage(originalImage, { transform, curvedText: option });
+        setProcessedImage(result);
+      } catch (error) {
+        console.error('Failed to reprocess with curved text:', error);
+        toast({
+          title: "Processing Failed",
+          description: "Failed to update the image with curved text",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  }, [originalImage, processedImage, processor, transform, toast]);
+
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
     if (!originalImage) {
       toast({
@@ -178,12 +201,14 @@ export function useImageProcessor() {
     isProcessing,
     transform,
     logoFile,
+    curvedText,
     processImage,
     setLogo,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
     updateTransform,
+    setCurvedTextOption,
     startOver
   };
 }

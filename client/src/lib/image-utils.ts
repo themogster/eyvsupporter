@@ -9,6 +9,13 @@ export interface ImageTransform {
   offsetY: number;
 }
 
+export type CurvedTextOption = 'none' | 'supporting' | 'donated';
+
+export interface ProcessingOptions {
+  transform?: ImageTransform;
+  curvedText?: CurvedTextOption;
+}
+
 export class ImageProcessor {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -51,6 +58,41 @@ export class ImageProcessor {
     });
   }
 
+  private drawCurvedText(text: string, centerX: number, centerY: number, radius: number): void {
+    const fontSize = 11;
+    this.ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+    this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+
+    // Calculate text metrics for proper spacing
+    const textMetrics = this.ctx.measureText(text);
+    const textWidth = textMetrics.width;
+    
+    // Calculate angle per character based on text width and radius
+    const anglePerPixel = 1 / radius;
+    const totalAngle = textWidth * anglePerPixel;
+    const startAngle = Math.PI - (totalAngle / 2); // Start from bottom left of circle
+    
+    // Draw each character along the curve
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const charWidth = this.ctx.measureText(char).width;
+      const charAngle = startAngle + (i * charWidth + charWidth / 2) * anglePerPixel;
+      
+      // Calculate position for this character
+      const x = centerX + Math.cos(charAngle) * radius;
+      const y = centerY + Math.sin(charAngle) * radius;
+      
+      // Save context and rotate for character
+      this.ctx.save();
+      this.ctx.translate(x, y);
+      this.ctx.rotate(charAngle + Math.PI / 2); // Rotate to be perpendicular to curve
+      this.ctx.fillText(char, 0, 0);
+      this.ctx.restore();
+    }
+  }
+
   async setLogo(logoFile: File): Promise<void> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -68,7 +110,7 @@ export class ImageProcessor {
     });
   }
 
-  async processImage(imageFile: File, transform?: ImageTransform): Promise<ProcessedImage> {
+  async processImage(imageFile: File, options?: ProcessingOptions): Promise<ProcessedImage> {
     // Wait for logo to load before processing
     try {
       await this.logoLoadPromise;
@@ -88,10 +130,14 @@ export class ImageProcessor {
           // Clear canvas
           this.ctx.clearRect(0, 0, 180, 180);
           
-          // Use transform values or defaults
-          const scale = transform?.scale || 1;
-          const userOffsetX = transform?.offsetX || 0;
-          const userOffsetY = transform?.offsetY || 0;
+          // Extract transform and curved text options
+          const imageTransform = options?.transform || { scale: 1, offsetX: 0, offsetY: 0 };
+          const curvedText = options?.curvedText || 'none';
+          
+          // Use transform values
+          const scale = imageTransform.scale;
+          const userOffsetX = imageTransform.offsetX;
+          const userOffsetY = imageTransform.offsetY;
           
           // Calculate dimensions to crop to square and center the image
           const size = Math.min(img.width, img.height);
@@ -158,6 +204,21 @@ export class ImageProcessor {
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText('EYV', 138, 138);
+          }
+          
+          // Draw curved text if specified
+          if (curvedText !== 'none') {
+            let textToDraw = '';
+            if (curvedText === 'supporting') {
+              textToDraw = "I'M SUPPORTING EARLY YEARS VOICE";
+            } else if (curvedText === 'donated') {
+              textToDraw = "I'VE DONATED";
+            }
+            
+            if (textToDraw) {
+              console.log('Drawing curved text:', textToDraw);
+              this.drawCurvedText(textToDraw, 90, 90, 65); // Center at 90,90 with radius 65
+            }
           }
           
           // Convert to blob
