@@ -58,7 +58,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     });
-    console.log('Mouse down - starting drag');
+
   }, []);
 
   // Global mouse handlers for proper drag functionality
@@ -66,28 +66,29 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (!isDragging || !canvasRef.current) return;
       
-      console.log('Global mouse move - dragging');
+
       
       const rect = canvasRef.current.getBoundingClientRect();
       const currentX = e.clientX - rect.left;
       const currentY = e.clientY - rect.top;
       
-      const deltaX = (currentX - dragStart.x) / rect.width;
-      const deltaY = (currentY - dragStart.y) / rect.height;
+      const deltaX = (currentX - dragStart.x) / rect.width * 2; // Scale to -1 to 1 range
+      const deltaY = (currentY - dragStart.y) / rect.height * 2;
       
       const newTransform: ImageTransform = {
         ...transform,
-        offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX * 0.5)),
-        offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY * 0.5))
+        offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX)),
+        offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY))
       };
       
+
       onTransformChange(newTransform);
       
       setDragStart({ x: currentX, y: currentY });
     };
 
     const handleGlobalMouseUp = () => {
-      console.log('Global mouse up - stopping drag');
+
       setIsDragging(false);
     };
 

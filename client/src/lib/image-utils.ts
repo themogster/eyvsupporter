@@ -289,8 +289,8 @@ export class ImageProcessor {
         
         // Use transform values
         const scale = transform.scale;
-        const userOffsetX = transform.offsetX;
-        const userOffsetY = transform.offsetY;
+        const userOffsetX = transform.offsetX * 50; // Convert normalized offset to pixels
+        const userOffsetY = transform.offsetY * 50;
         
         // Calculate dimensions to crop to square and center the image
         const size = Math.min(img.width, img.height);
@@ -307,52 +307,52 @@ export class ImageProcessor {
         
         // Create circular clipping path
         this.ctx.beginPath();
-        this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+        this.ctx.arc(90, 90, 78, 0, Math.PI * 2);
         this.ctx.clip();
         
         // Draw the image with transforms applied
         this.ctx.drawImage(
           img,
           sourceX, sourceY, sourceSize, sourceSize,  // Source rectangle (transformed)
-          8, 8, 164, 164                             // Destination rectangle (leave space for border)
+          12, 12, 156, 156                           // Destination rectangle (leave space for border)
         );
         
         // Restore context to remove clipping
         this.ctx.restore();
-        
-        // Draw circular border
+          
+        // Draw circular border - thicker to eliminate transparent ring
         this.ctx.beginPath();
         this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
-        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
-        this.ctx.lineWidth = 8;
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
+        this.ctx.lineWidth = 12;
         this.ctx.stroke();
         
-        // Draw logo background circle
+        // Draw logo background circle - positioned more inward and larger
         this.ctx.beginPath();
-        this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
+        this.ctx.arc(138, 138, 24, 0, Math.PI * 2);
         this.ctx.fillStyle = 'white';
         this.ctx.fill();
-        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
         
         // Draw logo image or fallback text
         if (this.logoImage) {
-          // Draw PNG logo in the white circle
+          // Draw PNG logo in the white circle - larger and more inward
           this.ctx.save();
           this.ctx.beginPath();
-          this.ctx.arc(146, 146, 16, 0, Math.PI * 2);
+          this.ctx.arc(138, 138, 22, 0, Math.PI * 2);
           this.ctx.clip();
-          // Center the logo in the circle
-          this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
+          // Center the logo in the circle - larger size (44x44 instead of 32x32)
+          this.ctx.drawImage(this.logoImage, 116, 116, 44, 44);
           this.ctx.restore();
         } else {
           // Fallback to EYV text
-          this.ctx.font = 'bold 12px Inter, sans-serif';
-          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+          this.ctx.font = 'bold 14px Inter, sans-serif';
+          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
           this.ctx.textAlign = 'center';
           this.ctx.textBaseline = 'middle';
-          this.ctx.fillText('EYV', 146, 146);
+          this.ctx.fillText('EYV', 138, 138);
         }
         
         // Convert to blob
