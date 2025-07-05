@@ -223,14 +223,17 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
               <SelectValue placeholder="Choose text option" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">No text</SelectItem>
               {messagesLoading ? (
                 <SelectItem value="loading" disabled>Loading messages...</SelectItem>
               ) : (
-                messages.map((message) => (
-                  <SelectItem key={message.id} value={message.messageText}>
-                    {message.displayText}
-                  </SelectItem>
-                ))
+                messages
+                  .filter(message => message.key !== 'none') // Exclude the 'none' option from database
+                  .map((message) => (
+                    <SelectItem key={message.id} value={message.messageText}>
+                      {message.displayText}
+                    </SelectItem>
+                  ))
               )}
             </SelectContent>
           </Select>
