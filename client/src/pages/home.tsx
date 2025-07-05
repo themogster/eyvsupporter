@@ -27,7 +27,7 @@ export default function Home() {
       <div className="bg-deep-purple text-white p-6 pb-8">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">EYV Support</h1>
-          <UserCircle className="w-8 h-8" />
+          <img src="/eyv-logo.png" alt="EYV Logo" className="w-8 h-8 rounded-full" />
         </div>
         <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture with EYV branding</p>
       </div>

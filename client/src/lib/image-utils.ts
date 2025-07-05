@@ -41,6 +41,15 @@ export class ImageProcessor {
       // Load PNG logo from public directory
       img.src = '/eyv-logo.png';
       console.log('Started loading PNG logo from:', img.src);
+      
+      // Add debugging to check if image loads
+      img.addEventListener('load', () => {
+        console.log('PNG logo loaded successfully, dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+      });
+      
+      img.addEventListener('error', (e) => {
+        console.error('PNG logo failed to load:', e);
+      });
     });
   }
 
@@ -131,7 +140,9 @@ export class ImageProcessor {
           this.ctx.stroke();
           
           // Draw logo image or fallback text
+          console.log('About to draw logo, logoImage exists:', !!this.logoImage);
           if (this.logoImage) {
+            console.log('Drawing PNG logo in circle');
             // Draw PNG logo in the white circle
             this.ctx.save();
             this.ctx.beginPath();
@@ -140,7 +151,9 @@ export class ImageProcessor {
             // Center the logo in the circle
             this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
             this.ctx.restore();
+            console.log('PNG logo drawn successfully');
           } else {
+            console.log('logoImage is null, drawing fallback text');
             // Fallback to EYV text
             this.ctx.font = 'bold 12px Inter, sans-serif';
             this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
