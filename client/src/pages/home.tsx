@@ -6,6 +6,8 @@ import { ProgressIndicator } from '@/components/progress-indicator';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 
 export default function Home() {
+  console.log('Home component rendering');
+  
   const {
     currentStep,
     processedImage,
