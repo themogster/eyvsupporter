@@ -405,15 +405,30 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 
 export async function getCameraStream(): Promise<MediaStream> {
   try {
+    // First check if mediaDevices is available
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('Camera not supported in this browser');
+    }
+
     return await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'user', // Front camera for selfies
-        width: { ideal: 1080 },
-        height: { ideal: 1080 }
+        width: { ideal: 640, max: 1280 },
+        height: { ideal: 480, max: 720 }
       }
     });
-  } catch (error) {
-    throw new Error('Camera access denied or not available');
+  } catch (error: any) {
+    console.error('Camera access error:', error);
+    
+    if (error.name === 'NotAllowedError') {
+      throw new Error('Camera access denied. Please allow camera permissions and try again.');
+    } else if (error.name === 'NotFoundError') {
+      throw new Error('No camera found on this device.');
+    } else if (error.name === 'NotReadableError') {
+      throw new Error('Camera is already in use by another application.');
+    } else {
+      throw new Error('Camera access failed: ' + (error.message || 'Unknown error'));
+    }
   }
 }
 

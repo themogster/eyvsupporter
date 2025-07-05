@@ -29,25 +29,39 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
 
   const startCamera = async () => {
     try {
+      console.log('Starting camera...');
       const stream = await getCameraStream();
+      console.log('Camera stream obtained:', stream);
       setCameraStream(stream);
       setShowCamera(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        console.log('Video srcObject set');
         
         // Wait for video to be ready before allowing interaction
         videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded');
           if (videoRef.current) {
-            videoRef.current.play();
+            videoRef.current.play().then(() => {
+              console.log('Video playing started');
+            }).catch(err => {
+              console.error('Video play failed:', err);
+            });
           }
         };
         
         videoRef.current.onplaying = () => {
+          console.log('Video is playing');
           setVideoReady(true);
+        };
+        
+        videoRef.current.onerror = (err) => {
+          console.error('Video error:', err);
         };
       }
     } catch (error) {
+      console.error('Camera start error:', error);
       toast({
         title: "Camera Error",
         description: error instanceof Error ? error.message : "Could not access camera",
