@@ -9,6 +9,14 @@ if (!rootElement) {
   console.error('Root element not found');
 } else {
   console.log('Root element found, creating React app');
+  
+  // Remove temporary header when React loads
+  const tempHeader = document.getElementById('temp-header');
+  if (tempHeader) {
+    tempHeader.remove();
+    console.log('Removed temporary header');
+  }
+  
   createRoot(rootElement).render(<App />);
   console.log('React app rendered');
 }

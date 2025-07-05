@@ -45,6 +45,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <!-- Temporary header with logo until React loads -->
+    <div id="temp-header" style="background: #6E1284; color: white; padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: bold; font-family: Inter, sans-serif;">EYV Support</h1>
+      <img src="/logo.png" alt="EYV Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onload="console.log('Header logo loaded!')" onerror="console.log('Header logo failed!')">
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->

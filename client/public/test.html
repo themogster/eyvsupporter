@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EYV Logo Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #6E1284; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EYV Support</h1>
+        <img src="/logo.png" alt="EYV Logo" class="logo" onload="console.log('Logo loaded!')" onerror="console.log('Logo failed to load!')">
+    </div>
+    <p>This is a test page to verify the logo loads correctly.</p>
+    <script>
+        console.log('Test page loaded');
+    </script>
+</body>
+</html>
