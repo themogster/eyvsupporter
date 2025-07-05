@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, RotateCcw, CheckCircle } from 'lucide-react';
+import { Download, RotateCcw, CheckCircle } from 'lucide-react';
 import { ProcessedImage } from '@/lib/image-utils';
 
 interface DownloadSectionProps {
@@ -79,14 +79,7 @@ export function DownloadSection({ processedImage, onDownload, onShare, onStartOv
           Download Profile Picture
         </Button>
 
-        <Button
-          onClick={onShare}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 font-medium touch-manipulation"
-          size="lg"
-        >
-          <Share2 className="w-4 h-4 mr-2" />
-          Share Directly
-        </Button>
+
 
         <Button
           onClick={onStartOver}
