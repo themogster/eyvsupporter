@@ -90,7 +90,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
             <SelectContent>
               <SelectItem value="none">No text</SelectItem>
               <SelectItem value="supporting">I'M SUPPORTING EARLY YEARS VOICE</SelectItem>
-              <SelectItem value="donated">I'VE DONATED</SelectItem>
+              <SelectItem value="donated">I'VE DONATED, HAVE YOU?</SelectItem>
             </SelectContent>
           </Select>
         </div>

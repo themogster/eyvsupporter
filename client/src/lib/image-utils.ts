@@ -223,7 +223,7 @@ export class ImageProcessor {
             if (curvedText === 'supporting') {
               textToDraw = "I'M SUPPORTING EARLY YEARS VOICE";
             } else if (curvedText === 'donated') {
-              textToDraw = "I'VE DONATED";
+              textToDraw = "I'VE DONATED, HAVE YOU?";
             }
             
             if (textToDraw) {
