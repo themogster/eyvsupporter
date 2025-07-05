@@ -31,7 +31,7 @@ export function PWAInstallBanner() {
 
   if (showInstructions) {
     return (
-      <Card className="fixed bottom-4 left-4 right-4 z-50 bg-purple-600 text-white shadow-lg border-0">
+      <Card className="fixed bottom-4 left-4 right-4 z-50 text-white shadow-lg border-0" style={{ backgroundColor: '#6E1284' }}>
         <div className="p-4">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center space-x-2">
@@ -42,17 +42,17 @@ export function PWAInstallBanner() {
               variant="ghost"
               size="sm"
               onClick={() => setShowInstructions(false)}
-              className="text-white hover:bg-purple-700 h-8 w-8 p-0"
+              className="text-white hover:bg-black/20 h-8 w-8 p-0"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
           
-          <p className="text-sm mb-3 text-purple-100">
+          <p className="text-sm mb-3 opacity-80">
             To install this app on your {instructions.platform}:
           </p>
           
-          <ol className="text-sm space-y-1 text-purple-100 mb-4">
+          <ol className="text-sm space-y-1 opacity-80 mb-4">
             {instructions.steps.map((step, index) => (
               <li key={index} className="flex items-start space-x-2">
                 <span className="font-medium text-white">{index + 1}.</span>
@@ -66,7 +66,8 @@ export function PWAInstallBanner() {
               variant="secondary"
               size="sm"
               onClick={() => setIsDismissed(true)}
-              className="bg-white text-purple-600 hover:bg-purple-50"
+              className="bg-white hover:bg-gray-100"
+              style={{ color: '#6E1284' }}
             >
               Maybe Later
             </Button>
@@ -77,7 +78,7 @@ export function PWAInstallBanner() {
   }
 
   return (
-    <Card className="fixed bottom-4 left-4 right-4 z-50 bg-purple-600 text-white shadow-lg border-0">
+    <Card className="fixed bottom-4 left-4 right-4 z-50 text-white shadow-lg border-0" style={{ backgroundColor: '#6E1284' }}>
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-2">
@@ -88,13 +89,13 @@ export function PWAInstallBanner() {
             variant="ghost"
             size="sm"
             onClick={() => setIsDismissed(true)}
-            className="text-white hover:bg-purple-700 h-8 w-8 p-0"
+            className="text-white hover:bg-black/20 h-8 w-8 p-0"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
         
-        <p className="text-sm mb-4 text-purple-100">
+        <p className="text-sm mb-4 opacity-80">
           Get the full app experience! Install EYV Creator for faster access and offline use.
         </p>
         
@@ -103,7 +104,8 @@ export function PWAInstallBanner() {
             onClick={handleInstall}
             variant="secondary"
             size="sm"
-            className="bg-white text-purple-600 hover:bg-purple-50 flex-1"
+            className="bg-white hover:bg-gray-100 flex-1"
+            style={{ color: '#6E1284' }}
           >
             <Download className="w-4 h-4 mr-2" />
             Install App
@@ -112,7 +114,7 @@ export function PWAInstallBanner() {
             variant="ghost"
             size="sm"
             onClick={() => setShowInstructions(true)}
-            className="text-white hover:bg-purple-700"
+            className="text-white hover:bg-black/20"
           >
             <Info className="w-4 h-4" />
           </Button>

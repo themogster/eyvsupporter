@@ -27,9 +27,9 @@
   --radius: 0.5rem;
   
   /* Custom EYV Support colors */
-  --deep-purple: hsl(258, 78%, 51%);
-  --light-purple: hsl(253, 91%, 76%);
-  --purple-100: hsl(253, 91%, 86%);
+  --deep-purple: hsl(278, 73%, 31%);
+  --light-purple: hsl(278, 73%, 65%);
+  --purple-100: hsl(278, 73%, 85%);
   --green-50: hsl(120, 60%, 97%);
   --green-200: hsl(120, 60%, 84%);
   --green-500: hsl(120, 60%, 50%);

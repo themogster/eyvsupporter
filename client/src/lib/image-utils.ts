@@ -69,7 +69,7 @@ export class ImageProcessor {
           // Draw circular border
           this.ctx.beginPath();
           this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
-          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
           this.ctx.lineWidth = 8;
           this.ctx.stroke();
           
@@ -78,13 +78,13 @@ export class ImageProcessor {
           this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
           this.ctx.fillStyle = 'white';
           this.ctx.fill();
-          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
           this.ctx.lineWidth = 2;
           this.ctx.stroke();
           
           // Draw EYV text
           this.ctx.font = 'bold 12px Inter, sans-serif';
-          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
           this.ctx.textAlign = 'center';
           this.ctx.textBaseline = 'middle';
           this.ctx.fillText('EYV', 146, 146);
@@ -173,7 +173,7 @@ export class ImageProcessor {
         // Draw circular border
         this.ctx.beginPath();
         this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
-        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
         this.ctx.lineWidth = 8;
         this.ctx.stroke();
         
@@ -182,13 +182,13 @@ export class ImageProcessor {
         this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
         this.ctx.fillStyle = 'white';
         this.ctx.fill();
-        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
         
         // Draw EYV text
         this.ctx.font = 'bold 12px Inter, sans-serif';
-        this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6B46C1';
+        this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('EYV', 146, 146);
