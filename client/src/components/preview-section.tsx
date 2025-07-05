@@ -31,10 +31,11 @@ interface PreviewSectionProps {
   onTextColorChange: (color: TextColor) => void;
   onTextPositionChange: (position: number) => void;
   onProceedToDownload: () => void;
+  onStartOver: () => void;
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, onStartOver, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -149,15 +150,26 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         isProcessing={isProcessing}
       />
 
-      {/* Continue Button */}
-      <Button
-        onClick={onProceedToDownload}
-        className="w-full bg-deep-purple hover:bg-purple-700 text-white touch-manipulation"
-        disabled={!processedImage}
-        size="lg"
-      >
-        Continue to Download
-      </Button>
+      {/* Action Buttons */}
+      <div className="space-y-3">
+        <Button
+          onClick={onProceedToDownload}
+          className="w-full bg-deep-purple hover:bg-purple-700 text-white touch-manipulation"
+          disabled={!processedImage}
+          size="lg"
+        >
+          Continue to Download
+        </Button>
+        
+        <Button
+          onClick={onStartOver}
+          variant="outline"
+          className="w-full border-gray-300 hover:bg-gray-100 touch-manipulation"
+          size="lg"
+        >
+          Upload Different Photo
+        </Button>
+      </div>
     </div>
   );
 }

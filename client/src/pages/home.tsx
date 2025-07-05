@@ -67,6 +67,7 @@ export default function Home() {
             onTextColorChange={setTextColorOption}
             onTextPositionChange={setTextPositionOption}
             onProceedToDownload={proceedToDownload}
+            onStartOver={startOver}
             isProcessing={isProcessing}
           />
         )}
