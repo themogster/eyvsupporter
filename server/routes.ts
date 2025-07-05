@@ -18,10 +18,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Log profile picture download
   app.post("/api/downloads", async (req, res) => {
     try {
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+      // Extract real client IP from proxy headers (for deployed environments)
+      const ipAddress = req.headers['x-forwarded-for'] || 
+                       req.headers['x-real-ip'] || 
+                       req.headers['x-client-ip'] || 
+                       req.connection.remoteAddress || 
+                       req.socket.remoteAddress || 
+                       req.ip || 
+                       'unknown';
+      
+      // If x-forwarded-for contains multiple IPs, take the first one (original client)
+      const clientIp = typeof ipAddress === 'string' ? ipAddress.split(',')[0].trim() : ipAddress;
       const downloadData = { 
         ...req.body, 
-        ipAddress 
+        ipAddress: clientIp 
       };
       
       const validatedData = insertDownloadSchema.parse(downloadData);
