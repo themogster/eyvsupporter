@@ -46,8 +46,8 @@ export class ImageProcessor {
         console.error('Failed to load EYV logo image:', error);
         reject(error);
       };
-      // Load from public directory
-      img.src = '/eyv-logo.svg';
+      // Load from public directory - using simplified version
+      img.src = '/eyv-logo-simple.svg';
       console.log('Started loading logo from:', img.src);
     });
   }
