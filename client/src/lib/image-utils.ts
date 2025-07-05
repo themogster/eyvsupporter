@@ -17,13 +17,16 @@ export class ImageProcessor {
   private logoLoadPromise: Promise<void>;
 
   constructor() {
+    console.log('ImageProcessor constructor called');
     this.canvas = document.createElement('canvas');
     this.canvas.width = 180;
     this.canvas.height = 180;
     this.ctx = this.canvas.getContext('2d')!;
     
     // Start loading the logo immediately
+    console.log('About to start loading default logo');
     this.logoLoadPromise = this.loadDefaultLogo();
+    console.log('Default logo loading started');
   }
 
   private async loadDefaultLogo(): Promise<void> {
