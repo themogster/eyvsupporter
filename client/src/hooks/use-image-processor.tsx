@@ -244,6 +244,9 @@ export function useImageProcessor() {
     setProcessedImage(null);
     setIsProcessing(false);
     setTransform({ scale: 1, offsetX: 0, offsetY: 0 });
+    setCurvedText('none');
+    setTextColor('#ffffff');
+    setTextPosition(30);
   }, []);
 
   return {

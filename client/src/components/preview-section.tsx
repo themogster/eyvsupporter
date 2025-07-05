@@ -166,6 +166,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">2</div>
         <h2 className="text-lg font-semibold text-gray-800">Preview & Edit</h2>
       </div>
+      {/* Canvas Preview Card */}
       <Card className="p-6">
         <div className="bg-gray-100 rounded-lg p-6 text-center">
           <div className="relative inline-block">
@@ -195,6 +196,10 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
             <p className="text-xs mt-2 text-blue-600 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
           </div>
         </div>
+      </Card>
+
+      {/* Controls Card */}
+      <Card className="p-6">
 
         {/* Curved Text Selector */}
         <div className="mb-6">
@@ -269,7 +274,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
             className="w-full"
           />
         </div>
-
       </Card>
       {/* Action Buttons */}
       <div className="space-y-3">
