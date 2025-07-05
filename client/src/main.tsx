@@ -10,11 +10,11 @@ if (!rootElement) {
 } else {
   console.log('Root element found, creating React app');
   
-  // Remove loading indicator when React loads
-  const loadingIndicator = document.getElementById('loading-indicator');
-  if (loadingIndicator) {
-    loadingIndicator.remove();
-    console.log('Removed loading indicator - React app loaded');
+  // Remove preview fallback when React loads
+  const previewFallback = document.getElementById('preview-fallback');
+  if (previewFallback) {
+    previewFallback.remove();
+    console.log('Removed preview fallback - React app loaded successfully');
   }
   
   createRoot(rootElement).render(<App />);
