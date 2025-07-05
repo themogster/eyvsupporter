@@ -14,6 +14,7 @@ export class ImageProcessor {
   private ctx: CanvasRenderingContext2D;
   private originalImage: HTMLImageElement | null = null;
   private logoImage: HTMLImageElement | null = null;
+  private logoLoadPromise: Promise<void>;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -21,8 +22,8 @@ export class ImageProcessor {
     this.canvas.height = 180;
     this.ctx = this.canvas.getContext('2d')!;
     
-    // Load default EYV logo
-    this.loadDefaultLogo();
+    // Load default EYV logo and store the promise
+    this.logoLoadPromise = this.loadDefaultLogo();
   }
 
   private async loadDefaultLogo(): Promise<void> {
@@ -31,17 +32,22 @@ export class ImageProcessor {
       const logoModule = await import('@assets/EYV Logo 4.svg');
       const logoUrl = logoModule.default;
       
-      const img = new Image();
-      img.onload = () => {
-        this.logoImage = img;
-        console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
-      };
-      img.onerror = (error) => {
-        console.error('Failed to load EYV logo image:', error);
-      };
-      img.src = logoUrl;
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          this.logoImage = img;
+          console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
+          resolve();
+        };
+        img.onerror = (error) => {
+          console.error('Failed to load EYV logo image:', error);
+          reject(error);
+        };
+        img.src = logoUrl;
+      });
     } catch (error) {
       console.warn('Failed to load default logo:', error);
+      throw error;
     }
   }
 
@@ -63,6 +69,13 @@ export class ImageProcessor {
   }
 
   async processImage(imageFile: File, transform?: ImageTransform): Promise<ProcessedImage> {
+    // Wait for logo to load before processing
+    try {
+      await this.logoLoadPromise;
+    } catch (error) {
+      console.warn('Logo failed to load, proceeding with text fallback');
+    }
+    
     return new Promise((resolve, reject) => {
       const img = new Image();
       
@@ -183,6 +196,13 @@ export class ImageProcessor {
   async reprocessWithTransform(transform: ImageTransform): Promise<ProcessedImage> {
     if (!this.originalImage) {
       throw new Error('No original image available for reprocessing');
+    }
+
+    // Wait for logo to load before reprocessing
+    try {
+      await this.logoLoadPromise;
+    } catch (error) {
+      console.warn('Logo failed to load, proceeding with text fallback');
     }
 
     const img = this.originalImage;
