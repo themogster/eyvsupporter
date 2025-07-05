@@ -46,7 +46,7 @@ export default function Home() {
             onLoad={() => console.log('Header logo loaded successfully')}
           />
         </div>
-        <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture with EYV branding</p>
+        <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
       </div>
       {/* Main Content */}
       <div className="p-6 space-y-6 pb-20">
