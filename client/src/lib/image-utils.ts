@@ -147,8 +147,8 @@ export class ImageProcessor {
           
           // Use transform values
           const scale = imageTransform.scale;
-          const userOffsetX = imageTransform.offsetX;
-          const userOffsetY = imageTransform.offsetY;
+          const userOffsetX = imageTransform.offsetX * 50; // Convert normalized offset to pixels
+          const userOffsetY = imageTransform.offsetY * 50;
           
           // Calculate dimensions to crop to square and center the image
           const size = Math.min(img.width, img.height);

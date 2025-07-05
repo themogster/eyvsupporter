@@ -149,6 +149,7 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
+
         const result = await processor.processImage(originalImage, { transform, curvedText: option, textColor, textPosition });
         setProcessedImage(result);
       } catch (error) {
@@ -162,7 +163,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, textColor, toast]);
+  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast]);
 
   const setTextColorOption = useCallback(async (color: TextColor) => {
     setTextColor(color);
@@ -184,7 +185,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, toast]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast]);
 
   const setTextPositionOption = useCallback(async (position: number) => {
     setTextPosition(position);
