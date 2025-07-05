@@ -224,7 +224,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
             </SelectTrigger>
             <SelectContent>
               {messagesLoading ? (
-                <SelectItem value="" disabled>Loading messages...</SelectItem>
+                <SelectItem value="loading" disabled>Loading messages...</SelectItem>
               ) : (
                 messages.map((message) => (
                   <SelectItem key={message.id} value={message.messageText}>
