@@ -34,7 +34,7 @@ export default function Home() {
       {/* Header */}
       <div className="bg-deep-purple text-white p-6 pb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">EYV Support</h1>
+          <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
           <img 
             src="/logo.png" 
             alt="EYV Logo" 
@@ -48,7 +48,6 @@ export default function Home() {
         </div>
         <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture with EYV branding</p>
       </div>
-
       {/* Main Content */}
       <div className="p-6 space-y-6 pb-20">
         {currentStep === 'upload' && (
@@ -85,7 +84,6 @@ export default function Home() {
           />
         )}
       </div>
-
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} />
     </div>
