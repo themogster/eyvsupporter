@@ -361,6 +361,8 @@ export class ImageProcessor {
           const textColor = options.textColor || '#ffffff';
           const textPosition = options.textPosition || 270;
           
+          console.log('reprocessWithTransform - curvedText:', curvedText, 'textColor:', textColor, 'textPosition:', textPosition);
+          
           if (curvedText !== 'none') {
             let textToDraw = '';
             if (curvedText === 'supporting') {
@@ -370,9 +372,12 @@ export class ImageProcessor {
             }
             
             if (textToDraw) {
+              console.log('reprocessWithTransform - Drawing curved text:', textToDraw);
               this.drawCurvedText(textToDraw, 90, 90, 65, textColor, textPosition);
             }
           }
+        } else {
+          console.log('reprocessWithTransform - No options provided, skipping text');
         }
         
         // Convert to blob
