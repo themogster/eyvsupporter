@@ -124,7 +124,7 @@ export class ImageProcessor {
           // Draw circular border - thicker to eliminate transparent ring
           this.ctx.beginPath();
           this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
-          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
           this.ctx.lineWidth = 12;
           this.ctx.stroke();
           
@@ -133,7 +133,7 @@ export class ImageProcessor {
           this.ctx.arc(138, 138, 24, 0, Math.PI * 2);
           this.ctx.fillStyle = 'white';
           this.ctx.fill();
-          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+          this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
           this.ctx.lineWidth = 2;
           this.ctx.stroke();
           
@@ -154,7 +154,7 @@ export class ImageProcessor {
             console.log('logoImage is null, drawing fallback text');
             // Fallback to EYV text
             this.ctx.font = 'bold 14px Inter, sans-serif';
-            this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+            this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText('EYV', 138, 138);
