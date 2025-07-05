@@ -36,7 +36,7 @@ export default function Home() {
           <img 
             src="/logo.png" 
             alt="EYV Logo" 
-            className="w-8 h-8 rounded-full object-cover"
+            className="w-16 h-16 rounded-full object-cover"
             onError={(e) => {
               console.log('Header logo failed to load');
               e.currentTarget.style.display = 'none';
