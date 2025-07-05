@@ -17,6 +17,7 @@ export interface ProcessingOptions {
   transform?: ImageTransform;
   curvedText?: CurvedTextOption;
   textColor?: TextColor;
+  textPosition?: number; // 0-360 degrees around the circle
 }
 
 export class ImageProcessor {
@@ -61,7 +62,7 @@ export class ImageProcessor {
     });
   }
 
-  private drawCurvedText(text: string, centerX: number, centerY: number, radius: number, color: TextColor = '#ffffff'): void {
+  private drawCurvedText(text: string, centerX: number, centerY: number, radius: number, color: TextColor = '#ffffff', startPosition: number = 30): void {
     const fontSize = 10;
     this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     this.ctx.fillStyle = color;
@@ -72,10 +73,11 @@ export class ImageProcessor {
     const chars = text.split('');
     const totalChars = chars.length;
     
-    // Position text at the top of the circle - spread across about 120 degrees
+    // Position text around the circle - spread across about 120 degrees
     const totalArcAngle = Math.PI * 0.67; // 120 degrees in radians
     const angleStep = totalArcAngle / (totalChars - 1);
-    const startAngle = Math.PI * 0.17; // Start from top left (about 30 degrees from top)
+    // Convert startPosition from degrees to radians and adjust for circle coordinate system
+    const startAngle = (startPosition * Math.PI / 180) - (totalArcAngle / 2);
     
     // Draw each character
     for (let i = 0; i < totalChars; i++) {
@@ -139,6 +141,7 @@ export class ImageProcessor {
           const imageTransform = options?.transform || { scale: 1, offsetX: 0, offsetY: 0 };
           const curvedText = options?.curvedText || 'none';
           const textColor = options?.textColor || '#ffffff';
+          const textPosition = options?.textPosition || 90; // Default to top (90 degrees)
           
           // Use transform values
           const scale = imageTransform.scale;
@@ -223,7 +226,7 @@ export class ImageProcessor {
             
             if (textToDraw) {
               console.log('Drawing curved text:', textToDraw);
-              this.drawCurvedText(textToDraw, 90, 90, 65, textColor); // Center at 90,90 with radius 65
+              this.drawCurvedText(textToDraw, 90, 90, 65, textColor, textPosition); // Center at 90,90 with radius 65
             }
           }
           

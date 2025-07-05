@@ -13,6 +13,7 @@ export function useImageProcessor() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
+  const [textPosition, setTextPosition] = useState<number>(90); // 90 degrees = top of circle
   const { toast } = useToast();
 
   // Create a stable processor instance
@@ -50,7 +51,7 @@ export function useImageProcessor() {
       // Reprocess current image with new logo if one exists
       if (originalImage) {
         setIsProcessing(true);
-        const result = await processor.processImage(originalImage, { transform, curvedText, textColor });
+        const result = await processor.processImage(originalImage, { transform, curvedText, textColor, textPosition });
         setProcessedImage(result);
         setIsProcessing(false);
       }
@@ -76,7 +77,7 @@ export function useImageProcessor() {
 
     setIsProcessing(true);
     try {
-      const result = await processor.processImage(file, { transform, curvedText, textColor });
+      const result = await processor.processImage(file, { transform, curvedText, textColor, textPosition });
       setOriginalImage(file);
       setProcessedImage(result);
       setCurrentStep('preview');
@@ -146,7 +147,7 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
-        const result = await processor.processImage(originalImage, { transform, curvedText: option, textColor });
+        const result = await processor.processImage(originalImage, { transform, curvedText: option, textColor, textPosition });
         setProcessedImage(result);
       } catch (error) {
         console.error('Failed to reprocess with curved text:', error);
@@ -168,7 +169,7 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
-        const result = await processor.processImage(originalImage, { transform, curvedText, textColor: color });
+        const result = await processor.processImage(originalImage, { transform, curvedText, textColor: color, textPosition });
         setProcessedImage(result);
       } catch (error) {
         console.error('Failed to reprocess with text color:', error);
@@ -182,6 +183,28 @@ export function useImageProcessor() {
       }
     }
   }, [originalImage, processedImage, processor, transform, curvedText, toast]);
+
+  const setTextPositionOption = useCallback(async (position: number) => {
+    setTextPosition(position);
+    
+    // Reprocess current image with new text position if one exists
+    if (originalImage && processedImage) {
+      setIsProcessing(true);
+      try {
+        const result = await processor.processImage(originalImage, { transform, curvedText, textColor, textPosition: position });
+        setProcessedImage(result);
+      } catch (error) {
+        console.error('Failed to reprocess with text position:', error);
+        toast({
+          title: "Processing Failed",
+          description: "Failed to update the image with new text position",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast]);
 
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
     if (!originalImage) {
@@ -226,6 +249,7 @@ export function useImageProcessor() {
     logoFile,
     curvedText,
     textColor,
+    textPosition,
     processImage,
     setLogo,
     proceedToDownload,
@@ -234,6 +258,7 @@ export function useImageProcessor() {
     updateTransform,
     setCurvedTextOption,
     setTextColorOption,
+    setTextPositionOption,
     startOver
   };
 }

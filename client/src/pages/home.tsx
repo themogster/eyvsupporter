@@ -16,6 +16,7 @@ export default function Home() {
     logoFile,
     curvedText,
     textColor,
+    textPosition,
     processImage,
     setLogo,
     proceedToDownload,
@@ -24,6 +25,7 @@ export default function Home() {
     updateTransform,
     setCurvedTextOption,
     setTextColorOption,
+    setTextPositionOption,
     startOver
   } = useImageProcessor();
 
@@ -64,9 +66,11 @@ export default function Home() {
             transform={transform}
             curvedText={curvedText}
             textColor={textColor}
+            textPosition={textPosition}
             onTransformChange={updateTransform}
             onCurvedTextChange={setCurvedTextOption}
             onTextColorChange={setTextColorOption}
+            onTextPositionChange={setTextPositionOption}
             onProceedToDownload={proceedToDownload}
             isProcessing={isProcessing}
           />

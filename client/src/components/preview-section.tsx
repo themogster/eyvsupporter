@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { ProcessedImage, ImageTransform, CurvedTextOption, TextColor } from '@/lib/image-utils';
 import { ImageTransformControls } from './image-transform-controls';
 
@@ -24,14 +25,16 @@ interface PreviewSectionProps {
   transform: ImageTransform;
   curvedText: CurvedTextOption;
   textColor: TextColor;
+  textPosition: number;
   onTransformChange: (transform: ImageTransform) => void;
   onCurvedTextChange: (option: CurvedTextOption) => void;
   onTextColorChange: (color: TextColor) => void;
+  onTextPositionChange: (position: number) => void;
   onProceedToDownload: () => void;
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, transform, curvedText, textColor, onTransformChange, onCurvedTextChange, onTextColorChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -116,12 +119,27 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
           </div>
         )}
 
-        <div className="space-y-3 mt-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <span className="text-sm font-medium text-gray-700">Border Color</span>
-            <div className="w-8 h-8 bg-deep-purple rounded-full border-2 border-white shadow-sm"></div>
+        {/* Text Position Slider */}
+        {curvedText !== 'none' && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Text Position (0° = right, 90° = top, 180° = left, 270° = bottom)
+            </label>
+            <Slider
+              value={[textPosition]}
+              onValueChange={(value) => onTextPositionChange(value[0])}
+              max={360}
+              min={0}
+              step={5}
+              className="w-full"
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Current: {textPosition}°
+            </div>
           </div>
-        </div>
+        )}
+
+
       </Card>
 
       {/* Transform Controls */}
