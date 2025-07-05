@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload } from 'lucide-react';
@@ -34,32 +34,6 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       console.log('Camera stream obtained:', stream);
       setCameraStream(stream);
       setShowCamera(true);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        console.log('Video srcObject set');
-        
-        // Wait for video to be ready before allowing interaction
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded');
-          if (videoRef.current) {
-            videoRef.current.play().then(() => {
-              console.log('Video playing started');
-            }).catch(err => {
-              console.error('Video play failed:', err);
-            });
-          }
-        };
-        
-        videoRef.current.onplaying = () => {
-          console.log('Video is playing');
-          setVideoReady(true);
-        };
-        
-        videoRef.current.onerror = (err) => {
-          console.error('Video error:', err);
-        };
-      }
     } catch (error) {
       console.error('Camera start error:', error);
       toast({
@@ -93,6 +67,42 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       });
     }
   };
+
+  // Setup video element when camera stream is available
+  useEffect(() => {
+    if (cameraStream && videoRef.current && showCamera) {
+      const video = videoRef.current;
+      video.srcObject = cameraStream;
+      
+      const handleLoadedMetadata = () => {
+        console.log('Video metadata loaded');
+        video.play().then(() => {
+          console.log('Video playing started');
+        }).catch(err => {
+          console.error('Video play failed:', err);
+        });
+      };
+      
+      const handlePlaying = () => {
+        console.log('Video is playing');
+        setVideoReady(true);
+      };
+      
+      const handleError = (err: any) => {
+        console.error('Video error:', err);
+      };
+      
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('error', handleError);
+      
+      return () => {
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('error', handleError);
+      };
+    }
+  }, [cameraStream, showCamera]);
 
   const stopCamera = () => {
     if (cameraStream) {
