@@ -10,7 +10,7 @@ export function useImageProcessor() {
   const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+
   const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
@@ -29,40 +29,7 @@ export function useImageProcessor() {
     }
   }, []);
 
-  const setLogo = useCallback(async (file: File) => {
-    // Validate SVG file
-    if (!file.type.includes('svg') && !file.type.includes('image/')) {
-      toast({
-        title: "Invalid File",
-        description: "Please upload an SVG or image file for the logo",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    try {
-      await processor.setLogo(file);
-      setLogoFile(file);
-      toast({
-        title: "Logo Uploaded",
-        description: "Your logo has been set successfully!",
-      });
-      
-      // Reprocess current image with new logo if one exists
-      if (originalImage) {
-        setIsProcessing(true);
-        const result = await processor.processImage(originalImage, { transform, curvedText, textColor, textPosition });
-        setProcessedImage(result);
-        setIsProcessing(false);
-      }
-    } catch (error) {
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload logo. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [processor, toast, originalImage, transform]);
 
   const processImage = useCallback(async (file: File) => {
     const validation = validateImageFile(file);
@@ -281,12 +248,10 @@ export function useImageProcessor() {
     processedImage,
     isProcessing,
     transform,
-    logoFile,
     curvedText,
     textColor,
     textPosition,
     processImage,
-    setLogo,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
