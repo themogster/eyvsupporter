@@ -36,13 +36,7 @@ The application follows a full-stack TypeScript architecture with clear separati
 - **Automatic circular cropping** with EYV branding overlay
 - **Optimized output** for Facebook profile picture specifications
 
-### Progressive Web App (PWA) Features
-- **Web App Manifest** with complete metadata and icon sets
-- **Service Worker** for offline functionality and asset caching
-- **Install prompts** with cross-platform compatibility (iOS Safari, Chrome, etc.)
-- **Offline detection** with user-friendly status indicators
-- **App-like experience** when installed on mobile devices
-- **Background sync** capabilities for future enhancements
+
 
 ### UI/UX Design
 - **Mobile-first responsive design** optimized for touch devices
@@ -105,9 +99,10 @@ The application is configured for deployment on Replit with the following build 
 Changelog:
 - July 04, 2025: Initial setup with mobile-first React app
 - July 04, 2025: Implemented advanced image manipulation with scale/zoom and drag-to-reposition controls
-- July 04, 2025: Added Progressive Web App (PWA) features including service worker, manifest, install prompts, and offline support
 - July 05, 2025: Added SVG logo upload functionality with default EYV Logo 4.svg branding
 - July 05, 2025: Successfully integrated EYV logo (PNG format) in header and profile picture processing. Fixed Chrome preview compatibility issues - app works perfectly in Edge and new browser tabs
+- July 05, 2025: Added database logging for downloads - saves base64 image, timestamp, and IP address to PostgreSQL
+- July 05, 2025: Removed PWA support - eliminated service worker, manifest, install prompts, and offline features
 ```
 
 ## User Preferences
