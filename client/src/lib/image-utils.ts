@@ -34,6 +34,10 @@ export class ImageProcessor {
       const img = new Image();
       img.onload = () => {
         this.logoImage = img;
+        console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
+      };
+      img.onerror = (error) => {
+        console.error('Failed to load EYV logo image:', error);
       };
       img.src = logoUrl;
     } catch (error) {
@@ -121,6 +125,7 @@ export class ImageProcessor {
           
           // Draw logo image or fallback text
           if (this.logoImage) {
+            console.log('Drawing EYV logo image');
             // Draw uploaded logo SVG
             this.ctx.save();
             this.ctx.beginPath();
@@ -129,6 +134,7 @@ export class ImageProcessor {
             this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
             this.ctx.restore();
           } else {
+            console.log('Drawing fallback EYV text');
             // Fallback to EYV text
             this.ctx.font = 'bold 12px Inter, sans-serif';
             this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
@@ -236,6 +242,7 @@ export class ImageProcessor {
         
         // Draw logo image or fallback text
         if (this.logoImage) {
+          console.log('Drawing EYV logo image (reprocess)');
           // Draw uploaded logo SVG
           this.ctx.save();
           this.ctx.beginPath();
@@ -244,6 +251,7 @@ export class ImageProcessor {
           this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
           this.ctx.restore();
         } else {
+          console.log('Drawing fallback EYV text (reprocess)');
           // Fallback to EYV text
           this.ctx.font = 'bold 12px Inter, sans-serif';
           this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
