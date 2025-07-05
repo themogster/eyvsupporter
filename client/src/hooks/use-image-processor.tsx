@@ -101,13 +101,48 @@ export function useImageProcessor() {
     setCurrentStep('download');
   }, []);
 
-  const downloadProcessedImage = useCallback(() => {
+  const downloadProcessedImage = useCallback(async () => {
     if (processedImage) {
-      downloadImage(processedImage.blob, 'eyv-profile-picture.png');
-      toast({
-        title: "Download Started",
-        description: "Your EYV profile picture is being downloaded!",
-      });
+      try {
+        // Convert blob to base64 for database storage
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(processedImage.blob);
+        });
+        
+        const base64Image = await base64Promise;
+        
+        // Log download to database
+        const response = await fetch('/api/downloads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            profileImage: base64Image,
+          }),
+        });
+        
+        if (!response.ok) {
+          console.error('Failed to log download to database');
+        }
+        
+        // Proceed with download
+        downloadImage(processedImage.blob, 'eyv-profile-picture.png');
+        toast({
+          title: "Download Started",
+          description: "Your EYV profile picture is being downloaded!",
+        });
+      } catch (error) {
+        console.error('Error during download:', error);
+        // Still allow download even if logging fails
+        downloadImage(processedImage.blob, 'eyv-profile-picture.png');
+        toast({
+          title: "Download Started",
+          description: "Your EYV profile picture is being downloaded!",
+        });
+      }
     }
   }, [processedImage, toast]);
 
