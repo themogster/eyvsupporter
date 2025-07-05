@@ -121,16 +121,16 @@ export class ImageProcessor {
           // Restore context to remove clipping
           this.ctx.restore();
           
-          // Draw circular border
+          // Draw circular border - thicker to eliminate transparent ring
           this.ctx.beginPath();
           this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
           this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
-          this.ctx.lineWidth = 8;
+          this.ctx.lineWidth = 12;
           this.ctx.stroke();
           
-          // Draw logo background circle
+          // Draw logo background circle - positioned more inward and larger
           this.ctx.beginPath();
-          this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
+          this.ctx.arc(138, 138, 24, 0, Math.PI * 2);
           this.ctx.fillStyle = 'white';
           this.ctx.fill();
           this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
@@ -141,23 +141,23 @@ export class ImageProcessor {
           console.log('About to draw logo, logoImage exists:', !!this.logoImage);
           if (this.logoImage) {
             console.log('Drawing PNG logo in circle');
-            // Draw PNG logo in the white circle
+            // Draw PNG logo in the white circle - larger and more inward
             this.ctx.save();
             this.ctx.beginPath();
-            this.ctx.arc(146, 146, 16, 0, Math.PI * 2);
+            this.ctx.arc(138, 138, 22, 0, Math.PI * 2);
             this.ctx.clip();
-            // Center the logo in the circle
-            this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
+            // Center the logo in the circle - larger size (44x44 instead of 32x32)
+            this.ctx.drawImage(this.logoImage, 116, 116, 44, 44);
             this.ctx.restore();
             console.log('PNG logo drawn successfully');
           } else {
             console.log('logoImage is null, drawing fallback text');
             // Fallback to EYV text
-            this.ctx.font = 'bold 12px Inter, sans-serif';
+            this.ctx.font = 'bold 14px Inter, sans-serif';
             this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
-            this.ctx.fillText('EYV', 146, 146);
+            this.ctx.fillText('EYV', 138, 138);
           }
           
           // Convert to blob
