@@ -12,6 +12,7 @@ export const downloads = pgTable("downloads", {
   id: serial("id").primaryKey(),
   profileImage: text("profile_image").notNull(),
   ipAddress: text("ip_address").notNull(),
+  eyvMessage: text("eyv_message"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -23,6 +24,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertDownloadSchema = createInsertSchema(downloads).pick({
   profileImage: true,
   ipAddress: true,
+  eyvMessage: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

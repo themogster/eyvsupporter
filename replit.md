@@ -103,6 +103,7 @@ Changelog:
 - July 05, 2025: Successfully integrated EYV logo (PNG format) in header and profile picture processing. Fixed Chrome preview compatibility issues - app works perfectly in Edge and new browser tabs
 - July 05, 2025: Added database logging for downloads - saves base64 image, timestamp, and IP address to PostgreSQL
 - July 05, 2025: Removed PWA support - eliminated service worker, manifest, install prompts, and offline features
+- July 05, 2025: Enhanced database logging with eyv_message field to track curved text selections ("supporting", "donated", or "none")
 ```
 
 ## User Preferences

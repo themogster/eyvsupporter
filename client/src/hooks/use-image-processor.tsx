@@ -88,6 +88,9 @@ export function useImageProcessor() {
           },
           body: JSON.stringify({
             profileImage: base64Image,
+            eyvMessage: curvedText === 'supporting' ? "I'M SUPPORTING EARLY YEARS VOICE" : 
+                       curvedText === 'donated' ? "I DONATED TO EARLY YEARS VOICE" : 
+                       "none",
           }),
         });
         
