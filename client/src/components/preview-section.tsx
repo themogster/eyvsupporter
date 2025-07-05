@@ -1,10 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ProcessedImage, ImageTransform, CurvedTextOption, TextColor } from '@/lib/image-utils';
-import { ImageTransformControls } from './image-transform-controls';
 
 function getColorName(color: TextColor): string {
   const colorNames: Record<TextColor, string> = {
@@ -37,6 +36,8 @@ interface PreviewSectionProps {
 
 export function PreviewSection({ processedImage, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, onStartOver, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (processedImage && canvasRef.current) {
@@ -47,6 +48,97 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       }
     }
   }, [processedImage]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
+    
+    setIsDragging(true);
+    const rect = canvasRef.current.getBoundingClientRect();
+    setDragStart({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !canvasRef.current) return;
+    
+    const rect = canvasRef.current.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    
+    const deltaX = (currentX - dragStart.x) / rect.width * 2; // Scale to canvas coordinates
+    const deltaY = (currentY - dragStart.y) / rect.height * 2;
+    
+    const newTransform: ImageTransform = {
+      ...transform,
+      offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX)),
+      offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY))
+    };
+    
+    onTransformChange(newTransform);
+    
+    setDragStart({ x: currentX, y: currentY });
+  }, [isDragging, dragStart, transform, onTransformChange]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!canvasRef.current || e.touches.length !== 1) return;
+    
+    setIsDragging(true);
+    const rect = canvasRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    setDragStart({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    });
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling
+    if (!isDragging || !canvasRef.current || e.touches.length !== 1) return;
+    
+    const rect = canvasRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const currentX = touch.clientX - rect.left;
+    const currentY = touch.clientY - rect.top;
+    
+    const deltaX = (currentX - dragStart.x) / rect.width * 2;
+    const deltaY = (currentY - dragStart.y) / rect.height * 2;
+    
+    const newTransform: ImageTransform = {
+      ...transform,
+      offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX)),
+      offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY))
+    };
+    
+    onTransformChange(newTransform);
+    
+    setDragStart({ x: currentX, y: currentY });
+  }, [isDragging, dragStart, transform, onTransformChange]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    const scaleStep = 0.1;
+    const delta = e.deltaY > 0 ? -scaleStep : scaleStep;
+    
+    const newScale = Math.max(0.5, Math.min(3, transform.scale + delta));
+    
+    const newTransform: ImageTransform = {
+      ...transform,
+      scale: newScale
+    };
+    
+    onTransformChange(newTransform);
+  }, [transform, onTransformChange]);
 
   return (
     <div className="space-y-4">
@@ -64,8 +156,16 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
                   ref={canvasRef}
                   width={180}
                   height={180}
-                  className="w-full h-full rounded-full shadow-lg"
+                  className={`w-full h-full rounded-full shadow-lg cursor-move select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                   style={{ imageRendering: 'crisp-edges' }}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onWheel={handleWheel}
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 rounded-full animate-pulse" />
@@ -76,6 +176,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
           <div className="mt-4 text-sm text-gray-600">
             <p>Optimized for Facebook (180x180px)</p>
             <p className="text-xs mt-1">Circular frame with EYV branding applied</p>
+            <p className="text-xs mt-2 text-blue-600 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
           </div>
         </div>
 
@@ -142,13 +243,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
 
 
       </Card>
-
-      {/* Transform Controls */}
-      <ImageTransformControls
-        transform={transform}
-        onTransformChange={onTransformChange}
-        isProcessing={isProcessing}
-      />
 
       {/* Action Buttons */}
       <div className="space-y-3">
