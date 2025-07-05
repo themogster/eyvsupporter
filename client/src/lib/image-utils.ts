@@ -59,35 +59,37 @@ export class ImageProcessor {
   }
 
   private drawCurvedText(text: string, centerX: number, centerY: number, radius: number): void {
-    const fontSize = 11;
-    this.ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+    const fontSize = 10;
+    this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     this.ctx.fillStyle = '#ffffff';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
 
-    // Calculate text metrics for proper spacing
-    const textMetrics = this.ctx.measureText(text);
-    const textWidth = textMetrics.width;
+    // Calculate the arc length and angle per character
+    const chars = text.split('');
+    const totalChars = chars.length;
     
-    // Calculate angle per character based on text width and radius
-    const anglePerPixel = 1 / radius;
-    const totalAngle = textWidth * anglePerPixel;
-    const startAngle = Math.PI - (totalAngle / 2); // Start from bottom left of circle
+    // Use a fixed angle spread for better readability (about 120 degrees for the bottom arc)
+    const totalArcAngle = Math.PI * 0.67; // 120 degrees in radians
+    const angleStep = totalArcAngle / (totalChars - 1);
+    const startAngle = Math.PI * 0.67; // Start from bottom left (120 degrees from top)
     
-    // Draw each character along the curve
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      const charWidth = this.ctx.measureText(char).width;
-      const charAngle = startAngle + (i * charWidth + charWidth / 2) * anglePerPixel;
+    // Draw each character
+    for (let i = 0; i < totalChars; i++) {
+      const char = chars[i];
+      if (char === ' ') continue; // Skip spaces but keep position
       
-      // Calculate position for this character
-      const x = centerX + Math.cos(charAngle) * radius;
-      const y = centerY + Math.sin(charAngle) * radius;
+      const angle = startAngle + (i * angleStep);
       
-      // Save context and rotate for character
+      // Calculate position
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      // Save context and position/rotate for character
       this.ctx.save();
       this.ctx.translate(x, y);
-      this.ctx.rotate(charAngle + Math.PI / 2); // Rotate to be perpendicular to curve
+      // Rotate so text reads naturally along the curve (tangent to circle)
+      this.ctx.rotate(angle + Math.PI / 2);
       this.ctx.fillText(char, 0, 0);
       this.ctx.restore();
     }
