@@ -27,28 +27,20 @@ export class ImageProcessor {
   }
 
   private async loadDefaultLogo(): Promise<void> {
-    try {
-      // Use dynamic import to get the EYV logo
-      const logoModule = await import('@assets/EYV Logo 4.svg');
-      const logoUrl = logoModule.default;
-      
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-          this.logoImage = img;
-          console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
-          resolve();
-        };
-        img.onerror = (error) => {
-          console.error('Failed to load EYV logo image:', error);
-          reject(error);
-        };
-        img.src = logoUrl;
-      });
-    } catch (error) {
-      console.warn('Failed to load default logo:', error);
-      throw error;
-    }
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        this.logoImage = img;
+        console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
+        resolve();
+      };
+      img.onerror = (error) => {
+        console.error('Failed to load EYV logo image:', error);
+        reject(error);
+      };
+      // Load from public directory
+      img.src = '/eyv-logo.svg';
+    });
   }
 
   async setLogo(logoFile: File): Promise<void> {
