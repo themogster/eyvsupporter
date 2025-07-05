@@ -9,7 +9,7 @@ export interface ImageTransform {
   offsetY: number;
 }
 
-export type CurvedTextOption = 'none' | 'supporting' | 'donated';
+export type CurvedTextOption = string;
 
 export type TextColor = '#ffffff' | '#000000' | '#ffff00' | '#ff0000' | '#00ff00' | '#0000ff' | '#ff8c00' | '#ff1493';
 
@@ -218,18 +218,9 @@ export class ImageProcessor {
           }
           
           // Draw curved text if specified
-          if (curvedText !== 'none') {
-            let textToDraw = '';
-            if (curvedText === 'supporting') {
-              textToDraw = "I'M SUPPORTING EARLY YEARS VOICE";
-            } else if (curvedText === 'donated') {
-              textToDraw = "I'VE DONATED, HAVE YOU?";
-            }
-            
-            if (textToDraw) {
-              console.log('Drawing curved text:', textToDraw);
-              this.drawCurvedText(textToDraw, 90, 90, 65, textColor, textPosition); // Center at 90,90 with radius 65
-            }
+          if (curvedText && curvedText !== 'none' && curvedText !== '') {
+            console.log('Drawing curved text:', curvedText);
+            this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition); // Center at 90,90 with radius 65
           }
           
           // Convert to blob
@@ -363,18 +354,9 @@ export class ImageProcessor {
           
           console.log('reprocessWithTransform - curvedText:', curvedText, 'textColor:', textColor, 'textPosition:', textPosition);
           
-          if (curvedText !== 'none') {
-            let textToDraw = '';
-            if (curvedText === 'supporting') {
-              textToDraw = "I'M SUPPORTING EARLY YEARS VOICE";
-            } else if (curvedText === 'donated') {
-              textToDraw = "I'VE DONATED, HAVE YOU?";
-            }
-            
-            if (textToDraw) {
-              console.log('reprocessWithTransform - Drawing curved text:', textToDraw);
-              this.drawCurvedText(textToDraw, 90, 90, 65, textColor, textPosition);
-            }
+          if (curvedText && curvedText !== 'none' && curvedText !== '') {
+            console.log('reprocessWithTransform - Drawing curved text:', curvedText);
+            this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition);
           }
         } else {
           console.log('reprocessWithTransform - No options provided, skipping text');

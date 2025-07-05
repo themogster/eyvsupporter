@@ -1,6 +1,6 @@
-import { users, downloads, type User, type InsertUser, type Download, type InsertDownload } from "@shared/schema";
+import { users, downloads, messages, type User, type InsertUser, type Download, type InsertDownload, type Message } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -10,6 +10,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   logDownload(download: InsertDownload): Promise<Download>;
+  getMessages(): Promise<Message[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -37,6 +38,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertDownload)
       .returning();
     return download;
+  }
+
+  async getMessages(): Promise<Message[]> {
+    const messageList = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.isActive, true))
+      .orderBy(asc(messages.sortOrder));
+    return messageList;
   }
 }
 

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ProcessedImage, ImageTransform, CurvedTextOption, TextColor } from '@/lib/image-utils';
+import type { Message } from '@shared/schema';
 
 function getColorName(color: TextColor): string {
   const colorNames: Record<TextColor, string> = {
@@ -38,6 +40,18 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  // Fetch messages from the database
+  const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
+    queryKey: ['/api/messages'],
+    queryFn: async () => {
+      const response = await fetch('/api/messages');
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      return response.json();
+    },
+  });
 
   useEffect(() => {
     if (processedImage && canvasRef.current) {
@@ -209,15 +223,21 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
               <SelectValue placeholder="Choose text option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">No text</SelectItem>
-              <SelectItem value="supporting">I'M SUPPORTING EARLY YEARS VOICE</SelectItem>
-              <SelectItem value="donated">I'VE DONATED, HAVE YOU?</SelectItem>
+              {messagesLoading ? (
+                <SelectItem value="" disabled>Loading messages...</SelectItem>
+              ) : (
+                messages.map((message) => (
+                  <SelectItem key={message.id} value={message.messageText}>
+                    {message.displayText}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>
 
         {/* Text Color Picker */}
-        {curvedText !== 'none' && (
+        {curvedText && curvedText !== '' && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Text Color
@@ -241,7 +261,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         )}
 
         {/* Text Position Slider */}
-        {curvedText !== 'none' && (
+        {curvedText && curvedText !== '' && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Text Position (0° = right, 90° = top, 180° = left, 270° = bottom)

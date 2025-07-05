@@ -11,7 +11,7 @@ export function useImageProcessor() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
 
-  const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
+  const [curvedText, setCurvedText] = useState<CurvedTextOption>('');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
   const { toast } = useToast();
@@ -88,9 +88,7 @@ export function useImageProcessor() {
           },
           body: JSON.stringify({
             profileImage: base64Image,
-            eyvMessage: curvedText === 'supporting' ? "I'M SUPPORTING EARLY YEARS VOICE" : 
-                       curvedText === 'donated' ? "I DONATED TO EARLY YEARS VOICE" : 
-                       "none",
+            eyvMessage: curvedText || "none",
           }),
         });
         
@@ -244,7 +242,7 @@ export function useImageProcessor() {
     setProcessedImage(null);
     setIsProcessing(false);
     setTransform({ scale: 1, offsetX: 0, offsetY: 0 });
-    setCurvedText('none');
+    setCurvedText('');
     setTextColor('#ffffff');
     setTextPosition(30);
   }, []);
