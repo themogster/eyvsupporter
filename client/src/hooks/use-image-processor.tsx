@@ -13,7 +13,7 @@ export function useImageProcessor() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
-  const [textPosition, setTextPosition] = useState<number>(90); // 90 degrees = top of circle
+  const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
   const { toast } = useToast();
 
   // Create a stable processor instance

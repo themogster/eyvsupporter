@@ -143,7 +143,7 @@ export class ImageProcessor {
           const imageTransform = options?.transform || { scale: 1, offsetX: 0, offsetY: 0 };
           const curvedText = options?.curvedText || 'none';
           const textColor = options?.textColor || '#ffffff';
-          const textPosition = options?.textPosition || 90; // Default to top (90 degrees)
+          const textPosition = options?.textPosition || 270; // Default to top (270 degrees)
           
           // Use transform values
           const scale = imageTransform.scale;
