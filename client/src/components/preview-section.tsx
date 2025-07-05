@@ -166,7 +166,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">2</div>
         <h2 className="text-lg font-semibold text-gray-800">Preview & Edit</h2>
       </div>
-
       <Card className="p-6">
         <div className="bg-gray-100 rounded-lg p-6 text-center">
           <div className="relative inline-block">
@@ -199,9 +198,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
 
         {/* Curved Text Selector */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Curved Text
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">EYV Message</label>
           <Select value={curvedText} onValueChange={onCurvedTextChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Choose text option" />
@@ -274,7 +271,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         </div>
 
       </Card>
-
       {/* Action Buttons */}
       <div className="space-y-3">
         <Button
