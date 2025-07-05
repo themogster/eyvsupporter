@@ -31,7 +31,15 @@ export class ImageProcessor {
       const img = new Image();
       img.onload = () => {
         this.logoImage = img;
-        console.log('EYV logo loaded successfully:', img.width, 'x', img.height);
+        console.log('EYV logo loaded successfully:', {
+          width: img.width,
+          height: img.height,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          src: img.src,
+          complete: img.complete
+        });
+        console.log('logoImage reference set:', this.logoImage !== null);
         resolve();
       };
       img.onerror = (error) => {
@@ -40,6 +48,7 @@ export class ImageProcessor {
       };
       // Load from public directory
       img.src = '/eyv-logo.svg';
+      console.log('Started loading logo from:', img.src);
     });
   }
 
@@ -64,8 +73,9 @@ export class ImageProcessor {
     // Wait for logo to load before processing
     try {
       await this.logoLoadPromise;
+      console.log('Logo load promise resolved, logoImage state:', this.logoImage !== null);
     } catch (error) {
-      console.warn('Logo failed to load, proceeding with text fallback');
+      console.warn('Logo failed to load, proceeding with text fallback', error);
     }
     
     return new Promise((resolve, reject) => {
@@ -130,16 +140,28 @@ export class ImageProcessor {
           
           // Draw logo image or fallback text
           if (this.logoImage) {
-            console.log('Drawing EYV logo image');
-            // Draw uploaded logo SVG
+            console.log('Drawing EYV logo image', {
+              logoWidth: this.logoImage.width,
+              logoHeight: this.logoImage.height,
+              naturalWidth: this.logoImage.naturalWidth,
+              naturalHeight: this.logoImage.naturalHeight
+            });
+            // Draw uploaded logo SVG - make it larger and more visible
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(146, 146, 16, 0, Math.PI * 2);
             this.ctx.clip();
-            this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
+            // Draw logo larger to ensure visibility
+            this.ctx.drawImage(this.logoImage, 126, 126, 40, 40);
             this.ctx.restore();
+            
+            // Also draw without clipping for debugging
+            console.log('Also drawing logo without clipping for debugging');
+            this.ctx.globalAlpha = 0.5;
+            this.ctx.drawImage(this.logoImage, 10, 10, 50, 50);
+            this.ctx.globalAlpha = 1.0;
           } else {
-            console.log('Drawing fallback EYV text');
+            console.log('Drawing fallback EYV text - logoImage is null');
             // Fallback to EYV text
             this.ctx.font = 'bold 12px Inter, sans-serif';
             this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
