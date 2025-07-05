@@ -20,6 +20,25 @@ export class ImageProcessor {
     this.canvas.width = 180;
     this.canvas.height = 180;
     this.ctx = this.canvas.getContext('2d')!;
+    
+    // Load default EYV logo
+    this.loadDefaultLogo();
+  }
+
+  private async loadDefaultLogo(): Promise<void> {
+    try {
+      // Use dynamic import to get the EYV logo
+      const logoModule = await import('@assets/EYV Logo 4.svg');
+      const logoUrl = logoModule.default;
+      
+      const img = new Image();
+      img.onload = () => {
+        this.logoImage = img;
+      };
+      img.src = logoUrl;
+    } catch (error) {
+      console.warn('Failed to load default logo:', error);
+    }
   }
 
   async setLogo(logoFile: File): Promise<void> {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a React-based web application that allows users to create EYV-branded Facebook profile pictures. The application provides a mobile-first, progressive interface where users can upload images or capture photos using their device camera, then automatically process them with EYV branding and circular cropping optimized for social media profile pictures.
+This is a React-based web application that allows users to create EYV-branded Facebook profile pictures. The application provides a mobile-first, progressive interface where users can upload images or capture photos using their device camera, then automatically process them with EYV branding and circular cropping optimized for social media profile pictures. Features include custom logo upload functionality with default EYV Logo 4.svg branding.
 
 ## System Architecture
 
@@ -106,6 +106,7 @@ Changelog:
 - July 04, 2025: Initial setup with mobile-first React app
 - July 04, 2025: Implemented advanced image manipulation with scale/zoom and drag-to-reposition controls
 - July 04, 2025: Added Progressive Web App (PWA) features including service worker, manifest, install prompts, and offline support
+- July 05, 2025: Added SVG logo upload functionality with default EYV Logo 4.svg branding
 ```
 
 ## User Preferences
