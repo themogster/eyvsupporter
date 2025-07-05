@@ -224,7 +224,7 @@ export function useImageProcessor() {
 
     setIsProcessing(true);
     try {
-      const result = await processor.reprocessWithTransform(newTransform);
+      const result = await processor.reprocessWithTransform(newTransform, { curvedText, textColor, textPosition });
       setProcessedImage(result);
       setTransform(newTransform);
     } catch (error) {

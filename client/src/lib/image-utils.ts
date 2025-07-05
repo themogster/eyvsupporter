@@ -269,7 +269,7 @@ export class ImageProcessor {
     return this.canvas;
   }
 
-  async reprocessWithTransform(transform: ImageTransform): Promise<ProcessedImage> {
+  async reprocessWithTransform(transform: ImageTransform, options?: Pick<ProcessingOptions, 'curvedText' | 'textColor' | 'textPosition'>): Promise<ProcessedImage> {
     if (!this.originalImage) {
       throw new Error('No original image available for reprocessing');
     }
@@ -353,6 +353,26 @@ export class ImageProcessor {
           this.ctx.textAlign = 'center';
           this.ctx.textBaseline = 'middle';
           this.ctx.fillText('EYV', 138, 138);
+        }
+        
+        // Draw curved text if specified
+        if (options) {
+          const curvedText = options.curvedText || 'none';
+          const textColor = options.textColor || '#ffffff';
+          const textPosition = options.textPosition || 270;
+          
+          if (curvedText !== 'none') {
+            let textToDraw = '';
+            if (curvedText === 'supporting') {
+              textToDraw = "I'M SUPPORTING EARLY YEARS VOICE";
+            } else if (curvedText === 'donated') {
+              textToDraw = "I'VE DONATED, HAVE YOU?";
+            }
+            
+            if (textToDraw) {
+              this.drawCurvedText(textToDraw, 90, 90, 65, textColor, textPosition);
+            }
+          }
         }
         
         // Convert to blob
