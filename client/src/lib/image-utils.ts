@@ -46,7 +46,7 @@ export class ImageProcessor {
       };
       
       // Load PNG logo from public directory
-      img.src = '/eyv-logo.png';
+      img.src = '/logo.png';
       console.log('Started loading PNG logo from:', img.src);
     });
   }

@@ -14,7 +14,17 @@ export function useImageProcessor() {
   const { toast } = useToast();
 
   // Create a stable processor instance
-  const processor = useMemo(() => new ImageProcessor(), []);
+  const processor = useMemo(() => {
+    console.log('Creating new ImageProcessor instance');
+    try {
+      const instance = new ImageProcessor();
+      console.log('ImageProcessor created successfully');
+      return instance;
+    } catch (error) {
+      console.error('Failed to create ImageProcessor:', error);
+      throw error;
+    }
+  }, []);
 
   const setLogo = useCallback(async (file: File) => {
     // Validate SVG file
