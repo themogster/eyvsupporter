@@ -218,7 +218,7 @@ export class ImageProcessor {
           }
           
           // Draw curved text if specified
-          if (curvedText && curvedText !== 'none' && curvedText !== '') {
+          if (curvedText && curvedText !== 'none') {
             console.log('Drawing curved text:', curvedText);
             this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition); // Center at 90,90 with radius 65
           }
@@ -354,7 +354,7 @@ export class ImageProcessor {
           
           console.log('reprocessWithTransform - curvedText:', curvedText, 'textColor:', textColor, 'textPosition:', textPosition);
           
-          if (curvedText && curvedText !== 'none' && curvedText !== '') {
+          if (curvedText && curvedText !== 'none') {
             console.log('reprocessWithTransform - Drawing curved text:', curvedText);
             this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition);
           }

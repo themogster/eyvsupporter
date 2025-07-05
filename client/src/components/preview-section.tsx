@@ -237,7 +237,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         </div>
 
         {/* Text Color Picker */}
-        {curvedText && curvedText !== '' && (
+        {curvedText && curvedText !== 'none' && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Text Color
@@ -261,7 +261,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         )}
 
         {/* Text Position Slider */}
-        {curvedText && curvedText !== '' && (
+        {curvedText && curvedText !== 'none' && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Text Position (0° = right, 90° = top, 180° = left, 270° = bottom)
