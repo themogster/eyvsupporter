@@ -22,34 +22,29 @@ export class ImageProcessor {
     this.canvas.height = 180;
     this.ctx = this.canvas.getContext('2d')!;
     
-    // Load default EYV logo and store the promise
+    // Start loading the logo immediately
     this.logoLoadPromise = this.loadDefaultLogo();
   }
 
   private async loadDefaultLogo(): Promise<void> {
     return new Promise((resolve, reject) => {
       const img = new Image();
+      img.crossOrigin = "anonymous";  // Add this for better compatibility
+      
       img.onload = () => {
         this.logoImage = img;
-        console.log('EYV PNG logo loaded successfully');
+        console.log('EYV PNG logo loaded successfully, dimensions:', img.naturalWidth, 'x', img.naturalHeight);
         resolve();
       };
+      
       img.onerror = (error) => {
         console.error('Failed to load EYV logo image:', error);
         reject(error);
       };
+      
       // Load PNG logo from public directory
       img.src = '/eyv-logo.png';
       console.log('Started loading PNG logo from:', img.src);
-      
-      // Add debugging to check if image loads
-      img.addEventListener('load', () => {
-        console.log('PNG logo loaded successfully, dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-      });
-      
-      img.addEventListener('error', (e) => {
-        console.error('PNG logo failed to load:', e);
-      });
     });
   }
 
