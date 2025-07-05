@@ -20,32 +20,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <!-- Preview compatibility fallback -->
-    <div id="preview-fallback" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; font-family: Inter, sans-serif;">
-      <div style="text-align: center; max-width: 400px; padding: 20px;">
-        <div style="background: #6E1284; color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px;">
-          <img src="/logo.png" alt="EYV Logo" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
-          <h2 style="margin: 0; font-size: 24px;">EYV Support</h2>
-          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 14px;">Profile Picture Creator</p>
-        </div>
-        <p style="color: #666; margin-bottom: 20px; line-height: 1.5;">The preview window has compatibility issues. Please use the button below to open the app in a new tab where it works perfectly.</p>
-        <button onclick="window.open(window.location.href, '_blank')" style="background: #6E1284; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif;">
-          Open App in New Tab
-        </button>
-        <p style="color: #999; font-size: 12px; margin-top: 15px;">The app includes EYV logo branding and full photo editing functionality</p>
-      </div>
-    </div>
-
-    <script>
-      // Hide fallback if React loads successfully within 3 seconds
-      setTimeout(() => {
-        const fallback = document.getElementById('preview-fallback');
-        const root = document.getElementById('root');
-        if (root && root.children.length > 0 && fallback) {
-          fallback.remove();
-        }
-      }, 3000);
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
