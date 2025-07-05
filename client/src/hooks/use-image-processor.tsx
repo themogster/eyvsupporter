@@ -236,7 +236,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [originalImage, processor, toast]);
+  }, [originalImage, processor, toast, curvedText, textColor, textPosition]);
 
   const startOver = useCallback(() => {
     setCurrentStep('upload');
