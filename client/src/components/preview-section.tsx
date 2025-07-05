@@ -2,20 +2,36 @@ import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ProcessedImage, ImageTransform, CurvedTextOption } from '@/lib/image-utils';
+import { ProcessedImage, ImageTransform, CurvedTextOption, TextColor } from '@/lib/image-utils';
 import { ImageTransformControls } from './image-transform-controls';
+
+function getColorName(color: TextColor): string {
+  const colorNames: Record<TextColor, string> = {
+    '#ffffff': 'White',
+    '#000000': 'Black', 
+    '#ffff00': 'Yellow',
+    '#ff0000': 'Red',
+    '#00ff00': 'Green',
+    '#0000ff': 'Blue',
+    '#ff8c00': 'Orange',
+    '#ff1493': 'Pink'
+  };
+  return colorNames[color];
+}
 
 interface PreviewSectionProps {
   processedImage: ProcessedImage | null;
   transform: ImageTransform;
   curvedText: CurvedTextOption;
+  textColor: TextColor;
   onTransformChange: (transform: ImageTransform) => void;
   onCurvedTextChange: (option: CurvedTextOption) => void;
+  onTextColorChange: (color: TextColor) => void;
   onProceedToDownload: () => void;
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, transform, curvedText, onTransformChange, onCurvedTextChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, curvedText, textColor, onTransformChange, onCurvedTextChange, onTextColorChange, onProceedToDownload, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -75,6 +91,30 @@ export function PreviewSection({ processedImage, transform, curvedText, onTransf
             </SelectContent>
           </Select>
         </div>
+
+        {/* Text Color Picker */}
+        {curvedText !== 'none' && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Text Color
+            </label>
+            <div className="grid grid-cols-4 gap-2">
+              {(['#ffffff', '#000000', '#ffff00', '#ff0000', '#00ff00', '#0000ff', '#ff8c00', '#ff1493'] as TextColor[]).map((color) => (
+                <button
+                  key={color}
+                  onClick={() => onTextColorChange(color)}
+                  className={`w-12 h-12 rounded-full border-4 transition-all ${
+                    textColor === color 
+                      ? 'border-purple-600 scale-110' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  title={getColorName(color)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-3 mt-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">

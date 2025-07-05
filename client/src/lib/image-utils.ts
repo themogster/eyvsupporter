@@ -11,9 +11,12 @@ export interface ImageTransform {
 
 export type CurvedTextOption = 'none' | 'supporting' | 'donated';
 
+export type TextColor = '#ffffff' | '#000000' | '#ffff00' | '#ff0000' | '#00ff00' | '#0000ff' | '#ff8c00' | '#ff1493';
+
 export interface ProcessingOptions {
   transform?: ImageTransform;
   curvedText?: CurvedTextOption;
+  textColor?: TextColor;
 }
 
 export class ImageProcessor {
@@ -58,10 +61,10 @@ export class ImageProcessor {
     });
   }
 
-  private drawCurvedText(text: string, centerX: number, centerY: number, radius: number): void {
+  private drawCurvedText(text: string, centerX: number, centerY: number, radius: number, color: TextColor = '#ffffff'): void {
     const fontSize = 10;
     this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
-    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillStyle = color;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
 
@@ -69,10 +72,10 @@ export class ImageProcessor {
     const chars = text.split('');
     const totalChars = chars.length;
     
-    // Use a fixed angle spread for better readability (about 120 degrees for the bottom arc)
+    // Position text at the top of the circle - spread across about 120 degrees
     const totalArcAngle = Math.PI * 0.67; // 120 degrees in radians
     const angleStep = totalArcAngle / (totalChars - 1);
-    const startAngle = Math.PI * 0.67; // Start from bottom left (120 degrees from top)
+    const startAngle = Math.PI * 0.17; // Start from top left (about 30 degrees from top)
     
     // Draw each character
     for (let i = 0; i < totalChars; i++) {
@@ -135,6 +138,7 @@ export class ImageProcessor {
           // Extract transform and curved text options
           const imageTransform = options?.transform || { scale: 1, offsetX: 0, offsetY: 0 };
           const curvedText = options?.curvedText || 'none';
+          const textColor = options?.textColor || '#ffffff';
           
           // Use transform values
           const scale = imageTransform.scale;
@@ -219,7 +223,7 @@ export class ImageProcessor {
             
             if (textToDraw) {
               console.log('Drawing curved text:', textToDraw);
-              this.drawCurvedText(textToDraw, 90, 90, 65); // Center at 90,90 with radius 65
+              this.drawCurvedText(textToDraw, 90, 90, 65, textColor); // Center at 90,90 with radius 65
             }
           }
           
