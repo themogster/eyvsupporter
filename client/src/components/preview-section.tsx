@@ -106,6 +106,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!canvasRef.current || e.touches.length !== 1) return;
     
+    e.preventDefault(); // Prevent scrolling
     setIsDragging(true);
     const rect = canvasRef.current.getBoundingClientRect();
     const touch = e.touches[0];
@@ -138,7 +139,8 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
     setDragStart({ x: currentX, y: currentY });
   }, [isDragging, dragStart, transform, onTransformChange]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent any default behavior
     setIsDragging(false);
   }, []);
 
@@ -175,7 +177,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
                   width={180}
                   height={180}
                   className={`w-full h-full rounded-full shadow-lg cursor-move select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                  style={{ imageRendering: 'crisp-edges' }}
+                  style={{ imageRendering: 'crisp-edges', touchAction: 'none' }}
                   onMouseDown={handleMouseDown}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}

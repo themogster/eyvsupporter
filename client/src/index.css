@@ -118,6 +118,26 @@
   .text-green-800 {
     color: var(--green-800);
   }
+
+  /* Prevent scrolling on touch drag for canvas elements */
+  canvas {
+    touch-action: none;
+  }
+  
+  /* Prevent text selection during drag operations */
+  .cursor-grab, .cursor-grabbing {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Additional mobile touch optimization */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
   
   .bg-green-500 {
     background-color: var(--green-500);
