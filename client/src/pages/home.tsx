@@ -11,7 +11,9 @@ export default function Home() {
     processedImage,
     isProcessing,
     transform,
+    logoFile,
     processImage,
+    setLogo,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
@@ -35,6 +37,8 @@ export default function Home() {
         {currentStep === 'upload' && (
           <UploadSection
             onImageSelect={processImage}
+            onLogoSelect={setLogo}
+            logoFile={logoFile}
             isProcessing={isProcessing}
           />
         )}

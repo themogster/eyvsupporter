@@ -13,12 +13,30 @@ export class ImageProcessor {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private originalImage: HTMLImageElement | null = null;
+  private logoImage: HTMLImageElement | null = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
     this.canvas.width = 180;
     this.canvas.height = 180;
     this.ctx = this.canvas.getContext('2d')!;
+  }
+
+  async setLogo(logoFile: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          this.logoImage = img;
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(logoFile);
+    });
   }
 
   async processImage(imageFile: File, transform?: ImageTransform): Promise<ProcessedImage> {
@@ -73,7 +91,7 @@ export class ImageProcessor {
           this.ctx.lineWidth = 8;
           this.ctx.stroke();
           
-          // Draw EYV logo background circle
+          // Draw logo background circle
           this.ctx.beginPath();
           this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
           this.ctx.fillStyle = 'white';
@@ -82,12 +100,23 @@ export class ImageProcessor {
           this.ctx.lineWidth = 2;
           this.ctx.stroke();
           
-          // Draw EYV text
-          this.ctx.font = 'bold 12px Inter, sans-serif';
-          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText('EYV', 146, 146);
+          // Draw logo image or fallback text
+          if (this.logoImage) {
+            // Draw uploaded logo SVG
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(146, 146, 16, 0, Math.PI * 2);
+            this.ctx.clip();
+            this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
+            this.ctx.restore();
+          } else {
+            // Fallback to EYV text
+            this.ctx.font = 'bold 12px Inter, sans-serif';
+            this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('EYV', 146, 146);
+          }
           
           // Convert to blob
           this.canvas.toBlob((blob) => {
@@ -177,7 +206,7 @@ export class ImageProcessor {
         this.ctx.lineWidth = 8;
         this.ctx.stroke();
         
-        // Draw EYV logo background circle
+        // Draw logo background circle
         this.ctx.beginPath();
         this.ctx.arc(146, 146, 18, 0, Math.PI * 2);
         this.ctx.fillStyle = 'white';
@@ -186,12 +215,23 @@ export class ImageProcessor {
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
         
-        // Draw EYV text
-        this.ctx.font = 'bold 12px Inter, sans-serif';
-        this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('EYV', 146, 146);
+        // Draw logo image or fallback text
+        if (this.logoImage) {
+          // Draw uploaded logo SVG
+          this.ctx.save();
+          this.ctx.beginPath();
+          this.ctx.arc(146, 146, 16, 0, Math.PI * 2);
+          this.ctx.clip();
+          this.ctx.drawImage(this.logoImage, 130, 130, 32, 32);
+          this.ctx.restore();
+        } else {
+          // Fallback to EYV text
+          this.ctx.font = 'bold 12px Inter, sans-serif';
+          this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#6E1284';
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('EYV', 146, 146);
+        }
         
         // Convert to blob
         this.canvas.toBlob((blob) => {

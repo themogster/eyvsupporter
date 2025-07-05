@@ -1,17 +1,21 @@
 import { useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Upload } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Camera, Upload, ImageIcon } from 'lucide-react';
 import { getCameraStream, captureImageFromVideo } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
 
 interface UploadSectionProps {
   onImageSelect: (file: File) => void;
+  onLogoSelect?: (file: File) => void;
+  logoFile?: File | null;
   isProcessing: boolean;
 }
 
-export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProps) {
+export function UploadSection({ onImageSelect, onLogoSelect, logoFile, isProcessing }: UploadSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [showCamera, setShowCamera] = useState(false);
@@ -21,6 +25,13 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
     const file = event.target.files?.[0];
     if (file) {
       onImageSelect(file);
+    }
+  };
+
+  const handleLogoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && onLogoSelect) {
+      onLogoSelect(file);
     }
   };
 
@@ -150,6 +161,45 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
           </div>
         </Button>
       </div>
+
+      {/* Logo Upload Section */}
+      {onLogoSelect && (
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700">Custom Logo (Optional)</h3>
+            {logoFile && (
+              <Badge variant="secondary" className="text-xs">
+                {logoFile.name}
+              </Badge>
+            )}
+          </div>
+          
+          <Card
+            className="cursor-pointer hover:border-deep-purple transition-colors touch-manipulation"
+            onClick={() => logoInputRef.current?.click()}
+          >
+            <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center">
+              <ImageIcon className="w-6 h-6 text-gray-400 mb-2 mx-auto" />
+              <p className="text-sm text-gray-600 font-medium">
+                {logoFile ? 'Change Logo' : 'Upload SVG Logo'}
+              </p>
+              <p className="text-xs text-gray-500">SVG or PNG recommended</p>
+            </div>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/svg+xml,image/png,image/jpg,image/jpeg"
+              onChange={handleLogoSelect}
+              className="hidden"
+              disabled={isProcessing}
+            />
+          </Card>
+          
+          <p className="text-xs text-gray-500 mt-2">
+            Your logo will replace "EYV" text in the profile picture
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,10 +10,46 @@ export function useImageProcessor() {
   const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   // Create a stable processor instance
   const processor = useMemo(() => new ImageProcessor(), []);
+
+  const setLogo = useCallback(async (file: File) => {
+    // Validate SVG file
+    if (!file.type.includes('svg') && !file.type.includes('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please upload an SVG or image file for the logo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await processor.setLogo(file);
+      setLogoFile(file);
+      toast({
+        title: "Logo Uploaded",
+        description: "Your logo has been set successfully!",
+      });
+      
+      // Reprocess current image with new logo if one exists
+      if (originalImage) {
+        setIsProcessing(true);
+        const result = await processor.processImage(originalImage, transform);
+        setProcessedImage(result);
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload logo. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [processor, toast, originalImage, transform]);
 
   const processImage = useCallback(async (file: File) => {
     const validation = validateImageFile(file);
@@ -131,7 +167,9 @@ export function useImageProcessor() {
     processedImage,
     isProcessing,
     transform,
+    logoFile,
     processImage,
+    setLogo,
     proceedToDownload,
     downloadProcessedImage,
     shareImage,
