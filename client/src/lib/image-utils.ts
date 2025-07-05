@@ -420,15 +420,32 @@ export async function getCameraStream(): Promise<MediaStream> {
 export function captureImageFromVideo(video: HTMLVideoElement): Promise<File> {
   return new Promise((resolve, reject) => {
     try {
+      // Check if video is ready
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        reject(new Error('Video not ready for capture'));
+        return;
+      }
+      
+      // Check if video is playing
+      if (video.paused || video.ended) {
+        reject(new Error('Video is not playing'));
+        return;
+      }
+      
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
       
       // Set canvas size to video dimensions
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
       // Draw current video frame to canvas
-      ctx.drawImage(video, 0, 0);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       // Convert to blob then file
       canvas.toBlob((blob) => {
@@ -436,11 +453,11 @@ export function captureImageFromVideo(video: HTMLVideoElement): Promise<File> {
           const file = new File([blob], 'camera-capture.png', { type: 'image/png' });
           resolve(file);
         } else {
-          reject(new Error('Failed to capture image from camera'));
+          reject(new Error('Failed to create image blob'));
         }
       }, 'image/png', 0.9);
     } catch (error) {
-      reject(error);
+      reject(error instanceof Error ? error : new Error('Unknown capture error'));
     }
   });
 }

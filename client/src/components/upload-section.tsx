@@ -15,6 +15,7 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const { toast } = useToast();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +35,17 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        
+        // Wait for video to be ready before allowing interaction
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play();
+          }
+        };
+        
+        videoRef.current.onplaying = () => {
+          setVideoReady(true);
+        };
       }
     } catch (error) {
       toast({
@@ -46,16 +57,24 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
   };
 
   const capturePhoto = async () => {
-    if (!videoRef.current || !cameraStream) return;
+    if (!videoRef.current || !cameraStream) {
+      toast({
+        title: "Capture Failed",
+        description: "Camera not ready",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const file = await captureImageFromVideo(videoRef.current);
       onImageSelect(file);
       stopCamera();
     } catch (error) {
+      console.error('Camera capture error:', error);
       toast({
         title: "Capture Failed",
-        description: "Failed to capture photo from camera",
+        description: error instanceof Error ? error.message : "Failed to capture photo from camera",
         variant: "destructive",
       });
     }
@@ -67,6 +86,7 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       setCameraStream(null);
     }
     setShowCamera(false);
+    setVideoReady(false);
   };
 
   if (showCamera) {
@@ -91,9 +111,10 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
               onClick={capturePhoto}
               className="flex-1 bg-deep-purple hover:bg-purple-700 touch-manipulation"
               size="lg"
+              disabled={!videoReady}
             >
               <Camera className="w-4 h-4 mr-2" />
-              Capture Photo
+              {videoReady ? 'Capture Photo' : 'Camera Loading...'}
             </Button>
             
             <Button
