@@ -61,7 +61,7 @@ export class ImageProcessor {
   private drawCurvedText(text: string, centerX: number, centerY: number, radius: number): void {
     const fontSize = 11;
     this.ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-    this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
+    this.ctx.fillStyle = '#ffffff';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
 
