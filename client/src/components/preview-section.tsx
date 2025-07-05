@@ -58,32 +58,49 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     });
+    console.log('Mouse down - starting drag');
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || !canvasRef.current) return;
-    
-    const rect = canvasRef.current.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-    
-    const deltaX = (currentX - dragStart.x) / rect.width * 2; // Scale to canvas coordinates
-    const deltaY = (currentY - dragStart.y) / rect.height * 2;
-    
-    const newTransform: ImageTransform = {
-      ...transform,
-      offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX)),
-      offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY))
+  // Global mouse handlers for proper drag functionality
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !canvasRef.current) return;
+      
+      console.log('Global mouse move - dragging');
+      
+      const rect = canvasRef.current.getBoundingClientRect();
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+      
+      const deltaX = (currentX - dragStart.x) / rect.width;
+      const deltaY = (currentY - dragStart.y) / rect.height;
+      
+      const newTransform: ImageTransform = {
+        ...transform,
+        offsetX: Math.max(-1, Math.min(1, transform.offsetX + deltaX * 0.5)),
+        offsetY: Math.max(-1, Math.min(1, transform.offsetY + deltaY * 0.5))
+      };
+      
+      onTransformChange(newTransform);
+      
+      setDragStart({ x: currentX, y: currentY });
     };
-    
-    onTransformChange(newTransform);
-    
-    setDragStart({ x: currentX, y: currentY });
-  }, [isDragging, dragStart, transform, onTransformChange]);
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+    const handleGlobalMouseUp = () => {
+      console.log('Global mouse up - stopping drag');
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, dragStart, transform, onTransformChange]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!canvasRef.current || e.touches.length !== 1) return;
@@ -159,9 +176,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
                   className={`w-full h-full rounded-full shadow-lg cursor-move select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                   style={{ imageRendering: 'crisp-edges' }}
                   onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
@@ -241,6 +255,20 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
           </div>
         )}
 
+        {/* Zoom Control */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Zoom ({(transform.scale * 100).toFixed(0)}%)
+          </label>
+          <Slider
+            value={[transform.scale]}
+            onValueChange={(value) => onTransformChange({ ...transform, scale: value[0] })}
+            max={3}
+            min={0.5}
+            step={0.1}
+            className="w-full"
+          />
+        </div>
 
       </Card>
 
