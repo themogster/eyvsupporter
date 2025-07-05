@@ -10,11 +10,11 @@ if (!rootElement) {
 } else {
   console.log('Root element found, creating React app');
   
-  // Remove temporary header when React loads
-  const tempHeader = document.getElementById('temp-header');
-  if (tempHeader) {
-    tempHeader.remove();
-    console.log('Removed temporary header');
+  // Remove loading indicator when React loads
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.remove();
+    console.log('Removed loading indicator - React app loaded');
   }
   
   createRoot(rootElement).render(<App />);

@@ -45,10 +45,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <!-- Temporary header with logo until React loads -->
-    <div id="temp-header" style="background: #6E1284; color: white; padding: 24px; display: flex; justify-content: space-between; align-items: center;">
-      <h1 style="margin: 0; font-size: 24px; font-weight: bold; font-family: Inter, sans-serif;">EYV Support</h1>
-      <img src="/logo.png" alt="EYV Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onload="console.log('Header logo loaded!')" onerror="console.log('Header logo failed!')">
+    <!-- Loading indicator -->
+    <div id="loading-indicator" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; font-family: Inter, sans-serif;">
+      <div style="text-align: center;">
+        <div style="background: #6E1284; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="margin: 0;">EYV Support</h2>
+          <p style="margin: 10px 0 0 0; opacity: 0.8;">Loading...</p>
+        </div>
+      </div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
