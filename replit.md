@@ -107,6 +107,7 @@ Changelog:
 - July 04, 2025: Implemented advanced image manipulation with scale/zoom and drag-to-reposition controls
 - July 04, 2025: Added Progressive Web App (PWA) features including service worker, manifest, install prompts, and offline support
 - July 05, 2025: Added SVG logo upload functionality with default EYV Logo 4.svg branding
+- July 05, 2025: Successfully integrated EYV logo (PNG format) in header and profile picture processing. Fixed Chrome preview compatibility issues - app works perfectly in Edge and new browser tabs
 ```
 
 ## User Preferences
