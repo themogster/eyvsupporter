@@ -28,56 +28,74 @@ export function useFacebookAuth() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
-    console.log('Environment check - Facebook App ID:', appId ? 'Found' : 'Not found');
-    console.log('All env vars:', import.meta.env);
-
-    // Check if FB is already loaded
-    if (window.FB) {
-      console.log('Facebook SDK already loaded');
-      setIsInitialized(true);
-      return;
-    }
-
-    // Set up Facebook SDK initialization
-    window.fbAsyncInit = function() {
-      console.log('fbAsyncInit called, App ID:', appId);
-      
-      if (!appId) {
-        console.error('Facebook App ID not found in environment variables');
-        setError('Facebook App ID not configured');
-        return;
-      }
-      
+    const initializeFacebook = async () => {
       try {
-        window.FB.init({
-          appId: appId,
-          cookie: true,
-          xfbml: true,
-          version: 'v19.0'
-        });
+        // Fetch Facebook App ID from server
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        const appId = config.facebookAppId;
+        
+        console.log('Facebook App ID from server:', appId ? 'Found' : 'Not found');
 
-        console.log('Facebook SDK initialized successfully with App ID:', appId);
-        setIsInitialized(true);
+        if (!appId) {
+          console.error('Facebook App ID not configured on server');
+          setError('Facebook App ID not configured');
+          return;
+        }
+
+        // Check if FB is already loaded
+        if (window.FB) {
+          console.log('Facebook SDK already loaded, re-initializing...');
+          window.FB.init({
+            appId: appId,
+            cookie: true,
+            xfbml: true,
+            version: 'v19.0'
+          });
+          setIsInitialized(true);
+          return;
+        }
+
+        // Set up Facebook SDK initialization
+        window.fbAsyncInit = function() {
+          console.log('fbAsyncInit called, App ID:', appId);
+          
+          try {
+            window.FB.init({
+              appId: appId,
+              cookie: true,
+              xfbml: true,
+              version: 'v19.0'
+            });
+
+            console.log('Facebook SDK initialized successfully with App ID:', appId);
+            setIsInitialized(true);
+          } catch (error) {
+            console.error('Facebook SDK initialization error:', error);
+            setError('Failed to initialize Facebook SDK');
+          }
+        };
+
+        // Load SDK if not already present
+        const existingScript = document.getElementById('facebook-jssdk');
+        if (!existingScript) {
+          console.log('Loading Facebook SDK script...');
+          const script = document.createElement('script');
+          script.id = 'facebook-jssdk';
+          script.src = 'https://connect.facebook.net/en_US/sdk.js';
+          script.onload = () => console.log('Facebook SDK script loaded');
+          script.onerror = () => console.error('Failed to load Facebook SDK script');
+          document.head.appendChild(script);
+        } else {
+          console.log('Facebook SDK script already exists');
+        }
       } catch (error) {
-        console.error('Facebook SDK initialization error:', error);
-        setError('Failed to initialize Facebook SDK');
+        console.error('Failed to fetch Facebook App ID:', error);
+        setError('Failed to load Facebook configuration');
       }
     };
 
-    // Load SDK if not already present
-    const existingScript = document.getElementById('facebook-jssdk');
-    if (!existingScript) {
-      console.log('Loading Facebook SDK script...');
-      const script = document.createElement('script');
-      script.id = 'facebook-jssdk';
-      script.src = 'https://connect.facebook.net/en_US/sdk.js';
-      script.onload = () => console.log('Facebook SDK script loaded');
-      script.onerror = () => console.error('Failed to load Facebook SDK script');
-      document.head.appendChild(script);
-    } else {
-      console.log('Facebook SDK script already exists');
-    }
+    initializeFacebook();
   }, []);
 
   const loginAndGetProfilePicture = useCallback(async (): Promise<string | null> => {

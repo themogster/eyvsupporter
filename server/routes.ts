@@ -4,6 +4,13 @@ import { storage } from "./storage";
 import { insertDownloadSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Get Facebook App ID for frontend
+  app.get("/api/config", async (req, res) => {
+    res.json({
+      facebookAppId: process.env.FACEBOOK_APP_ID || null
+    });
+  });
+
   // Get messages for dropdown
   app.get("/api/messages", async (req, res) => {
     try {
