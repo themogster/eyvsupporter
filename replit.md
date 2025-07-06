@@ -106,6 +106,7 @@ Changelog:
 - July 05, 2025: Enhanced database logging with eyv_message field to track curved text selections ("supporting", "donated", or "none")
 - July 05, 2025: Created dynamic messages table with database-driven dropdown, "No text" option hardcoded as first item
 - July 05, 2025: Fixed IP address logging to capture real client IP from proxy headers instead of localhost
+- July 05, 2025: Added Facebook Login integration allowing users to import their current profile pictures directly
 ```
 
 ## User Preferences

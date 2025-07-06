@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Camera, Upload } from 'lucide-react';
 import { getCameraStream, captureImageFromVideo } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
+import { useFacebookAuth } from '@/hooks/use-facebook-auth';
+import { SiFacebook } from 'react-icons/si';
 
 interface UploadSectionProps {
   onImageSelect: (file: File) => void;
@@ -17,6 +19,7 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
   const [showCamera, setShowCamera] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const { toast } = useToast();
+  const { loginAndGetProfilePicture, isLoading: fbLoading, error: fbError } = useFacebookAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -113,6 +116,32 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
     setVideoReady(false);
   };
 
+  const importFromFacebook = async () => {
+    try {
+      const imageUrl = await loginAndGetProfilePicture();
+      if (imageUrl) {
+        // Convert the Facebook image URL to a File object
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'facebook-profile-picture.jpg', { type: 'image/jpeg' });
+        
+        onImageSelect(file);
+        
+        toast({
+          title: "Success!",
+          description: "Your Facebook profile picture has been imported.",
+        });
+      }
+    } catch (error) {
+      console.error('Facebook import error:', error);
+      toast({
+        title: "Import Failed",
+        description: error instanceof Error ? error.message : "Could not import Facebook profile picture",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (showCamera) {
     return (
       <div className="space-y-4">
@@ -196,9 +225,29 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
             <p className="text-sm text-gray-500">Use your camera</p>
           </div>
         </Button>
+
+        {/* Facebook Import */}
+        <Button
+          onClick={importFromFacebook}
+          variant="outline"
+          className="w-full p-6 h-auto bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300 touch-manipulation"
+          disabled={isProcessing || fbLoading}
+        >
+          <div className="text-center">
+            <SiFacebook className="w-8 h-8 text-blue-600 mb-3 mx-auto" />
+            <p className="text-blue-700 font-medium mb-1">
+              {fbLoading ? 'Importing...' : 'Import from Facebook'}
+            </p>
+            <p className="text-sm text-blue-600">Use your current profile picture</p>
+          </div>
+        </Button>
       </div>
 
-
+      {fbError && (
+        <div className="text-red-600 text-sm text-center mt-2">
+          {fbError}
+        </div>
+      )}
     </div>
   );
 }
