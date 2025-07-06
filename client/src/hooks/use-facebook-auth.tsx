@@ -28,34 +28,55 @@ export function useFacebookAuth() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
+    console.log('Environment check - Facebook App ID:', appId ? 'Found' : 'Not found');
+    console.log('All env vars:', import.meta.env);
+
     // Check if FB is already loaded
     if (window.FB) {
+      console.log('Facebook SDK already loaded');
       setIsInitialized(true);
       return;
     }
 
     // Set up Facebook SDK initialization
     window.fbAsyncInit = function() {
-      const appId = import.meta.env.VITE_FACEBOOK_APP_ID || 'your-app-id';
+      console.log('fbAsyncInit called, App ID:', appId);
       
-      window.FB.init({
-        appId: appId,
-        cookie: true,
-        xfbml: true,
-        version: 'v18.0'
-      });
+      if (!appId) {
+        console.error('Facebook App ID not found in environment variables');
+        setError('Facebook App ID not configured');
+        return;
+      }
+      
+      try {
+        window.FB.init({
+          appId: appId,
+          cookie: true,
+          xfbml: true,
+          version: 'v19.0'
+        });
 
-      console.log('Facebook SDK initialized with App ID:', appId);
-      setIsInitialized(true);
+        console.log('Facebook SDK initialized successfully with App ID:', appId);
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Facebook SDK initialization error:', error);
+        setError('Failed to initialize Facebook SDK');
+      }
     };
 
     // Load SDK if not already present
     const existingScript = document.getElementById('facebook-jssdk');
     if (!existingScript) {
+      console.log('Loading Facebook SDK script...');
       const script = document.createElement('script');
       script.id = 'facebook-jssdk';
       script.src = 'https://connect.facebook.net/en_US/sdk.js';
+      script.onload = () => console.log('Facebook SDK script loaded');
+      script.onerror = () => console.error('Failed to load Facebook SDK script');
       document.head.appendChild(script);
+    } else {
+      console.log('Facebook SDK script already exists');
     }
   }, []);
 
