@@ -113,6 +113,10 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   const switchToRegistration = () => {
     setIsLogin(false);
     resetRegistration();
+    // Ensure we start at step 0 for registration
+    if (registrationStep === 0) {
+      // No action needed, already at step 0
+    }
   };
 
   const switchToLogin = () => {
@@ -218,9 +222,8 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
                   <User className="w-12 h-12 text-deep-purple mx-auto mb-4" />
                   <p className="text-gray-600 mb-4">Ready to create your account?</p>
                   <Button
-                    onClick={() => registerStep1Mutation.reset()}
+                    onClick={() => setRegistrationStep(1)}
                     className="w-full bg-deep-purple hover:bg-purple-700"
-                    disabled={registerStep1Mutation.isPending}
                   >
                     Get Started
                     <ArrowRight className="w-4 h-4 ml-2" />

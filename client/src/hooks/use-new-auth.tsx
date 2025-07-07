@@ -63,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await apiRequest("POST", "/api/register/step1", data);
       return await res.json();
     },
-    onSuccess: (data) => {
-      setPendingEmail(data.email || pendingEmail);
+    onSuccess: (data, variables) => {
+      setPendingEmail(variables.email);
       setRegistrationStep(2);
       toast({
         title: "Code sent",
