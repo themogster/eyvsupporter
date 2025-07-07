@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, Search, Filter, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import type { Download as DownloadType } from "@shared/schema";
@@ -194,6 +194,9 @@ export default function AdminDownloads() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Profile Picture Preview</DialogTitle>
+            <DialogDescription>
+              Full size view of the downloaded profile picture
+            </DialogDescription>
           </DialogHeader>
           <div className="flex justify-center p-4">
             {selectedImage && (

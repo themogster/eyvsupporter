@@ -124,6 +124,8 @@ Changelog:
   • Replaced Quick Actions panel with Top 5 Text Messages panel showing most popular curved text selections
   • Updated Recent Downloads panel to display last 10 downloads instead of 5
   • Fixed database field mapping issues and date formatting errors for proper data display
+  • Added profile picture previews in Recent Downloads panel replacing generic download icons
+  • Implemented modal image viewer in Downloads section showing 2x size (320px) circular previews
 ```
 
 ## User Preferences
