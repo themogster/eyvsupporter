@@ -39,34 +39,39 @@ export default function Home() {
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen shadow-lg">
       {/* Header */}
-      <div className="bg-deep-purple text-white p-6 pb-8 relative">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <img 
-              src="/logo.png" 
-              alt="EYV Logo" 
-              className="w-16 h-16 rounded-full object-cover"
-              onError={(e) => {
-                console.log('Header logo failed to load');
-                e.currentTarget.style.display = 'none';
-              }}
-              onLoad={() => console.log('Header logo loaded successfully')}
-            />
-            <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
+      <div className="bg-deep-purple text-white">
+        <div className="p-6 pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/logo.png" 
+                alt="EYV Logo" 
+                className="w-16 h-16 rounded-full object-cover"
+                onError={(e) => {
+                  console.log('Header logo failed to load');
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => console.log('Header logo loaded successfully')}
+              />
+              <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAdminModalOpen(true)}
+                className="text-white hover:bg-purple-600 p-2"
+                title="Admin Access"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAdminModalOpen(true)}
-              className="text-white hover:bg-purple-600 p-2"
-              title="Admin Access"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
+          <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
         </div>
-        <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
+        
+        {/* Top Level Admin Navigation */}
+        <AdminNav />
       </div>
       {/* Main Content */}
       <div className="p-6 space-y-6 pb-20">
@@ -118,9 +123,6 @@ export default function Home() {
         isOpen={isAdminModalOpen} 
         onClose={() => setIsAdminModalOpen(false)} 
       />
-      
-      {/* Admin Navigation */}
-      <AdminNav />
     </div>
   );
 }

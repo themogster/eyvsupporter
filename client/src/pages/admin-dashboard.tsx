@@ -296,9 +296,6 @@ export default function AdminDashboard() {
           </Card>
         </div>
       </div>
-      
-      {/* Admin Navigation */}
-      <AdminNav />
     </div>
   );
 }

@@ -34,29 +34,31 @@ export function AdminNav() {
   const [location] = useLocation();
 
   return (
-    <div className="bg-white border-b border-gray-200 mb-6 -mx-6 px-6 py-4">
-      <nav className="flex space-x-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location === item.href;
-          
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-purple-100 text-purple-700 border border-purple-200"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              )}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+    <div className="bg-purple-800 border-t border-purple-600">
+      <div className="max-w-md mx-auto">
+        <nav className="flex overflow-x-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href;
+            
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center space-x-1 px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap",
+                  isActive
+                    ? "bg-purple-600 text-white border-b-2 border-white"
+                    : "text-purple-200 hover:text-white hover:bg-purple-700"
+                )}
+              >
+                <Icon className="w-3 h-3" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }
