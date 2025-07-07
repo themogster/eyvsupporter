@@ -37,7 +37,7 @@ export default function Home() {
   } = useImageProcessor();
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen shadow-lg">
+    <div className="light max-w-md mx-auto bg-white min-h-screen shadow-lg">
       {/* Header */}
       <div className="bg-deep-purple text-white">
         <div className="p-6 pb-4">

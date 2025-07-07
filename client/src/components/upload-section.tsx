@@ -167,10 +167,10 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       <div className="grid grid-cols-1 gap-4">
         {/* File Upload */}
         <Card
-          className="cursor-pointer hover:border-deep-purple transition-colors touch-manipulation"
+          className="cursor-pointer hover:border-deep-purple transition-colors touch-manipulation bg-white"
           onClick={() => fileInputRef.current?.click()}
         >
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
             <Upload className="w-8 h-8 text-gray-400 mb-3 mx-auto" />
             <p className="text-gray-600 font-medium mb-1">Choose from Gallery</p>
             <p className="text-sm text-gray-500">JPG, PNG, WEBP up to 10MB</p>
