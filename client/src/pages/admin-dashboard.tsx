@@ -136,7 +136,9 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="text-xs text-gray-500">
-                        {format(new Date(download.created_at), 'MMM dd, HH:mm')}
+                        {download.created_at && !isNaN(new Date(download.created_at).getTime()) 
+                          ? format(new Date(download.created_at), 'MMM dd, HH:mm') 
+                          : 'Unknown'}
                       </div>
                     </div>
                   ))
