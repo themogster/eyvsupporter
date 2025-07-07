@@ -40,17 +40,7 @@ export default function Home() {
       {/* Header */}
       <div className="bg-deep-purple text-white p-6 pb-8 relative">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAdminModalOpen(true)}
-              className="text-white hover:bg-purple-600 p-2"
-              title="Admin Access"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
             <img 
               src="/logo.png" 
               alt="EYV Logo" 
@@ -61,6 +51,18 @@ export default function Home() {
               }}
               onLoad={() => console.log('Header logo loaded successfully')}
             />
+            <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsAdminModalOpen(true)}
+              className="text-white hover:bg-purple-600 p-2"
+              title="Admin Access"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
           </div>
         </div>
         <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
