@@ -69,14 +69,14 @@ export function AdminHeader() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      "flex items-center justify-center w-10 h-10 rounded-md transition-colors",
                       isActive
                         ? "bg-purple-100 text-purple-700 border border-purple-200"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     )}
+                    title={item.label}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <Icon className="w-5 h-5" />
                   </Link>
                 );
               })}
