@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query";
-import { AdminLogin, AdminRegister, VerifyTwoFactor } from "@shared/schema";
+import { AdminLogin, AdminRegisterEmail, AdminSetPassword, VerifyTwoFactor } from "@shared/schema";
 import { apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,7 +14,8 @@ type AdminAuthContextType = {
   isLoading: boolean;
   error: Error | null;
   loginMutation: UseMutationResult<any, Error, AdminLogin>;
-  registerMutation: UseMutationResult<any, Error, AdminRegister>;
+  registerMutation: UseMutationResult<any, Error, AdminRegisterEmail>;
+  setPasswordMutation: UseMutationResult<any, Error, AdminSetPassword>;
   verifyLoginMutation: UseMutationResult<any, Error, VerifyTwoFactor>;
   verifyRegistrationMutation: UseMutationResult<any, Error, VerifyTwoFactor>;
   logoutMutation: UseMutationResult<any, Error, void>;
@@ -22,6 +23,8 @@ type AdminAuthContextType = {
   setPendingEmail: (email: string | null) => void;
   isLoginPending: boolean;
   isRegistrationPending: boolean;
+  isEmailVerified: boolean;
+  setIsEmailVerified: (verified: boolean) => void;
 };
 
 export const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
@@ -53,6 +56,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [isLoginPending, setIsLoginPending] = useState(false);
   const [isRegistrationPending, setIsRegistrationPending] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: AdminLogin) => {
@@ -79,7 +83,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (credentials: AdminRegister) => {
+    mutationFn: async (credentials: AdminRegisterEmail) => {
       const res = await apiRequest("POST", "/api/admin/register", credentials);
       const data = await res.json();
       setPendingEmail(credentials.email);
@@ -99,6 +103,30 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         variant: "destructive",
       });
       setIsRegistrationPending(false);
+    },
+  });
+
+  const setPasswordMutation = useMutation({
+    mutationFn: async (credentials: AdminSetPassword) => {
+      const res = await apiRequest("POST", "/api/admin/set-password", credentials);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/admin/user"], data.user);
+      setPendingEmail(null);
+      setIsRegistrationPending(false);
+      setIsEmailVerified(false);
+      toast({
+        title: "Registration Complete",
+        description: "Your admin account has been created successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Password setup failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -131,11 +159,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["/api/admin/user"], data.user);
-      setPendingEmail(null);
-      setIsRegistrationPending(false);
+      setIsEmailVerified(true);
       toast({
-        title: "Registration successful",
+        title: "Email verified",
         description: data.message,
       });
     },
@@ -180,6 +206,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         error,
         loginMutation,
         registerMutation,
+        setPasswordMutation,
         verifyLoginMutation,
         verifyRegistrationMutation,
         logoutMutation,
@@ -187,6 +214,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         setPendingEmail,
         isLoginPending,
         isRegistrationPending,
+        isEmailVerified,
+        setIsEmailVerified,
       }}
     >
       {children}

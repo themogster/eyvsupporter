@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { 
   insertDownloadSchema, 
   adminLoginSchema, 
+  adminRegisterEmailSchema,
+  adminSetPasswordSchema,
   adminRegisterSchema, 
   verifyTwoFactorSchema 
 } from "@shared/schema";
@@ -61,10 +63,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin authentication routes
   
-  // Admin registration (step 1: create pending account)
+  // Admin registration (step 1: email only)
   app.post("/api/admin/register", async (req, res) => {
     try {
-      const validatedData = adminRegisterSchema.parse(req.body);
+      const validatedData = adminRegisterEmailSchema.parse(req.body);
       
       // Check if user already exists
       const existingUser = await storage.getAdminUserByEmail(validatedData.email);
@@ -75,10 +77,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create 2FA token for registration
       await createTwoFactorToken(validatedData.email, 'registration');
       
-      // Store email and password temporarily in session for verification
+      // Store email temporarily in session for verification
       req.session.pendingRegistration = {
-        email: validatedData.email,
-        password: validatedData.password
+        email: validatedData.email
       };
 
       res.json({ 
@@ -91,7 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin registration verification (step 2: verify 2FA and create account)
+  // Admin registration verification (step 2: verify 2FA, ask for password)
   app.post("/api/admin/verify-registration", async (req, res) => {
     try {
       const validatedData = verifyTwoFactorSchema.parse(req.body);
@@ -110,8 +111,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid or expired verification code' });
       }
 
+      // Mark as verified, ready for password setup
+      req.session.pendingRegistration.verified = true;
+
+      res.json({ 
+        success: true, 
+        message: 'Email verified. Please set your password.' 
+      });
+    } catch (error) {
+      console.error('Error verifying registration:', error);
+      res.status(400).json({ error: 'Verification failed' });
+    }
+  });
+
+  // Admin registration (step 3: set password and complete registration)
+  app.post("/api/admin/set-password", async (req, res) => {
+    try {
+      const validatedData = adminSetPasswordSchema.parse(req.body);
+      
+      if (!req.session.pendingRegistration || !req.session.pendingRegistration.verified) {
+        return res.status(400).json({ error: 'No verified registration found' });
+      }
+
+      if (req.session.pendingRegistration.email !== validatedData.email) {
+        return res.status(400).json({ error: 'Email mismatch' });
+      }
+
       // Create the admin user
-      const hashedPassword = await hashPassword(req.session.pendingRegistration.password);
+      const hashedPassword = await hashPassword(validatedData.password);
       const adminUser = await storage.createAdminUser({
         email: validatedData.email,
         password: hashedPassword
@@ -130,8 +157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Registration completed successfully' 
       });
     } catch (error) {
-      console.error('Error verifying registration:', error);
-      res.status(400).json({ error: 'Verification failed' });
+      console.error('Error setting password:', error);
+      res.status(400).json({ error: 'Password setup failed' });
     }
   });
 

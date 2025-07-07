@@ -81,6 +81,19 @@ export const adminLoginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const adminRegisterEmailSchema = z.object({
+  email: z.string().email(),
+});
+
+export const adminSetPasswordSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export const adminRegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -107,5 +120,7 @@ export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertTwoFactorToken = z.infer<typeof insertTwoFactorTokenSchema>;
 export type TwoFactorToken = typeof twoFactorTokens.$inferSelect;
 export type AdminLogin = z.infer<typeof adminLoginSchema>;
+export type AdminRegisterEmail = z.infer<typeof adminRegisterEmailSchema>;
+export type AdminSetPassword = z.infer<typeof adminSetPasswordSchema>;
 export type AdminRegister = z.infer<typeof adminRegisterSchema>;
 export type VerifyTwoFactor = z.infer<typeof verifyTwoFactorSchema>;

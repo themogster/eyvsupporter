@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminLogin, AdminRegister, VerifyTwoFactor, adminLoginSchema, adminRegisterSchema, verifyTwoFactorSchema } from "@shared/schema";
+import { AdminLogin, AdminRegisterEmail, AdminSetPassword, VerifyTwoFactor, adminLoginSchema, adminRegisterEmailSchema, adminSetPasswordSchema, verifyTwoFactorSchema } from "@shared/schema";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import {
   Dialog,
@@ -53,12 +53,10 @@ export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
   });
 
   // Registration form
-  const registerForm = useForm<AdminRegister>({
-    resolver: zodResolver(adminRegisterSchema),
+  const registerForm = useForm<AdminRegisterEmail>({
+    resolver: zodResolver(adminRegisterEmailSchema),
     defaultValues: {
       email: "",
-      password: "",
-      confirmPassword: "",
     },
   });
 
