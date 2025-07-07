@@ -100,7 +100,7 @@ export function AdminHeader() {
                   ) : (
                     <Sun className="w-4 h-4 mr-2" />
                   )}
-                  {theme === "light" ? "Dark mode" : "Light mode"}
+                  {theme === "light" ? "Switch to dark" : "Switch to light"}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
