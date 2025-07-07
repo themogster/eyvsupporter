@@ -63,8 +63,11 @@ export async function sendTwoFactorEmail(email: string, token: string, type: str
   } catch (error) {
     console.error('SendGrid email error:', error);
     console.log(`FALLBACK: 2FA Token for ${email}: ${token}`);
-    // For now, log the token to console until i-love-eyv.com domain is verified in SendGrid
-    // Don't throw error so the process continues
+    // For development: log the token to console when email fails
+    // In production, this should be properly configured with verified domain
+    
+    // Don't throw error - allow the registration process to continue
+    // The user can get the token from the server console logs
   }
 }
 

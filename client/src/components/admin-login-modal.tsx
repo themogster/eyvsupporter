@@ -69,26 +69,38 @@ export function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
   });
 
   const onLoginSubmit = async (data: AdminLogin) => {
-    await loginMutation.mutateAsync(data);
+    try {
+      await loginMutation.mutateAsync(data);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   const onRegisterSubmit = async (data: AdminRegister) => {
-    await registerMutation.mutateAsync(data);
+    try {
+      await registerMutation.mutateAsync(data);
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
   };
 
   const onVerifySubmit = async (data: Pick<VerifyTwoFactor, 'token'>) => {
     if (!pendingEmail) return;
 
-    const verificationData: VerifyTwoFactor = {
-      email: pendingEmail,
-      token: data.token,
-      type: isLoginPending ? 'login' : 'registration',
-    };
+    try {
+      const verificationData: VerifyTwoFactor = {
+        email: pendingEmail,
+        token: data.token,
+        type: isLoginPending ? 'login' : 'registration',
+      };
 
-    if (isLoginPending) {
-      await verifyLoginMutation.mutateAsync(verificationData);
-    } else if (isRegistrationPending) {
-      await verifyRegistrationMutation.mutateAsync(verificationData);
+      if (isLoginPending) {
+        await verifyLoginMutation.mutateAsync(verificationData);
+      } else if (isRegistrationPending) {
+        await verifyRegistrationMutation.mutateAsync(verificationData);
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
     }
   };
 
