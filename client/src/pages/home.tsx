@@ -5,7 +5,7 @@ import { PreviewSection } from '@/components/preview-section';
 import { DownloadSection } from '@/components/download-section';
 import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
-import { AdminLoginModal } from '@/components/admin-login-modal';
+import { NewAuthModal } from '@/components/new-auth-modal';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 import { AdminNav } from '@/components/admin-nav';
 import { Button } from '@/components/ui/button';
@@ -118,7 +118,7 @@ export default function Home() {
       <ProgressIndicator currentStep={currentStep} />
 
       {/* Admin Login Modal */}
-      <AdminLoginModal 
+      <NewAuthModal 
         isOpen={isAdminModalOpen} 
         onClose={() => setIsAdminModalOpen(false)} 
       />

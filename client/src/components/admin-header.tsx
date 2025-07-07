@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, MessageSquare, Download, BarChart3, User, LogOut, Settings, ChevronDown, Sun, Moon } from "lucide-react";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/hooks/use-new-auth";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,7 @@ const navItems = [
 
 export function AdminHeader() {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAdminAuth();
+  const { user, logoutMutation } = useAuth();
   const { theme, setTheme } = useTheme();
 
   return (

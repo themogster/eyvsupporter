@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/hooks/use-new-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { TrendingUp, Download, MessageSquare, Calendar } from "lucide-react";
@@ -7,7 +7,7 @@ import { format, parseISO } from "date-fns";
 import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminAnalytics() {
-  const { user } = useAdminAuth();
+  const { user } = useAuth();
 
   const { data: analyticsResponse, isLoading } = useQuery({
     queryKey: ["/api/admin/analytics"],

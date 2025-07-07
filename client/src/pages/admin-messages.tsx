@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/hooks/use-new-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ interface EditingMessage extends Partial<InsertMessage> {
 }
 
 export default function AdminMessages() {
-  const { user } = useAdminAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [isCreating, setIsCreating] = useState(false);

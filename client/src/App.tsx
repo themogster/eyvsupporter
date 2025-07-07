@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AdminAuthProvider } from "@/hooks/use-admin-auth";
+import { AuthProvider } from "@/hooks/use-new-auth";
 import { ThemeProvider } from "@/components/theme-provider";
 import Home from "@/pages/home";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -33,12 +33,12 @@ function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="eyv-admin-theme">
       <QueryClientProvider client={queryClient}>
-        <AdminAuthProvider>
+        <AuthProvider>
           <TooltipProvider>
             <Toaster />
             <Router />
           </TooltipProvider>
-        </AdminAuthProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

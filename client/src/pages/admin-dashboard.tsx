@@ -1,4 +1,4 @@
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/hooks/use-new-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { AdminHeader } from "@/components/admin-header";
 import { format } from "date-fns";
 
 export default function AdminDashboard() {
-  const { user } = useAdminAuth();
+  const { user } = useAuth();
 
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/admin/dashboard"],

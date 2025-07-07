@@ -8,7 +8,10 @@ import {
   adminRegisterEmailSchema,
   adminSetPasswordSchema,
   adminRegisterSchema, 
-  verifyTwoFactorSchema 
+  verifyTwoFactorSchema,
+  registerStepOneSchema,
+  registerStepTwoSchema,
+  registerStepThreeSchema
 } from "@shared/schema";
 import { 
   hashPassword, 
@@ -17,6 +20,7 @@ import {
   verifyTwoFactorToken,
   cleanupExpiredTokens 
 } from "./admin-auth";
+import { requireAuth, requireAdmin, requireUser } from "./auth-middleware";
 import session from "express-session";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -64,41 +68,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin authentication routes
   
-  // Admin registration (step 1: email only)
-  app.post("/api/admin/register", async (req, res) => {
+  // Registration Step 1: Email submission
+  app.post("/api/register/step1", async (req, res) => {
     try {
-      const validatedData = adminRegisterEmailSchema.parse(req.body);
+      const validatedData = registerStepOneSchema.parse(req.body);
       
       // Check if user already exists
       const existingUser = await storage.getAdminUserByEmail(validatedData.email);
       if (existingUser) {
-        return res.status(400).json({ error: 'User already exists' });
+        return res.status(400).json({ error: 'Email already registered' });
       }
 
-      // Create 2FA token for registration
-      await createTwoFactorToken(validatedData.email, 'registration');
+      // Generate and send 2FA token
+      const token = await createTwoFactorToken(validatedData.email, 'registration');
       
-      // Store email temporarily in session for verification
+      // Store email temporarily in session
       req.session.pendingRegistration = {
-        email: validatedData.email
+        email: validatedData.email,
+        step: 1
       };
 
       res.json({ 
         success: true, 
-        message: 'Registration started! Check your email for the verification code. If no email arrives, check the server console for the backup code.' 
+        message: 'Verification code sent! Check your email or server console for the code.' 
       });
     } catch (error) {
-      console.error('Error in admin registration:', error);
+      console.error('Registration Step 1 error:', error);
       res.status(400).json({ error: 'Registration failed' });
     }
   });
 
-  // Admin registration verification (step 2: verify 2FA, ask for password)
-  app.post("/api/admin/verify-registration", async (req, res) => {
+  // Registration Step 2: Verify 2FA token
+  app.post("/api/register/step2", async (req, res) => {
     try {
-      const validatedData = verifyTwoFactorSchema.parse(req.body);
+      const validatedData = registerStepTwoSchema.parse(req.body);
       
-      if (!req.session.pendingRegistration) {
+      if (!req.session.pendingRegistration || req.session.pendingRegistration.step !== 1) {
         return res.status(400).json({ error: 'No pending registration found' });
       }
 
@@ -112,20 +117,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Invalid or expired verification code' });
       }
 
-      // Mark as verified, ready for password setup
-      req.session.pendingRegistration.verified = true;
+      // Mark as verified, ready for password
+      req.session.pendingRegistration = {
+        email: validatedData.email,
+        step: 2,
+        verified: true
+      };
 
       res.json({ 
         success: true, 
-        message: 'Email verified. Please set your password.' 
+        message: 'Email verified! Please set your password.' 
       });
     } catch (error) {
-      console.error('Error verifying registration:', error);
+      console.error('Registration Step 2 error:', error);
       res.status(400).json({ error: 'Verification failed' });
     }
   });
 
-  // Admin registration (step 3: set password and complete registration)
+  // Registration Step 3: Set password and complete registration
+  app.post("/api/register/step3", async (req, res) => {
+    try {
+      const validatedData = registerStepThreeSchema.parse(req.body);
+      
+      if (!req.session.pendingRegistration || 
+          req.session.pendingRegistration.step !== 2 || 
+          !req.session.pendingRegistration.verified) {
+        return res.status(400).json({ error: 'Invalid registration state' });
+      }
+
+      if (req.session.pendingRegistration.email !== validatedData.email) {
+        return res.status(400).json({ error: 'Email mismatch' });
+      }
+
+      // Create the user with 'user' role by default
+      const hashedPassword = await hashPassword(validatedData.password);
+      const adminUser = await storage.createAdminUser({
+        email: validatedData.email,
+        password: hashedPassword,
+        role: 'user'
+      });
+
+      // Clear pending registration and log the user in
+      delete req.session.pendingRegistration;
+      req.session.adminUser = { 
+        id: adminUser.id, 
+        email: adminUser.email, 
+        role: adminUser.role 
+      };
+      await storage.updateAdminUserLastLogin(adminUser.id);
+
+      res.json({ 
+        success: true, 
+        user: { id: adminUser.id, email: adminUser.email, role: adminUser.role },
+        message: 'Registration completed! You are now logged in.' 
+      });
+    } catch (error) {
+      console.error('Registration Step 3 error:', error);
+      res.status(400).json({ error: 'Registration completion failed' });
+    }
+  });
+
+  // Admin registration (step 3: set password and complete registration) - LEGACY
   app.post("/api/admin/set-password", async (req, res) => {
     try {
       const validatedData = adminSetPasswordSchema.parse(req.body);
@@ -227,21 +279,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current admin user
-  app.get("/api/admin/user", (req, res) => {
-    if (!req.session.adminUser) {
-      return res.status(401).json({ error: 'Not authenticated' });
-    }
-    
-    res.json({ 
-      user: { id: req.session.adminUser.userId, email: req.session.adminUser.email }
-    });
+  app.get("/api/admin/user", requireAuth, (req, res) => {
+    res.json(req.session.adminUser);
   });
 
   // Admin logout
-  app.post("/api/admin/logout", (req, res) => {
-    if (req.session.adminUser) {
-      delete req.session.adminUser;
-    }
+  app.post("/api/admin/logout", requireAuth, (req, res) => {
+    delete req.session.adminUser;
     if (req.session.pendingLogin) {
       delete req.session.pendingLogin;
     }
@@ -252,13 +296,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, message: 'Logged out successfully' });
   });
 
-  // Admin dashboard data (protected route)
-  app.get("/api/admin/dashboard", async (req, res) => {
-
-    if (!req.session.adminUser) {
-      return res.status(401).json({ error: 'Not authenticated' });
-    }
-
+  // Admin dashboard data (protected route - admin role required)
+  app.get("/api/admin/dashboard", requireAdmin, async (req, res) => {
     try {
       const messages = await storage.getMessages();
       const downloads = await storage.getDownloads();

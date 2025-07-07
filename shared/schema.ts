@@ -30,6 +30,7 @@ export const adminUsers = pgTable("admin_users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").default("user").notNull(), // "user" or "admin"
   isActive: boolean("is_active").default(true).notNull(),
   lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -67,6 +68,7 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
   email: true,
   password: true,
+  role: true,
 });
 
 export const insertTwoFactorTokenSchema = createInsertSchema(twoFactorTokens).pick({
@@ -86,6 +88,25 @@ export const adminRegisterEmailSchema = z.object({
 });
 
 export const adminSetPasswordSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+// New schema for step-by-step registration
+export const registerStepOneSchema = z.object({
+  email: z.string().email(),
+});
+
+export const registerStepTwoSchema = z.object({
+  email: z.string().email(),
+  token: z.string().length(6),
+});
+
+export const registerStepThreeSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   confirmPassword: z.string().min(8),
@@ -124,3 +145,6 @@ export type AdminRegisterEmail = z.infer<typeof adminRegisterEmailSchema>;
 export type AdminSetPassword = z.infer<typeof adminSetPasswordSchema>;
 export type AdminRegister = z.infer<typeof adminRegisterSchema>;
 export type VerifyTwoFactor = z.infer<typeof verifyTwoFactorSchema>;
+export type RegisterStepOne = z.infer<typeof registerStepOneSchema>;
+export type RegisterStepTwo = z.infer<typeof registerStepTwoSchema>;
+export type RegisterStepThree = z.infer<typeof registerStepThreeSchema>;

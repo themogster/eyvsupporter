@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/hooks/use-new-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import type { Download as DownloadType } from "@shared/schema";
 import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminDownloads() {
-  const { user } = useAdminAuth();
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
