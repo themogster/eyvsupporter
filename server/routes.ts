@@ -137,25 +137,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registration Step 3: Set password and complete registration
   app.post("/api/register/step3", async (req, res) => {
     try {
+      console.log('Registration Step 3 started:', { body: req.body });
+      console.log('Session state:', { 
+        hasPendingRegistration: !!req.session.pendingRegistration,
+        step: req.session.pendingRegistration?.step,
+        verified: req.session.pendingRegistration?.verified,
+        email: req.session.pendingRegistration?.email
+      });
+      
       const validatedData = registerStepThreeSchema.parse(req.body);
       
       if (!req.session.pendingRegistration || 
           req.session.pendingRegistration.step !== 2 || 
           !req.session.pendingRegistration.verified) {
+        console.log('Invalid registration state detected');
         return res.status(400).json({ error: 'Invalid registration state' });
       }
 
       if (req.session.pendingRegistration.email !== validatedData.email) {
+        console.log('Email mismatch:', req.session.pendingRegistration.email, 'vs', validatedData.email);
         return res.status(400).json({ error: 'Email mismatch' });
       }
 
       // Create the user with 'user' role by default
+      console.log('Creating user with email:', validatedData.email);
       const hashedPassword = await hashPassword(validatedData.password);
       const adminUser = await storage.createAdminUser({
         email: validatedData.email,
         password: hashedPassword,
         role: 'user'
       });
+      console.log('User created successfully:', adminUser.id);
 
       // Clear pending registration and log the user in
       delete req.session.pendingRegistration;
@@ -164,7 +176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: adminUser.email, 
         role: adminUser.role 
       };
+      
+      console.log('Updating last login for user:', adminUser.id);
       await storage.updateAdminUserLastLogin(adminUser.id);
+      console.log('Registration Step 3 completed successfully');
 
       res.json({ 
         success: true, 
@@ -173,7 +188,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Registration Step 3 error:', error);
-      res.status(400).json({ error: 'Registration completion failed' });
+      console.error('Error stack:', error.stack);
+      res.status(500).json({ error: 'Registration completion failed: ' + (error.message || 'Unknown error') });
     }
   });
 
