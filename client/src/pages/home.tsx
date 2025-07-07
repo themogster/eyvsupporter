@@ -70,8 +70,7 @@ export default function Home() {
           <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
         </div>
         
-        {/* Top Level Admin Navigation */}
-        <AdminNav />
+
       </div>
       {/* Main Content */}
       <div className="p-6 space-y-6 pb-20">

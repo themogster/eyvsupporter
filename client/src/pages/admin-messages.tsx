@@ -10,7 +10,7 @@ import { Plus, Edit2, Trash2, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Message, InsertMessage } from "@shared/schema";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminHeader } from "@/components/admin-header";
 
 interface EditingMessage extends Partial<InsertMessage> {
   id?: number;
@@ -114,7 +114,7 @@ export default function AdminMessages() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNav />
+      <AdminHeader />
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
         <div>

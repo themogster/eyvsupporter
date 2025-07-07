@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { TrendingUp, Download, MessageSquare, Calendar } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminAnalytics() {
   const { user } = useAdminAuth();
@@ -58,7 +58,7 @@ export default function AdminAnalytics() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNav />
+      <AdminHeader />
       <div className="max-w-7xl mx-auto p-6">
         <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">Analytics Dashboard</h1>

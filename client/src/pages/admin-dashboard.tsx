@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
-import { AdminNav } from "@/components/admin-nav";
+import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAdminAuth();
@@ -50,13 +50,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Admin Navigation */}
-      <AdminNav />
-      
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <AdminHeader />
+      
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-deep-purple rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
@@ -95,12 +93,6 @@ export default function AdminDashboard() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
