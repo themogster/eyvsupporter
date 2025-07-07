@@ -18,10 +18,6 @@ if (!rootElement) {
     console.log('Removed preview fallback - React app loaded successfully');
   }
   
-  createRoot(rootElement).render(
-    <ThemeProvider defaultTheme="light" storageKey="eyv-admin-theme">
-      <App />
-    </ThemeProvider>
-  );
+  createRoot(rootElement).render(<App />);
   console.log('React app rendered');
 }
