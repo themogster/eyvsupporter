@@ -31,9 +31,12 @@ export function ThankYouSection({ onStartOver }: ThankYouSectionProps) {
 
           {/* Thank You Message */}
           <div className="space-y-4">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <Heart className="w-6 h-6 text-red-500 fill-current" />
-              <h3 className="text-xl font-bold text-deep-purple">Thank you for supporting Early Years Voice</h3>
+            <div className="text-center mb-4">
+              <Heart className="w-10 h-10 text-red-500 fill-current mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-deep-purple">
+                Thank you for supporting<br />
+                Early Years Voice
+              </h3>
             </div>
             
             <p className="text-gray-700 text-base leading-relaxed">
