@@ -181,7 +181,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         <h2 className="text-lg font-semibold text-gray-800">Preview & Edit</h2>
       </div>
       {/* Canvas Preview Card */}
-      <Card className="p-6">
+      <Card className="p-6 bg-white border-gray-200">
         <div className="bg-gray-100 rounded-lg p-6 text-center">
           <div className="relative inline-block">
             <div className="w-48 h-48 mx-auto relative">
@@ -212,7 +212,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       </Card>
 
       {/* Controls Card */}
-      <Card className="p-6">
+      <Card className="p-6 bg-white border-gray-200">
 
         {/* Curved Text Selector */}
         <div className="mb-6">
