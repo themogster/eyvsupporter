@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { TrendingUp, Download, MessageSquare, Calendar } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { AdminNav } from "@/components/admin-nav";
@@ -20,11 +20,34 @@ export default function AdminAnalytics() {
 
   const analytics = analyticsResponse?.data;
 
-  // Prepare chart data
-  const dailyChartData = analytics?.dailyStats?.map((stat: any) => ({
-    date: format(parseISO(stat.date), 'MMM dd'),
-    downloads: Number(stat.count)
-  })) || [];
+  // Prepare chart data - ensure we have all 30 days
+  const getDailyChartData = () => {
+    const last30Days = [];
+    const today = new Date();
+    
+    // Generate array of last 30 days
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      last30Days.push({
+        date: date.toISOString().split('T')[0],
+        displayDate: format(date, 'MMM dd'),
+        downloads: 0
+      });
+    }
+    
+    // Merge with actual data
+    analytics?.dailyStats?.forEach((stat: any) => {
+      const dayIndex = last30Days.findIndex(day => day.date === stat.date);
+      if (dayIndex >= 0) {
+        last30Days[dayIndex].downloads = Number(stat.count);
+      }
+    });
+    
+    return last30Days;
+  };
+
+  const dailyChartData = getDailyChartData();
 
   const messageChartData = analytics?.messageStats?.map((stat: any) => ({
     name: stat.message || 'No Text',
@@ -88,7 +111,7 @@ export default function AdminAnalytics() {
               <CardContent>
                 <div className="text-2xl font-bold">
                   {dailyChartData.length > 0 
-                    ? Math.round(dailyChartData.reduce((sum, day) => sum + day.downloads, 0) / dailyChartData.length)
+                    ? Math.round(dailyChartData.reduce((sum: number, day: any) => sum + day.downloads, 0) / dailyChartData.length)
                     : 0
                   }
                 </div>
@@ -108,13 +131,27 @@ export default function AdminAnalytics() {
               <CardContent>
                 {dailyChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={dailyChartData}>
+                    <LineChart data={dailyChartData}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="downloads" fill="#8884d8" />
-                    </BarChart>
+                      <XAxis 
+                        dataKey="displayDate" 
+                        tick={{ fontSize: 12 }}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip 
+                        labelFormatter={(label) => `Date: ${label}`}
+                        formatter={(value) => [`${value} downloads`, 'Downloads']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="downloads" 
+                        stroke="#8884d8" 
+                        strokeWidth={2}
+                        dot={{ fill: '#8884d8', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#8884d8', strokeWidth: 2 }}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
@@ -132,25 +169,35 @@ export default function AdminAnalytics() {
               </CardHeader>
               <CardContent>
                 {messageChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={messageChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {messageChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <div className="space-y-4">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart>
+                        <Pie
+                          data={messageChartData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={false}
+                        >
+                          {messageChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value, name) => [`${value} downloads`, name]} />
+                        <Legend 
+                          verticalAlign="bottom" 
+                          height={36}
+                          formatter={(value, entry) => {
+                            const total = messageChartData.reduce((sum, item) => sum + item.value, 0);
+                            const percent = ((entry.payload.value / total) * 100).toFixed(0);
+                            return `${value} (${percent}%)`;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 ) : (
                   <div className="h-[300px] flex items-center justify-center text-gray-500">
                     No message data available
