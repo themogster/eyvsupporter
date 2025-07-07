@@ -7,6 +7,7 @@ import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
 import { AdminLoginModal } from '@/components/admin-login-modal';
 import { useImageProcessor } from '@/hooks/use-image-processor';
+import { AdminNav } from '@/components/admin-nav';
 import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 
@@ -117,6 +118,9 @@ export default function Home() {
         isOpen={isAdminModalOpen} 
         onClose={() => setIsAdminModalOpen(false)} 
       />
+      
+      {/* Admin Navigation */}
+      <AdminNav />
     </div>
   );
 }
