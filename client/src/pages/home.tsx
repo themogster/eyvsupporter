@@ -1,13 +1,19 @@
 // Remove UserCircle import as we're using the logo image
+import { useState } from 'react';
 import { UploadSection } from '@/components/upload-section';
 import { PreviewSection } from '@/components/preview-section';
 import { DownloadSection } from '@/components/download-section';
 import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
+import { AdminLoginModal } from '@/components/admin-login-modal';
 import { useImageProcessor } from '@/hooks/use-image-processor';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 
 export default function Home() {
   console.log('Home component rendering');
+  
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   
   const {
     currentStep,
@@ -32,19 +38,30 @@ export default function Home() {
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen shadow-lg">
       {/* Header */}
-      <div className="bg-deep-purple text-white p-6 pb-8">
+      <div className="bg-deep-purple text-white p-6 pb-8 relative">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
-          <img 
-            src="/logo.png" 
-            alt="EYV Logo" 
-            className="w-16 h-16 rounded-full object-cover"
-            onError={(e) => {
-              console.log('Header logo failed to load');
-              e.currentTarget.style.display = 'none';
-            }}
-            onLoad={() => console.log('Header logo loaded successfully')}
-          />
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsAdminModalOpen(true)}
+              className="text-white hover:bg-purple-600 p-2"
+              title="Admin Access"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+            <img 
+              src="/logo.png" 
+              alt="EYV Logo" 
+              className="w-16 h-16 rounded-full object-cover"
+              onError={(e) => {
+                console.log('Header logo failed to load');
+                e.currentTarget.style.display = 'none';
+              }}
+              onLoad={() => console.log('Header logo loaded successfully')}
+            />
+          </div>
         </div>
         <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
       </div>
@@ -92,6 +109,12 @@ export default function Home() {
       </div>
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} />
+
+      {/* Admin Login Modal */}
+      <AdminLoginModal 
+        isOpen={isAdminModalOpen} 
+        onClose={() => setIsAdminModalOpen(false)} 
+      />
     </div>
   );
 }
