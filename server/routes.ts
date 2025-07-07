@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin login (step 1: verify credentials)
+  // Admin login - direct login without 2FA
   app.post("/api/admin/login", async (req, res) => {
     try {
       const validatedData = adminLoginSchema.parse(req.body);
@@ -172,16 +172,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
 
-      // Create 2FA token for login
-      const token = await createTwoFactorToken(validatedData.email, 'login');
-      console.log(`Login 2FA token for ${validatedData.email}: ${token}`);
+      // Update last login timestamp
+      await storage.updateAdminUserLastLogin(user.id);
       
-      // Store user ID temporarily in session for verification
-      req.session.pendingLogin = { userId: user.id, email: user.email };
+      // Log user in directly - no 2FA required for login
+      req.session.adminUser = { id: user.id, email: user.email };
 
       res.json({ 
         success: true, 
-        message: 'Verification code sent to your email. Please check your email and enter the code.' 
+        user: { id: user.id, email: user.email },
+        message: 'Login successful' 
       });
     } catch (error) {
       console.error('Error in admin login:', error);

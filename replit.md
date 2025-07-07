@@ -110,6 +110,7 @@ Changelog:
 - July 07, 2025: Removed Facebook integration - cleaned up all Facebook SDK code, hooks, and UI components
 - July 07, 2025: Added admin section with email-based authentication and 2FA verification system. Includes modal login form, admin dashboard, and PostgreSQL session storage
 - July 07, 2025: Updated admin registration flow - email first, then 2FA code, then password setup. Created ian@the-Morgans.biz admin user with password123. Integrated SendGrid for 2FA emails with i-love-eyv.com domain
+- July 07, 2025: Removed 2FA requirement for admin login - 2FA now only used for registration and password changes. Admin login is now direct with email/password only
 ```
 
 ## User Preferences

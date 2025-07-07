@@ -61,16 +61,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const loginMutation = useMutation({
     mutationFn: async (credentials: AdminLogin) => {
       const res = await apiRequest("POST", "/api/admin/login", credentials);
-      const data = await res.json();
-      setPendingEmail(credentials.email);
-      setIsLoginPending(true);
-      return data;
+      return await res.json();
     },
     onSuccess: (data) => {
-      toast({
-        title: "Verification code sent",
-        description: data.message,
-      });
+      if (data.user) {
+        queryClient.setQueryData(["/api/admin/user"], data.user);
+        toast({
+          title: "Login successful",
+          description: data.message,
+        });
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -78,7 +78,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         description: error.message,
         variant: "destructive",
       });
-      setIsLoginPending(false);
     },
   });
 
