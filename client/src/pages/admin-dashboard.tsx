@@ -136,8 +136,12 @@ export default function AdminDashboard() {
                   stats.recentDownloads.slice(0, 10).map((download: any) => (
                     <div key={download.id} className="flex items-center justify-between border-b pb-2">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                          <Download className="w-4 h-4 text-purple-600" />
+                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-purple-200">
+                          <img 
+                            src={download.profileImage} 
+                            alt="Profile preview" 
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div>
                           <p className="text-sm font-medium">{download.eyvMessage || 'No text'}</p>
