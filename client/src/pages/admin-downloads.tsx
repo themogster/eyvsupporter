@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, Search, Filter, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import type { Download as DownloadType } from "@shared/schema";
@@ -16,6 +17,8 @@ export default function AdminDownloads() {
   const [limit] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
   const [messageFilter, setMessageFilter] = useState("all");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: downloadsData, isLoading } = useQuery({
     queryKey: ["/api/admin/downloads", page, limit],
@@ -47,17 +50,8 @@ export default function AdminDownloads() {
   });
 
   const handleViewImage = (imageData: string) => {
-    const newWindow = window.open();
-    if (newWindow) {
-      newWindow.document.write(`
-        <html>
-          <head><title>Profile Picture</title></head>
-          <body style="margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f3f4f6;">
-            <img src="${imageData}" style="max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />
-          </body>
-        </html>
-      `);
-    }
+    setSelectedImage(imageData);
+    setIsModalOpen(true);
   };
 
   return (
@@ -194,6 +188,25 @@ export default function AdminDownloads() {
         </CardContent>
       </Card>
         </div>
+
+      {/* Image Preview Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Profile Picture Preview</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center p-4">
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Profile picture preview"
+                className="w-80 h-80 object-cover rounded-full border-4 border-purple-200"
+                style={{ width: '320px', height: '320px' }}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
