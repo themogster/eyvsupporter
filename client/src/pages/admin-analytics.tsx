@@ -57,9 +57,10 @@ export default function AdminAnalytics() {
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00c49f'];
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      <div className="mb-6">
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">Analytics Dashboard</h1>
         <p className="text-gray-600">Comprehensive insights into EYV Support usage</p>
       </div>
@@ -250,6 +251,7 @@ export default function AdminAnalytics() {
           </Card>
         </div>
       )}
+        </div>
     </div>
   );
 }

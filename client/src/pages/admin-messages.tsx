@@ -113,9 +113,10 @@ export default function AdminMessages() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      <div className="flex items-center justify-between mb-6">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Message Management</h1>
           <p className="text-gray-600">Manage curved text options for profile pictures</p>
@@ -279,6 +280,7 @@ export default function AdminMessages() {
           ))}
         </div>
       )}
+        </div>
     </div>
   );
 }
