@@ -5,7 +5,7 @@ import {
   type TwoFactorToken, type InsertTwoFactorToken 
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, asc, and, gt, desc, gte, sql } from "drizzle-orm";
+import { eq, asc, and, gt, desc, gte, sql, isNotNull } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
