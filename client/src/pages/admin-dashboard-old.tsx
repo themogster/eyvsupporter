@@ -21,6 +21,8 @@ export default function AdminDashboard() {
     enabled: !!user, // Only run query if user is authenticated
   });
 
+
+
   if (!user) {
     return null;
   }
@@ -67,43 +69,8 @@ export default function AdminDashboard() {
       <AdminHeader />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Overview of your EYV admin panel</p>
-        </div>
-
-        {/* Stats Grid */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Downloads</CardTitle>
-              <Download className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalDownloads || 0}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Downloads</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.todayDownloads || 0}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Week</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.weekDownloads || 0}</div>
-            </CardContent>
-          </Card>
-          
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Messages</CardTitle>
@@ -111,13 +78,46 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.messagesCount || 0}</div>
+              <p className="text-xs text-muted-foreground">Curved text options</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Downloads</CardTitle>
+              <Download className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">Profile pictures created</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Today's Downloads</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.todayDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">New today</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Week</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.weekDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">Downloads this week</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Content Grid */}
+        {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Downloads */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Recent Downloads</CardTitle>
@@ -146,18 +146,16 @@ export default function AdminDashboard() {
                   <p className="text-sm text-gray-500">No recent downloads</p>
                 )}
               </div>
-              
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-4">
                 <Link href="/admin/downloads">
-                  <div className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center">
+                  <button className="text-sm text-purple-600 hover:text-purple-700">
                     View all downloads →
-                  </div>
+                  </button>
                 </Link>
               </div>
             </CardContent>
           </Card>
 
-          {/* Top Text Messages */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Top Text Messages</CardTitle>
@@ -167,13 +165,13 @@ export default function AdminDashboard() {
               <div className="space-y-3">
                 {Array.isArray(stats.topMessages) && stats.topMessages.length > 0 ? (
                   stats.topMessages.slice(0, 5).map((message: any, index: number) => (
-                    <div key={message.text || index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={message.id || index} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-medium text-purple-600">
                           {index + 1}
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{message.text || 'No text'}</p>
+                          <p className="text-sm font-medium">{message.text || message.key || 'No text'}</p>
                           <p className="text-xs text-gray-500">{message.count || 0} uses</p>
                         </div>
                       </div>
@@ -183,14 +181,6 @@ export default function AdminDashboard() {
                 ) : (
                   <p className="text-sm text-gray-500">No message data available</p>
                 )}
-              </div>
-              
-              <div className="mt-4 pt-4 border-t">
-                <Link href="/admin/messages">
-                  <div className="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center">
-                    Manage messages →
-                  </div>
-                </Link>
               </div>
             </CardContent>
           </Card>

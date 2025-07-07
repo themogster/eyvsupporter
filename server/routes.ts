@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data: {
           messagesCount: messages.length,
           totalDownloads: downloads.length,
-          recentDownloads: recentDownloads,
+          recentDownloads: recentDownloads.slice(0, 10),
           todayDownloads: todayDownloads.length,
           weekDownloads: recentDownloads.length,
           messages,
