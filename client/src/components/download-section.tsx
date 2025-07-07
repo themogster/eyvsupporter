@@ -90,7 +90,7 @@ export function DownloadSection({ processedImage, onDownload, onShare, onStartOv
         <Button
           onClick={onStartOver}
           variant="outline"
-          className="w-full py-3 px-6 font-medium touch-manipulation"
+          className="w-full py-3 px-6 font-medium touch-manipulation bg-white text-gray-900 hover:text-gray-900 border-gray-300 hover:bg-gray-100"
           size="lg"
         >
           <RotateCcw className="w-4 h-4 mr-2" />

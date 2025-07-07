@@ -311,7 +311,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         <Button
           onClick={onStartOver}
           variant="outline"
-          className="w-full border-gray-300 hover:bg-gray-100 touch-manipulation"
+          className="w-full border-gray-300 hover:bg-gray-100 touch-manipulation bg-white text-gray-900 hover:text-gray-900"
           size="lg"
         >
           Upload Different Photo
