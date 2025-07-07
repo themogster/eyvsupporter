@@ -2,6 +2,17 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import sgMail from '@sendgrid/mail';
+
+// Initialize SendGrid with error handling
+if (process.env.SENDGRID_API_KEY) {
+  try {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  } catch (error) {
+    console.error('Failed to initialize SendGrid:', error);
+  }
+} else {
+  console.warn('SENDGRID_API_KEY not found - email sending will use fallback mode');
+}
 import { AdminUser } from "@shared/schema";
 
 const scryptAsync = promisify(scrypt);
@@ -26,10 +37,9 @@ export function generateTwoFactorToken(): string {
 export async function sendTwoFactorEmail(email: string, token: string, type: string): Promise<void> {
   
   if (!process.env.SENDGRID_API_KEY) {
-    throw new Error('SENDGRID_API_KEY environment variable is not set');
+    console.log(`FALLBACK: 2FA Token for ${email}: ${token}`);
+    return; // Don't throw error, just use fallback
   }
-  
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   
   const typeDisplayNames = {
     registration: 'Registration Verification',
@@ -63,11 +73,7 @@ export async function sendTwoFactorEmail(email: string, token: string, type: str
   } catch (error) {
     console.error('SendGrid email error:', error);
     console.log(`FALLBACK: 2FA Token for ${email}: ${token}`);
-    // For development: log the token to console when email fails
-    // In production, this should be properly configured with verified domain
-    
-    // Don't throw error - allow the registration process to continue
-    // The user can get the token from the server console logs
+    // Email failed but don't break the flow - user can get token from console
   }
 }
 

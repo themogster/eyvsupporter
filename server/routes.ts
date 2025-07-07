@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         success: true, 
-        message: 'Verification code sent to your email. Please check your email and enter the code. If you don\'t receive the email, check the server console for the fallback code.' 
+        message: 'Registration started! Check your email for the verification code. If no email arrives, check the server console for the backup code.' 
       });
     } catch (error) {
       console.error('Error in admin registration:', error);
