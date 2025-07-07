@@ -57,7 +57,7 @@ export default function AdminAnalytics() {
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00c49f'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AdminHeader />
       <div className="max-w-7xl mx-auto p-3 sm:p-6">
         <div className="mb-4 sm:mb-6">

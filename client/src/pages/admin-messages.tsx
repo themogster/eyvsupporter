@@ -113,7 +113,7 @@ export default function AdminMessages() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AdminHeader />
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">

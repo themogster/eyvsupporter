@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { ThemeProvider } from "./components/theme-provider";
 
 console.log('main.tsx is loading');
 
@@ -17,6 +18,10 @@ if (!rootElement) {
     console.log('Removed preview fallback - React app loaded successfully');
   }
   
-  createRoot(rootElement).render(<App />);
+  createRoot(rootElement).render(
+    <ThemeProvider defaultTheme="light" storageKey="eyv-admin-theme">
+      <App />
+    </ThemeProvider>
+  );
   console.log('React app rendered');
 }

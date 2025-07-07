@@ -126,6 +126,9 @@ Changelog:
   • Fixed database field mapping issues and date formatting errors for proper data display
   • Added profile picture previews in Recent Downloads panel replacing generic download icons
   • Implemented modal image viewer in Downloads section showing 2x size (320px) circular previews
+  • Enhanced mobile responsiveness with reduced padding and text sizes across all admin pages
+  • Created comprehensive light/dark mode switcher in admin profile menu with full theme persistence
+  • Applied dark mode styling to all admin components including header navigation and page backgrounds
 ```
 
 ## User Preferences
