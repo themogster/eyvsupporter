@@ -62,6 +62,7 @@ export default function AdminDownloads() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNav />
       <div className="max-w-7xl mx-auto p-6">
         <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">Download Analytics</h1>
