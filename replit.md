@@ -107,6 +107,7 @@ Changelog:
 - July 05, 2025: Created dynamic messages table with database-driven dropdown, "No text" option hardcoded as first item
 - July 05, 2025: Fixed IP address logging to capture real client IP from proxy headers instead of localhost
 - July 05, 2025: Added Facebook Login integration allowing users to import their current profile pictures directly
+- July 07, 2025: Removed Facebook integration - cleaned up all Facebook SDK code, hooks, and UI components
 ```
 
 ## User Preferences
