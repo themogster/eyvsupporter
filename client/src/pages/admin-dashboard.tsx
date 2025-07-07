@@ -1,34 +1,17 @@
-import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LogOut, Users, MessageSquare, Download, Calendar, User, ChevronDown, Settings, BarChart3, Eye } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Users, Download, MessageSquare, TrendingUp, Calendar, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { AdminHeader } from "@/components/admin-header";
+import { format } from "date-fns";
 
 export default function AdminDashboard() {
-  const { user, logoutMutation } = useAdminAuth();
-  const [, setLocation] = useLocation();
+  const { user } = useAdminAuth();
 
-  // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!user) {
-      setLocation("/");
-    }
-  }, [user, setLocation]);
-
-  // Always call hooks before any early returns
-  const { data: dashboardData, isLoading } = useQuery({
+  const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/admin/dashboard"],
     queryFn: async () => {
       const res = await fetch("/api/admin/dashboard");
@@ -38,61 +21,52 @@ export default function AdminDashboard() {
     enabled: !!user, // Only run query if user is authenticated
   });
 
-  const handleLogout = async () => {
-    await logoutMutation.mutateAsync();
-  };
-
   if (!user) {
     return null;
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-red-600">Error loading dashboard data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = dashboardData?.data || {};
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <AdminHeader />
       
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-deep-purple rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">EYV Admin</h1>
-                <p className="text-sm text-gray-600">Dashboard</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full w-8 h-8 hover:bg-gray-100"
-                  >
-                    <User className="w-5 h-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Profile Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    disabled={logoutMutation.isPending}
-                    className="text-red-600"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    {logoutMutation.isPending ? "Signing out..." : "Sign out"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -101,192 +75,120 @@ export default function AdminDashboard() {
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold">{dashboardData?.data?.messagesCount || 0}</div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                <Link href="/admin/messages" className="text-blue-600 hover:underline">
-                  Manage messages →
-                </Link>
-              </p>
+              <div className="text-2xl font-bold">{stats.messagesCount || 0}</div>
+              <p className="text-xs text-muted-foreground">Curved text options</p>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Downloads</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Downloads</CardTitle>
               <Download className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold">{dashboardData?.data?.totalDownloads || 0}</div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                <Link href="/admin/downloads" className="text-blue-600 hover:underline">
-                  View details →
-                </Link>
-              </p>
+              <div className="text-2xl font-bold">{stats.totalDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">Profile pictures created</p>
             </CardContent>
           </Card>
-
+          
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent (7 days)</CardTitle>
+              <CardTitle className="text-sm font-medium">Today's Downloads</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.todayDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">New today</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Week</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold">{dashboardData?.data?.recentDownloads || 0}</div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Downloads this week
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold">{dashboardData?.data?.todayDownloads || 0}</div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Downloads today
-              </p>
+              <div className="text-2xl font-bold">{stats.weekDownloads || 0}</div>
+              <p className="text-xs text-muted-foreground">Downloads this week</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Content Areas */}
+        {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Downloads</CardTitle>
-              <CardDescription>
-                Latest profile picture downloads
-              </CardDescription>
+              <CardTitle className="text-lg">Recent Downloads</CardTitle>
+              <CardDescription>Latest profile pictures created</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="space-y-3">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="flex items-center space-x-3">
-                      <Skeleton className="w-8 h-8 rounded-full" />
-                      <div className="flex-1">
-                        <Skeleton className="h-4 w-24 mb-1" />
-                        <Skeleton className="h-3 w-32" />
+              <div className="space-y-4">
+                {stats.recentDownloads?.slice(0, 5).map((download: any) => (
+                  <div key={download.id} className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <Download className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{download.eyv_message || 'No text'}</p>
+                        <p className="text-xs text-gray-500">{download.ip_address}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : dashboardData?.data?.downloads?.length > 0 ? (
-                <div className="space-y-3">
-                  {dashboardData.data.downloads.slice(0, 5).map((download: any) => (
-                    <div key={download.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50">
-                      <img
-                        src={download.profileImage}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {download.ipAddress}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {download.eyvMessage ? `Message: ${download.eyvMessage}` : 'No message'}
-                        </p>
-                      </div>
+                    <div className="text-xs text-gray-500">
+                      {format(new Date(download.created_at), 'MMM dd, HH:mm')}
                     </div>
-                  ))}
-                  <Link href="/admin/downloads" className="block text-center text-sm text-blue-600 hover:underline pt-2">
+                  </div>
+                )) || (
+                  <p className="text-sm text-gray-500">No recent downloads</p>
+                )}
+              </div>
+              <div className="mt-4">
+                <Link href="/admin/downloads">
+                  <button className="text-sm text-purple-600 hover:text-purple-700">
                     View all downloads →
-                  </Link>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 text-center py-4">
-                  No downloads yet
-                </p>
-              )}
+                  </button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Available Messages</CardTitle>
-              <CardDescription>
-                Current curved text options
-              </CardDescription>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+              <CardDescription>Common administrative tasks</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="space-y-2">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-8 w-full" />
-                  ))}
-                </div>
-              ) : dashboardData?.data?.messages?.length > 0 ? (
-                <div className="space-y-2">
-                  {dashboardData.data.messages.map((message: any) => (
-                    <div key={message.id} className="flex items-center justify-between p-2 rounded border">
-                      <span className="text-sm font-medium">{message.displayText}</span>
-                      <span className={`text-xs px-2 py-1 rounded ${message.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {message.isActive ? 'Active' : 'Inactive'}
-                      </span>
+              <div className="space-y-3">
+                <Link href="/admin/messages">
+                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <MessageSquare className="w-5 h-5 text-purple-600" />
+                      <span className="text-sm font-medium">Manage Messages</span>
                     </div>
-                  ))}
-                  <Link href="/admin/messages" className="block text-center text-sm text-blue-600 hover:underline pt-2">
-                    Manage messages →
-                  </Link>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-gray-600 mb-3">No messages configured</p>
-                  <Link href="/admin/messages">
-                    <Button size="sm">Add Messages</Button>
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>
-                Usage statistics and insights
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Detailed analytics will show user engagement patterns, popular message choices,
-                download trends, and geographic usage data.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Settings</CardTitle>
-              <CardDescription>
-                System configuration
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Admin settings will include logo management, color scheme updates,
-                email templates, and feature toggles.
-              </p>
+                    <Badge variant="secondary">{stats.messagesCount || 0}</Badge>
+                  </button>
+                </Link>
+                
+                <Link href="/admin/downloads">
+                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <Download className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm font-medium">View Downloads</span>
+                    </div>
+                    <Badge variant="secondary">{stats.totalDownloads || 0}</Badge>
+                  </button>
+                </Link>
+                
+                <Link href="/admin/analytics">
+                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-medium">Analytics</span>
+                    </div>
+                    <Badge variant="secondary">View</Badge>
+                  </button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
