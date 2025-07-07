@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, Search, Filter, Calendar } from "lucide-react";
+import { Download, Search, Filter, Calendar, Eye } from "lucide-react";
 import { format } from "date-fns";
 import type { Download as DownloadType } from "@shared/schema";
 import { AdminHeader } from "@/components/admin-header";
@@ -178,8 +178,9 @@ export default function AdminDownloads() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleViewImage(download.profileImage)}
+                    title="View full size image"
                   >
-                    View Full Size
+                    <Eye className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
