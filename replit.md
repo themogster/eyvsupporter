@@ -129,6 +129,15 @@ Changelog:
   • Enhanced mobile responsiveness with reduced padding and text sizes across all admin pages
   • Created comprehensive light/dark mode switcher in admin profile menu with full theme persistence
   • Applied dark mode styling to all admin components including header navigation and page backgrounds
+- July 07, 2025: Completely rebuilt authentication system with enhanced 4-step registration flow:
+  • Replaced single-step registration with progressive 4-step process: Welcome → Email → 2FA → Password → Auto-login
+  • Added role-based user system with "user" (default) and "admin" roles stored in PostgreSQL
+  • Created new NewAuthModal component with step-by-step UI flow and proper state management
+  • Updated all admin components to use new authentication hook (useAuth from use-new-auth.tsx)
+  • Added role-based middleware (requireAuth, requireAdmin, requireUser) for API route protection
+  • Fixed "Get Started" button functionality and registration step progression
+  • Maintained light mode enforcement for main photo editing app while preserving admin dark mode
+  • Eliminated all runtime errors from old authentication system and ensured clean component transitions
 ```
 
 ## User Preferences

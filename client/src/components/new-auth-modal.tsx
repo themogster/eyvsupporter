@@ -29,6 +29,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     registerStep3Mutation,
     loginMutation,
     resetRegistration,
+    setRegistrationStep,
   } = useAuth();
 
   // Forms for each step
