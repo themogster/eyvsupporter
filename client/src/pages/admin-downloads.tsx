@@ -57,14 +57,14 @@ export default function AdminDownloads() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminHeader />
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Download Analytics</h1>
-        <p className="text-gray-600">View and analyze profile picture downloads</p>
+      <div className="max-w-7xl mx-auto p-3 sm:p-6">
+        <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-2">Download Analytics</h1>
+        <p className="text-sm sm:text-base text-gray-600">View and analyze profile picture downloads</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
+      <Card className="mb-4 sm:mb-6">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Filter className="w-5 h-5 mr-2" />
@@ -149,9 +149,9 @@ export default function AdminDownloads() {
           ) : (
             <div className="space-y-4">
               {filteredDownloads.map((download: DownloadType) => (
-                <div key={download.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 relative">
+                <div key={download.id} className="flex items-center justify-between p-2 sm:p-4 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center space-x-2 sm:space-x-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 relative">
                       <img
                         src={download.profileImage}
                         alt="Profile"
