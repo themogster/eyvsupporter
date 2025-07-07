@@ -40,7 +40,7 @@ export function AdminHeader() {
 
   return (
     <div className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-[#b7b7b7]">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-3">
             <div className="hidden sm:flex w-8 h-8 bg-purple-600 rounded-lg items-center justify-center">
