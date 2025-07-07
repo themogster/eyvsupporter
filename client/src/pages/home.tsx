@@ -2,6 +2,7 @@
 import { UploadSection } from '@/components/upload-section';
 import { PreviewSection } from '@/components/preview-section';
 import { DownloadSection } from '@/components/download-section';
+import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 
@@ -18,6 +19,7 @@ export default function Home() {
     textPosition,
     processImage,
     proceedToDownload,
+    proceedToThankYou,
     downloadProcessedImage,
     shareImage,
     updateTransform,
@@ -77,6 +79,13 @@ export default function Home() {
             processedImage={processedImage}
             onDownload={downloadProcessedImage}
             onShare={shareImage}
+            onStartOver={startOver}
+            onProceedToThankYou={proceedToThankYou}
+          />
+        )}
+
+        {currentStep === 'thankyou' && (
+          <ThankYouSection
             onStartOver={startOver}
           />
         )}

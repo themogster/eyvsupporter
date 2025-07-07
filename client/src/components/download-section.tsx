@@ -9,10 +9,19 @@ interface DownloadSectionProps {
   onDownload: () => void;
   onShare: () => void;
   onStartOver: () => void;
+  onProceedToThankYou: () => void;
 }
 
-export function DownloadSection({ processedImage, onDownload, onShare, onStartOver }: DownloadSectionProps) {
+export function DownloadSection({ processedImage, onDownload, onShare, onStartOver, onProceedToThankYou }: DownloadSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  const handleDownload = () => {
+    onDownload();
+    // Transition to thank you stage after download
+    setTimeout(() => {
+      onProceedToThankYou();
+    }, 500);
+  };
 
   useEffect(() => {
     if (processedImage && canvasRef.current) {
@@ -71,7 +80,7 @@ export function DownloadSection({ processedImage, onDownload, onShare, onStartOv
 
       <div className="space-y-3">
         <Button
-          onClick={onDownload}
+          onClick={handleDownload}
           className="w-full bg-deep-purple hover:bg-purple-700 text-white py-4 px-6 text-lg font-semibold shadow-lg touch-manipulation"
           size="lg"
         >

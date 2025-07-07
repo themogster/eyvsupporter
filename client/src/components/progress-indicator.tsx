@@ -6,7 +6,7 @@ interface ProgressIndicatorProps {
 }
 
 export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
-  const steps = ['upload', 'preview', 'download'] as const;
+  const steps = ['upload', 'preview', 'download', 'thankyou'] as const;
   
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-md mx-auto">

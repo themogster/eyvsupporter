@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { ImageProcessor, ProcessedImage, ImageTransform, ProcessingOptions, CurvedTextOption, TextColor, validateImageFile, downloadImage } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
 
-export type Step = 'upload' | 'preview' | 'download';
+export type Step = 'upload' | 'preview' | 'download' | 'thankyou';
 
 export function useImageProcessor() {
   const [currentStep, setCurrentStep] = useState<Step>('upload');
@@ -66,6 +66,10 @@ export function useImageProcessor() {
 
   const proceedToDownload = useCallback(() => {
     setCurrentStep('download');
+  }, []);
+
+  const proceedToThankYou = useCallback(() => {
+    setCurrentStep('thankyou');
   }, []);
 
   const downloadProcessedImage = useCallback(async () => {
@@ -258,6 +262,7 @@ export function useImageProcessor() {
     textPosition,
     processImage,
     proceedToDownload,
+    proceedToThankYou,
     downloadProcessedImage,
     shareImage,
     updateTransform,
