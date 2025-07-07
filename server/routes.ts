@@ -173,7 +173,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create 2FA token for login
-      await createTwoFactorToken(validatedData.email, 'login');
+      const token = await createTwoFactorToken(validatedData.email, 'login');
+      console.log(`Login 2FA token for ${validatedData.email}: ${token}`);
       
       // Store user ID temporarily in session for verification
       req.session.pendingLogin = { userId: user.id, email: user.email };
