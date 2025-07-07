@@ -43,12 +43,12 @@ export function AdminHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+            <div className="hidden sm:flex w-8 h-8 bg-purple-600 rounded-lg items-center justify-center">
               <LayoutDashboard className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-semibold text-gray-900">EYV Admin</h1>
-              <p className="text-sm text-gray-500">Management Dashboard</p>
+              <p className="hidden sm:block text-sm text-gray-500">Management Dashboard</p>
             </div>
           </div>
           
