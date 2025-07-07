@@ -206,7 +206,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
           
           <div className="mt-4 text-sm text-gray-600">
             <p>Optimized for Facebook (180x180px)</p>
-            <p className="text-xs mt-1">Circular frame with EYV branding applied</p>
             <p className="text-xs mt-2 text-blue-600 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
           </div>
         </div>
