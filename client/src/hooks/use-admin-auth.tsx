@@ -3,6 +3,7 @@ import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query"
 import { AdminLogin, AdminRegisterEmail, AdminSetPassword, VerifyTwoFactor } from "@shared/schema";
 import { apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 type AdminUser = {
   id: number;
@@ -31,6 +32,7 @@ export const AdminAuthContext = createContext<AdminAuthContextType | null>(null)
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const {
     data: user,
@@ -187,6 +189,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         title: "Logged out",
         description: "You have been successfully logged out",
       });
+      navigate("/");
     },
     onError: (error: Error) => {
       toast({
