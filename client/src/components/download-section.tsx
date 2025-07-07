@@ -41,7 +41,6 @@ export function DownloadSection({ processedImage, onDownload, onShare, onStartOv
         </div>
         <h2 className="text-lg font-semibold text-gray-800">Ready to Download</h2>
       </div>
-
       {/* Show the processed image */}
       <Card className="p-6">
         <div className="bg-gray-100 rounded-lg p-6 text-center">
@@ -67,17 +66,15 @@ export function DownloadSection({ processedImage, onDownload, onShare, onStartOv
           </div>
         </div>
       </Card>
-
       <Card className="p-4 bg-green-50 border-green-200">
         <div className="flex items-center space-x-3">
           <CheckCircle className="w-6 h-6 text-green-500" />
           <div>
             <p className="text-green-800 font-medium">Your profile picture is ready!</p>
-            <p className="text-green-700 text-sm">Optimized for Facebook with EYV branding</p>
+            <p className="text-green-700 text-sm">Optimized for Facebook and supporting EYV</p>
           </div>
         </div>
       </Card>
-
       <div className="space-y-3">
         <Button
           onClick={handleDownload}
