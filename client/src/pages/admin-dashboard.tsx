@@ -123,22 +123,24 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {stats.recentDownloads?.slice(0, 5).map((download: any) => (
-                  <div key={download.id} className="flex items-center justify-between border-b pb-2">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Download className="w-4 h-4 text-purple-600" />
+                {Array.isArray(stats.recentDownloads) && stats.recentDownloads.length > 0 ? (
+                  stats.recentDownloads.slice(0, 5).map((download: any) => (
+                    <div key={download.id} className="flex items-center justify-between border-b pb-2">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Download className="w-4 h-4 text-purple-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{download.eyv_message || 'No text'}</p>
+                          <p className="text-xs text-gray-500">{download.ip_address}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium">{download.eyv_message || 'No text'}</p>
-                        <p className="text-xs text-gray-500">{download.ip_address}</p>
+                      <div className="text-xs text-gray-500">
+                        {format(new Date(download.created_at), 'MMM dd, HH:mm')}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {format(new Date(download.created_at), 'MMM dd, HH:mm')}
-                    </div>
-                  </div>
-                )) || (
+                  ))
+                ) : (
                   <p className="text-sm text-gray-500">No recent downloads</p>
                 )}
               </div>
