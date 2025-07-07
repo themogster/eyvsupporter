@@ -25,10 +25,7 @@ export default function AdminDashboard() {
     }
   }, [user, setLocation]);
 
-  if (!user) {
-    return null;
-  }
-
+  // Always call hooks before any early returns
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ["/api/admin/dashboard"],
     queryFn: async () => {
@@ -36,11 +33,18 @@ export default function AdminDashboard() {
       if (!res.ok) throw new Error("Failed to fetch dashboard data");
       return res.json();
     },
+    enabled: !!user, // Only run query if user is authenticated
   });
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
+  const handleLogout = async () => {
+    await logoutMutation.mutateAsync();
   };
+
+  if (!user) {
+    return null;
+  }
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
