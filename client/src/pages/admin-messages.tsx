@@ -22,10 +22,12 @@ export default function AdminMessages() {
   const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  const { data: messages = [], isLoading } = useQuery({
+  const { data: messagesResponse, isLoading } = useQuery({
     queryKey: ["/api/admin/messages"],
     enabled: !!user,
   });
+
+  const messages = messagesResponse?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (messageData: InsertMessage) => {

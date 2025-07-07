@@ -22,7 +22,7 @@ export default function AdminDownloads() {
     enabled: !!user,
   });
 
-  const { data: messagesData } = useQuery({
+  const { data: messagesResponse } = useQuery({
     queryKey: ["/api/admin/messages"],
     enabled: !!user,
   });
@@ -33,7 +33,7 @@ export default function AdminDownloads() {
 
   const downloads = downloadsData?.data || [];
   const pagination = downloadsData?.pagination;
-  const messages = messagesData?.data || [];
+  const messages = messagesResponse?.data || [];
 
   // Filter downloads based on search and message filter
   const filteredDownloads = downloads.filter((download: DownloadType) => {

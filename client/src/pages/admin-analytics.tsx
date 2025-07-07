@@ -9,7 +9,7 @@ import { AdminNav } from "@/components/admin-nav";
 export default function AdminAnalytics() {
   const { user } = useAdminAuth();
 
-  const { data: analyticsData, isLoading } = useQuery({
+  const { data: analyticsResponse, isLoading } = useQuery({
     queryKey: ["/api/admin/analytics"],
     enabled: !!user,
   });
@@ -18,7 +18,7 @@ export default function AdminAnalytics() {
     return <div>Not authenticated</div>;
   }
 
-  const analytics = analyticsData?.data;
+  const analytics = analyticsResponse?.data;
 
   // Prepare chart data
   const dailyChartData = analytics?.dailyStats?.map((stat: any) => ({
