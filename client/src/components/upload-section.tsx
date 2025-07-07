@@ -185,19 +185,7 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
           />
         </Card>
 
-        {/* Camera Capture */}
-        <Button
-          onClick={startCamera}
-          variant="outline"
-          className="w-full p-6 h-auto bg-gray-100 hover:bg-gray-200 touch-manipulation"
-          disabled={isProcessing}
-        >
-          <div className="text-center">
-            <Camera className="w-8 h-8 text-gray-600 mb-3 mx-auto" />
-            <p className="text-gray-700 font-medium mb-1">Take Photo</p>
-            <p className="text-sm text-gray-500">Use your camera</p>
-          </div>
-        </Button>
+
 
       </div>
     </div>
