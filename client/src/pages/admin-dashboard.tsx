@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogOut, Users, MessageSquare, Download, Calendar, User, ChevronDown, Settings } from "lucide-react";
+import { LogOut, Users, MessageSquare, Download, Calendar, User, ChevronDown, Settings, BarChart3, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
+import { AdminNav } from "@/components/admin-nav";
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAdminAuth();
@@ -96,6 +98,8 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation */}
+        <AdminNav />
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -110,7 +114,9 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">{dashboardData?.data?.messagesCount || 0}</div>
               )}
               <p className="text-xs text-muted-foreground">
-                Available in dropdown
+                <Link href="/admin/messages" className="text-blue-600 hover:underline">
+                  Manage messages →
+                </Link>
               </p>
             </CardContent>
           </Card>
@@ -124,44 +130,46 @@ export default function AdminDashboard() {
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <div className="text-2xl font-bold">-</div>
+                <div className="text-2xl font-bold">{dashboardData?.data?.totalDownloads || 0}</div>
               )}
               <p className="text-xs text-muted-foreground">
-                Coming soon
+                <Link href="/admin/downloads" className="text-blue-600 hover:underline">
+                  View details →
+                </Link>
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Month</CardTitle>
+              <CardTitle className="text-sm font-medium">Recent (7 days)</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <div className="text-2xl font-bold">-</div>
+                <div className="text-2xl font-bold">{dashboardData?.data?.recentDownloads || 0}</div>
               )}
               <p className="text-xs text-muted-foreground">
-                Coming soon
+                Downloads this week
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Today</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <div className="text-2xl font-bold">-</div>
+                <div className="text-2xl font-bold">{dashboardData?.data?.todayDownloads || 0}</div>
               )}
               <p className="text-xs text-muted-foreground">
-                Coming soon
+                Downloads today
               </p>
             </CardContent>
           </Card>
@@ -171,31 +179,91 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Recent Downloads</CardTitle>
               <CardDescription>
-                Latest downloads and user interactions
+                Latest profile picture downloads
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">
-                Activity tracking will be available soon. This will show recent profile picture downloads,
-                message selections, and user engagement metrics.
-              </p>
+              {isLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-24 mb-1" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : dashboardData?.data?.downloads?.length > 0 ? (
+                <div className="space-y-3">
+                  {dashboardData.data.downloads.slice(0, 5).map((download: any) => (
+                    <div key={download.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50">
+                      <img
+                        src={download.profileImage}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {download.ipAddress}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {download.eyvMessage ? `Message: ${download.eyvMessage}` : 'No message'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <Link href="/admin/downloads" className="block text-center text-sm text-blue-600 hover:underline pt-2">
+                    View all downloads →
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600 text-center py-4">
+                  No downloads yet
+                </p>
+              )}
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Message Management</CardTitle>
+              <CardTitle>Available Messages</CardTitle>
               <CardDescription>
-                Manage EYV support messages
+                Current curved text options
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">
-                Message editing and management features will be available soon. You'll be able to add,
-                edit, and reorder the curved text options available to users.
-              </p>
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </div>
+              ) : dashboardData?.data?.messages?.length > 0 ? (
+                <div className="space-y-2">
+                  {dashboardData.data.messages.map((message: any) => (
+                    <div key={message.id} className="flex items-center justify-between p-2 rounded border">
+                      <span className="text-sm font-medium">{message.displayText}</span>
+                      <span className={`text-xs px-2 py-1 rounded ${message.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {message.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                  ))}
+                  <Link href="/admin/messages" className="block text-center text-sm text-blue-600 hover:underline pt-2">
+                    Manage messages →
+                  </Link>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-600 mb-3">No messages configured</p>
+                  <Link href="/admin/messages">
+                    <Button size="sm">Add Messages</Button>
+                  </Link>
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -258,21 +258,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Get basic stats - you can expand this later
       const messages = await storage.getMessages();
-      // TODO: Add download stats, user stats, etc.
+      const downloads = await storage.getDownloads();
+      const recentDownloads = await storage.getRecentDownloads(7); // Last 7 days
+      const todayDownloads = await storage.getTodayDownloads();
       
       res.json({
         success: true,
         data: {
           messagesCount: messages.length,
-          // downloadCount: downloads.length, // TODO: implement
-          // Add more stats as needed
+          totalDownloads: downloads.length,
+          recentDownloads: recentDownloads.length,
+          todayDownloads: todayDownloads.length,
+          messages,
+          downloads: downloads.slice(0, 10), // Recent 10 downloads
         }
       });
     } catch (error) {
       console.error('Error getting dashboard data:', error);
       res.status(500).json({ error: 'Failed to get dashboard data' });
+    }
+  });
+
+  // Admin message management
+  app.get("/api/admin/messages", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const messages = await storage.getMessages();
+      res.json({ success: true, data: messages });
+    } catch (error) {
+      console.error('Error getting messages:', error);
+      res.status(500).json({ error: 'Failed to get messages' });
+    }
+  });
+
+  app.post("/api/admin/messages", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const messageData = insertMessageSchema.parse(req.body);
+      const message = await storage.createMessage(messageData);
+      res.json({ success: true, data: message });
+    } catch (error) {
+      console.error('Error creating message:', error);
+      res.status(400).json({ error: 'Failed to create message' });
+    }
+  });
+
+  app.put("/api/admin/messages/:id", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const id = parseInt(req.params.id);
+      const messageData = insertMessageSchema.partial().parse(req.body);
+      const message = await storage.updateMessage(id, messageData);
+      res.json({ success: true, data: message });
+    } catch (error) {
+      console.error('Error updating message:', error);
+      res.status(400).json({ error: 'Failed to update message' });
+    }
+  });
+
+  app.delete("/api/admin/messages/:id", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteMessage(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      res.status(400).json({ error: 'Failed to delete message' });
+    }
+  });
+
+  // Admin download analytics
+  app.get("/api/admin/downloads", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const downloads = await storage.getDownloadsPaginated(page, limit);
+      const total = await storage.getDownloadsCount();
+      
+      res.json({ 
+        success: true, 
+        data: downloads,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error) {
+      console.error('Error getting downloads:', error);
+      res.status(500).json({ error: 'Failed to get downloads' });
+    }
+  });
+
+  // Admin analytics
+  app.get("/api/admin/analytics", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const analytics = await storage.getAnalytics();
+      res.json({ success: true, data: analytics });
+    } catch (error) {
+      console.error('Error getting analytics:', error);
+      res.status(500).json({ error: 'Failed to get analytics' });
     }
   });
 

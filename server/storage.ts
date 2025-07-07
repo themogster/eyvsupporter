@@ -1,11 +1,11 @@
 import { 
   users, downloads, messages, adminUsers, twoFactorTokens,
   type User, type InsertUser, type Download, type InsertDownload, 
-  type Message, type AdminUser, type InsertAdminUser, 
+  type Message, type InsertMessage, type AdminUser, type InsertAdminUser, 
   type TwoFactorToken, type InsertTwoFactorToken 
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, asc, and, gt } from "drizzle-orm";
+import { eq, asc, and, gt, desc, gte, sql } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -16,6 +16,17 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   logDownload(download: InsertDownload): Promise<Download>;
   getMessages(): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  updateMessage(id: number, message: Partial<InsertMessage>): Promise<Message>;
+  deleteMessage(id: number): Promise<void>;
+  
+  // Download analytics
+  getDownloads(): Promise<Download[]>;
+  getDownloadsPaginated(page: number, limit: number): Promise<Download[]>;
+  getDownloadsCount(): Promise<number>;
+  getRecentDownloads(days: number): Promise<Download[]>;
+  getTodayDownloads(): Promise<Download[]>;
+  getAnalytics(): Promise<any>;
   
   // Admin user methods
   getAdminUser(id: number): Promise<AdminUser | undefined>;
@@ -64,6 +75,99 @@ export class DatabaseStorage implements IStorage {
       .where(eq(messages.isActive, true))
       .orderBy(asc(messages.sortOrder));
     return messageList;
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async updateMessage(id: number, updateData: Partial<InsertMessage>): Promise<Message> {
+    const [message] = await db
+      .update(messages)
+      .set(updateData)
+      .where(eq(messages.id, id))
+      .returning();
+    return message;
+  }
+
+  async deleteMessage(id: number): Promise<void> {
+    await db.delete(messages).where(eq(messages.id, id));
+  }
+
+  async getDownloads(): Promise<Download[]> {
+    const downloadList = await db.select().from(downloads).orderBy(desc(downloads.createdAt));
+    return downloadList;
+  }
+
+  async getDownloadsPaginated(page: number, limit: number): Promise<Download[]> {
+    const offset = (page - 1) * limit;
+    const downloadList = await db.select()
+      .from(downloads)
+      .orderBy(desc(downloads.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return downloadList;
+  }
+
+  async getDownloadsCount(): Promise<number> {
+    const result = await db.select({ count: sql`count(*)` }).from(downloads);
+    return Number(result[0].count);
+  }
+
+  async getRecentDownloads(days: number): Promise<Download[]> {
+    const dateThreshold = new Date();
+    dateThreshold.setDate(dateThreshold.getDate() - days);
+    
+    const downloadList = await db.select()
+      .from(downloads)
+      .where(gte(downloads.createdAt, dateThreshold))
+      .orderBy(desc(downloads.createdAt));
+    return downloadList;
+  }
+
+  async getTodayDownloads(): Promise<Download[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const downloadList = await db.select()
+      .from(downloads)
+      .where(gte(downloads.createdAt, today));
+    return downloadList;
+  }
+
+  async getAnalytics(): Promise<any> {
+    // Get downloads by message type
+    const messageStats = await db.select({
+      message: downloads.eyvMessage,
+      count: sql`count(*)`
+    })
+    .from(downloads)
+    .groupBy(downloads.eyvMessage);
+
+    // Get downloads by day for the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const dailyStats = await db.select({
+      date: sql`DATE(${downloads.createdAt})`,
+      count: sql`count(*)`
+    })
+    .from(downloads)
+    .where(gte(downloads.createdAt, thirtyDaysAgo))
+    .groupBy(sql`DATE(${downloads.createdAt})`)
+    .orderBy(sql`DATE(${downloads.createdAt})`);
+
+    return {
+      messageStats,
+      dailyStats,
+      totalDownloads: await this.getDownloadsCount(),
+      recentDownloads: (await this.getRecentDownloads(7)).length,
+      todayDownloads: (await this.getTodayDownloads()).length,
+    };
   }
 
   // Admin user methods
