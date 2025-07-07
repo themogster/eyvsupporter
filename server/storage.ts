@@ -143,13 +143,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAnalytics(): Promise<any> {
-    // Get downloads by message type
+    // Get downloads by message type with consolidation of empty/none values
     const messageStats = await db.select({
-      message: downloads.eyvMessage,
+      message: sql<string>`CASE 
+        WHEN ${downloads.eyvMessage} = 'none' OR ${downloads.eyvMessage} = '' OR ${downloads.eyvMessage} IS NULL 
+        THEN 'No Text' 
+        ELSE ${downloads.eyvMessage} 
+      END`,
       count: sql`count(*)`
     })
     .from(downloads)
-    .groupBy(downloads.eyvMessage);
+    .groupBy(sql`CASE 
+      WHEN ${downloads.eyvMessage} = 'none' OR ${downloads.eyvMessage} = '' OR ${downloads.eyvMessage} IS NULL 
+      THEN 'No Text' 
+      ELSE ${downloads.eyvMessage} 
+    END`);
 
     // Get downloads by day for the last 30 days
     const thirtyDaysAgo = new Date();
