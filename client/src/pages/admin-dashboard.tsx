@@ -14,7 +14,12 @@ export default function AdminDashboard() {
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/admin/dashboard"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/dashboard");
+      const res = await fetch("/api/admin/dashboard", {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch dashboard data");
       return res.json();
     },
@@ -61,6 +66,8 @@ export default function AdminDashboard() {
   }
 
   const stats = dashboardData?.data || {};
+  
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -133,12 +140,12 @@ export default function AdminDashboard() {
                           <Download className="w-4 h-4 text-purple-600" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{download.eyv_message || 'No text'}</p>
-                          <p className="text-xs text-gray-500">{download.ip_address}</p>
+                          <p className="text-sm font-medium">{download.eyvMessage || 'No text'}</p>
+                          <p className="text-xs text-gray-500">{download.ipAddress}</p>
                         </div>
                       </div>
                       <div className="text-xs text-gray-500">
-                        {download.created_at ? format(new Date(download.created_at), 'MMM dd, HH:mm') : 'Unknown'}
+                        {download.createdAt ? format(new Date(download.createdAt), 'MMM dd, HH:mm') : 'Unknown'}
                       </div>
                     </div>
                   ))

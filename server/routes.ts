@@ -254,6 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin dashboard data (protected route)
   app.get("/api/admin/dashboard", async (req, res) => {
+
     if (!req.session.adminUser) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
