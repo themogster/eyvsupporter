@@ -63,11 +63,10 @@ export default function AdminDashboard() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="flex items-center space-x-2 hover:bg-gray-100"
+                    size="icon"
+                    className="rounded-full w-8 h-8 hover:bg-gray-100"
                   >
-                    <User className="w-4 h-4" />
-                    <span className="text-sm text-gray-600">{user.email}</span>
-                    <ChevronDown className="w-4 h-4" />
+                    <User className="w-5 h-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
