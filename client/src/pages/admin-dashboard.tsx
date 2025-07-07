@@ -124,7 +124,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {Array.isArray(stats.recentDownloads) && stats.recentDownloads.length > 0 ? (
-                  stats.recentDownloads.slice(0, 5).map((download: any) => (
+                  stats.recentDownloads.slice(0, 10).map((download: any) => (
                     <div key={download.id} className="flex items-center justify-between border-b pb-2">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -156,40 +156,29 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-              <CardDescription>Common administrative tasks</CardDescription>
+              <CardTitle className="text-lg">Top Text Messages</CardTitle>
+              <CardDescription>Most popular curved text selections</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Link href="/admin/messages">
-                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <MessageSquare className="w-5 h-5 text-purple-600" />
-                      <span className="text-sm font-medium">Manage Messages</span>
+                {Array.isArray(stats.topMessages) && stats.topMessages.length > 0 ? (
+                  stats.topMessages.slice(0, 5).map((message: any, index: number) => (
+                    <div key={message.id || index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-medium text-purple-600">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{message.text || message.key || 'No text'}</p>
+                          <p className="text-xs text-gray-500">{message.count || 0} uses</p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary">{message.count || 0}</Badge>
                     </div>
-                    <Badge variant="secondary">{stats.messagesCount || 0}</Badge>
-                  </button>
-                </Link>
-                
-                <Link href="/admin/downloads">
-                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <Download className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm font-medium">View Downloads</span>
-                    </div>
-                    <Badge variant="secondary">{stats.totalDownloads || 0}</Badge>
-                  </button>
-                </Link>
-                
-                <Link href="/admin/analytics">
-                  <button className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-medium">Analytics</span>
-                    </div>
-                    <Badge variant="secondary">View</Badge>
-                  </button>
-                </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No message data available</p>
+                )}
               </div>
             </CardContent>
           </Card>

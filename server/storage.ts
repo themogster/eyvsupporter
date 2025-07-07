@@ -39,6 +39,9 @@ export interface IStorage {
   getTwoFactorToken(email: string, token: string, type: string): Promise<TwoFactorToken | undefined>;
   markTwoFactorTokenUsed(id: number): Promise<void>;
   cleanupExpiredTokens(): Promise<void>;
+  
+  // Analytics methods
+  getTopMessages(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -232,6 +235,24 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(twoFactorTokens)
       .where(gt(new Date(), twoFactorTokens.expiresAt));
+  }
+
+  async getTopMessages(): Promise<any[]> {
+    const topMessages = await db
+      .select({
+        message: downloads.eyvMessage,
+        count: sql<number>`COUNT(*)`
+      })
+      .from(downloads)
+      .where(isNotNull(downloads.eyvMessage))
+      .groupBy(downloads.eyvMessage)
+      .orderBy(sql`COUNT(*) DESC`)
+      .limit(5);
+
+    return topMessages.map(item => ({
+      text: item.message,
+      count: item.count
+    }));
   }
 }
 

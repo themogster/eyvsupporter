@@ -263,16 +263,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const downloads = await storage.getDownloads();
       const recentDownloads = await storage.getRecentDownloads(7); // Last 7 days
       const todayDownloads = await storage.getTodayDownloads();
+      const topMessages = await storage.getTopMessages();
       
       res.json({
         success: true,
         data: {
           messagesCount: messages.length,
           totalDownloads: downloads.length,
-          recentDownloads: recentDownloads.length,
+          recentDownloads: recentDownloads,
           todayDownloads: todayDownloads.length,
+          weekDownloads: recentDownloads.length,
           messages,
-          downloads: downloads.slice(0, 10), // Recent 10 downloads
+          topMessages,
         }
       });
     } catch (error) {
