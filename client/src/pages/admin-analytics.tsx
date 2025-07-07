@@ -50,7 +50,7 @@ export default function AdminAnalytics() {
   const dailyChartData = getDailyChartData();
 
   const messageChartData = analytics?.messageStats?.map((stat: any) => ({
-    name: stat.message || 'No Text',
+    name: (stat.message === 'none' || !stat.message) ? 'No Text' : stat.message,
     value: Number(stat.count)
   })) || [];
 
