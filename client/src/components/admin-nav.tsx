@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, MessageSquare, Download, BarChart3, Home } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Download, BarChart3, Home, Users } from "lucide-react";
 
 const navItems = [
   {
@@ -27,6 +27,11 @@ const navItems = [
     href: "/admin/analytics",
     label: "Analytics",
     icon: BarChart3,
+  },
+  {
+    href: "/admin/users",
+    label: "Users",
+    icon: Users,
   },
 ];
 

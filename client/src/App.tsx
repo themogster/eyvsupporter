@@ -11,6 +11,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import AdminMessages from "@/pages/admin-messages";
 import AdminDownloads from "@/pages/admin-downloads";
 import AdminAnalytics from "@/pages/admin-analytics";
+import AdminUsers from "@/pages/admin-users";
 import NotFound from "@/pages/not-found";
 
 console.log('App.tsx loading');
@@ -38,6 +39,11 @@ function Router() {
       <Route path="/admin/analytics">
         <AdminRoute>
           <AdminAnalytics />
+        </AdminRoute>
+      </Route>
+      <Route path="/admin/users">
+        <AdminRoute>
+          <AdminUsers />
         </AdminRoute>
       </Route>
       <Route component={NotFound} />

@@ -30,6 +30,9 @@ export interface IStorage {
   getAdminUserByEmail(email: string): Promise<AdminUser | undefined>;
   createAdminUser(user: InsertAdminUser): Promise<AdminUser>;
   updateAdminUserLastLogin(id: number): Promise<void>;
+  getAllAdminUsers(): Promise<AdminUser[]>;
+  updateAdminUser(id: number, updates: Partial<InsertAdminUser>): Promise<AdminUser>;
+  deleteAdminUser(id: number): Promise<void>;
   
   // 2FA methods
   createTwoFactorToken(token: InsertTwoFactorToken): Promise<TwoFactorToken>;
@@ -188,6 +191,29 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(adminUsers)
       .set({ lastLogin: new Date() })
+      .where(eq(adminUsers.id, id));
+  }
+
+  async getAllAdminUsers(): Promise<AdminUser[]> {
+    const usersList = await db
+      .select()
+      .from(adminUsers)
+      .orderBy(desc(adminUsers.createdAt));
+    return usersList;
+  }
+
+  async updateAdminUser(id: number, updates: Partial<InsertAdminUser>): Promise<AdminUser> {
+    const [user] = await db
+      .update(adminUsers)
+      .set(updates)
+      .where(eq(adminUsers.id, id))
+      .returning();
+    return user;
+  }
+
+  async deleteAdminUser(id: number): Promise<void> {
+    await db
+      .delete(adminUsers)
       .where(eq(adminUsers.id, id));
   }
 

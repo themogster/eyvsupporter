@@ -343,6 +343,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Users management routes (admin only)
+  app.get("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllAdminUsers();
+      res.json(users);
+    } catch (error) {
+      console.error('Error getting users:', error);
+      res.status(500).json({ error: 'Failed to get users' });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      // If password is provided, hash it
+      if (updates.password) {
+        updates.password = await hashPassword(updates.password);
+      }
+      
+      const user = await storage.updateAdminUser(id, updates);
+      res.json(user);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ error: 'Failed to update user' });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteAdminUser(id);
+      res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Failed to delete user' });
+    }
+  });
+
   // Admin message management
   app.get("/api/admin/messages", async (req, res) => {
     if (!req.session.adminUser) {
