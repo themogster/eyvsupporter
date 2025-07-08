@@ -78,12 +78,17 @@ export async function sendTwoFactorEmail(email: string, token: string, type: str
 }
 
 export async function verifyAdminUser(email: string, password: string): Promise<AdminUser | null> {
+  console.log('Verifying admin user:', email);
   const user = await storage.getAdminUserByEmail(email);
+  console.log('User found:', user ? 'YES' : 'NO');
   if (!user || !user.isActive) {
+    console.log('User not found or inactive');
     return null;
   }
 
+  console.log('Checking password...');
   const isPasswordValid = await comparePasswords(password, user.password);
+  console.log('Password valid:', isPasswordValid);
   if (!isPasswordValid) {
     return null;
   }

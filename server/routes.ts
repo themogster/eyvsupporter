@@ -234,9 +234,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin login - direct login without 2FA
   app.post("/api/admin/login", async (req, res) => {
     try {
+      console.log('Admin login attempt:', { email: req.body.email });
       const validatedData = adminLoginSchema.parse(req.body);
       
       const user = await verifyAdminUser(validatedData.email, validatedData.password);
+      console.log('Login verification result:', user ? 'SUCCESS' : 'FAILED');
       if (!user) {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
