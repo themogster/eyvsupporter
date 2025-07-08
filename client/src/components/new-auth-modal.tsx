@@ -155,7 +155,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white text-gray-900 border-gray-200 [&_*]:text-gray-900">
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-deep-purple" />
@@ -174,9 +174,9 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
                 <User className="w-8 h-8 text-deep-purple" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Welcome back!</h3>
-                <p className="text-sm text-gray-500">{user.email}</p>
-                <p className="text-xs text-gray-400 mt-1">Role: {user.role}</p>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Welcome back!</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Role: {user.role}</p>
               </div>
               <div className="space-y-2">
                 {user.role === 'admin' && (
@@ -265,7 +265,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
               {registrationStep === 0 && (
                 <div className="text-center">
                   <User className="w-12 h-12 text-deep-purple mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">Ready to create your account?</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">Ready to create your account?</p>
                   <Button
                     onClick={() => setRegistrationStep(1)}
                     className="w-full bg-deep-purple hover:bg-purple-700"
@@ -405,7 +405,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
           )}
 
           {/* Switch between login and registration */}
-          <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
             {isLogin ? (
               <button
                 onClick={switchToRegistration}
