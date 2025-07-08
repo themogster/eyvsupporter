@@ -182,7 +182,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       </div>
       {/* Canvas Preview Card */}
       <Card className="p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
-        <div className="dark:bg-gray-700 rounded-lg p-6 text-center bg-[#1f2937]">
+        <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 text-center">
           <div className="relative inline-block">
             <div className="w-48 h-48 mx-auto relative">
               {processedImage ? (
