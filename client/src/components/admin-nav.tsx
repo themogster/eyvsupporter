@@ -1,13 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, MessageSquare, Download, BarChart3, Home, Users } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Download, BarChart3, Users } from "lucide-react";
 
 const navItems = [
-  {
-    href: "/",
-    label: "Main App",
-    icon: Home,
-  },
   {
     href: "/admin",
     label: "Dashboard",
@@ -37,6 +32,7 @@ const navItems = [
 
 export function AdminNav() {
   const [location] = useLocation();
+  // Navigation includes Users menu item
 
   return (
     <div className="bg-purple-700 border-t border-purple-500 py-2">
