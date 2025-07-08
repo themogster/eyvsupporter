@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { AdminHeader } from "@/components/admin-header";
 
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Plus, User } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, Edit, Plus, User, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { AdminUser } from "@shared/schema";
@@ -21,6 +22,9 @@ interface UserFormData {
   password?: string;
 }
 
+type SortField = 'email' | 'role' | 'created_at' | 'last_login_at';
+type SortOrder = 'asc' | 'desc';
+
 export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -29,11 +33,42 @@ export default function AdminUsersPage() {
     role: "user",
     password: ""
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>('email');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch users
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ["/api/admin/users"],
   });
+
+  // Filtered and sorted users
+  const filteredAndSortedUsers = useMemo(() => {
+    let filtered = users.filter(user =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      // Handle null values
+      if (aValue === null) aValue = '';
+      if (bValue === null) bValue = '';
+
+      // Convert to string for comparison
+      aValue = String(aValue);
+      bValue = String(bValue);
+
+      if (sortOrder === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }, [users, searchTerm, sortField, sortOrder]);
 
   // Update user mutation
   const updateUserMutation = useMutation({
@@ -81,6 +116,69 @@ export default function AdminUsersPage() {
     },
   });
 
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const promises = ids.map(id => apiRequest("DELETE", `/api/admin/users/${id}`));
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setSelectedUsers(new Set());
+      setIsDeleteDialogOpen(false);
+      toast({
+        title: "Users deleted",
+        description: `${selectedUsers.size} users have been successfully deleted`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Helper functions
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(new Set(filteredAndSortedUsers.map(u => u.id)));
+    } else {
+      setSelectedUsers(new Set());
+    }
+  };
+
+  const handleSelectUser = (userId: number, checked: boolean) => {
+    const newSelected = new Set(selectedUsers);
+    if (checked) {
+      newSelected.add(userId);
+    } else {
+      newSelected.delete(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedUsers.size > 0) {
+      bulkDeleteMutation.mutate(Array.from(selectedUsers));
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="w-4 h-4" />;
+    return sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
+  };
+
   const handleEdit = (user: AdminUser) => {
     setEditingUser(user);
     setFormData({
@@ -126,13 +224,41 @@ export default function AdminUsersPage() {
             <h1 className="text-3xl font-bold text-foreground">Users Management</h1>
             <p className="text-muted-foreground mt-1">Manage registered users and their permissions</p>
           </div>
+          <div className="flex items-center gap-2">
+            {selectedUsers.size > 0 && (
+              <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Selected ({selectedUsers.size})
+              </Button>
+            )}
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add User
+            </Button>
+          </div>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="mb-6 flex gap-4 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search users by email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {filteredAndSortedUsers.length} of {users.length} users
+          </div>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Registered Users ({users.length})
+              Registered Users ({filteredAndSortedUsers.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -141,27 +267,59 @@ export default function AdminUsersPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-muted-foreground mt-2">Loading users...</p>
               </div>
-            ) : users.length === 0 ? (
+            ) : filteredAndSortedUsers.length === 0 ? (
               <div className="text-center py-8">
                 <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No users found</p>
+                <p className="text-muted-foreground">
+                  {searchTerm ? 'No users found matching your search' : 'No users found'}
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Role</TableHead>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedUsers.size === filteredAndSortedUsers.length && filteredAndSortedUsers.length > 0}
+                          onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                          aria-label="Select all users"
+                        />
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('email')} className="h-auto p-0 font-semibold">
+                          Email {getSortIcon('email')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('role')} className="h-auto p-0 font-semibold">
+                          Role {getSortIcon('role')}
+                        </Button>
+                      </TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Last Login</TableHead>
-                      <TableHead>Created</TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('last_login_at')} className="h-auto p-0 font-semibold">
+                          Last Login {getSortIcon('last_login_at')}
+                        </Button>
+                      </TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('created_at')} className="h-auto p-0 font-semibold">
+                          Created {getSortIcon('created_at')}
+                        </Button>
+                      </TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {filteredAndSortedUsers.map((user) => (
                       <TableRow key={user.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedUsers.has(user.id)}
+                            onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                            aria-label={`Select user ${user.email}`}
+                          />
+                        </TableCell>
                         <TableCell className="font-medium">{user.email}</TableCell>
                         <TableCell>
                           <Badge variant={user.role === "admin" ? "default" : "secondary"}>
@@ -266,6 +424,52 @@ export default function AdminUsersPage() {
                   {updateUserMutation.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Bulk Delete</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to delete {selectedUsers.size} selected user{selectedUsers.size === 1 ? '' : 's'}? 
+                This action cannot be undone.
+              </p>
+              <div className="mt-4 max-h-40 overflow-y-auto">
+                <p className="text-sm font-medium mb-2">Users to be deleted:</p>
+                <ul className="text-sm space-y-1">
+                  {Array.from(selectedUsers).map(userId => {
+                    const user = users.find(u => u.id === userId);
+                    return user ? (
+                      <li key={userId} className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {user.role}
+                        </Badge>
+                        {user.email}
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleBulkDelete}
+                disabled={bulkDeleteMutation.isPending}
+              >
+                {bulkDeleteMutation.isPending ? "Deleting..." : "Delete Users"}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
