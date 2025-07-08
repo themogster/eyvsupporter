@@ -5,16 +5,12 @@ import { PreviewSection } from '@/components/preview-section';
 import { DownloadSection } from '@/components/download-section';
 import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
-import { NewAuthModal } from '@/components/new-auth-modal';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 import { AdminNav } from '@/components/admin-nav';
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { SettingsDropdown } from '@/components/settings-dropdown';
 
 export default function Home() {
   console.log('Home component rendering');
-  
-  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   
   const {
     currentStep,
@@ -56,15 +52,9 @@ export default function Home() {
               <h1 className="text-2xl font-bold">Early Years Voice Supporter</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsAdminModalOpen(true)}
-                className="text-white hover:bg-purple-600 p-2"
-                title="Admin Access"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
+              <div className="text-white [&>*]:text-white [&>*]:hover:bg-purple-600">
+                <SettingsDropdown />
+              </div>
             </div>
           </div>
           <p className="text-purple-100 text-sm">Create the perfect Facebook profile picture to support Early Years Voice!</p>
@@ -117,11 +107,7 @@ export default function Home() {
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} />
 
-      {/* Admin Login Modal */}
-      <NewAuthModal 
-        isOpen={isAdminModalOpen} 
-        onClose={() => setIsAdminModalOpen(false)} 
-      />
+
     </div>
   );
 }

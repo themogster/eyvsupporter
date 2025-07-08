@@ -155,7 +155,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white text-gray-900 border-gray-200 [&_*]:text-gray-900">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-deep-purple" />
