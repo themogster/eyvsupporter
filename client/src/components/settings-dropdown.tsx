@@ -43,11 +43,11 @@ export function SettingsDropdown() {
             <Settings className="w-5 h-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200">
+        <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600">
           {/* Theme Toggle */}
           <DropdownMenuItem
             onClick={handleThemeToggle}
-            className="cursor-pointer text-gray-900 hover:bg-gray-100"
+            className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             {theme === "light" ? (
               <>
@@ -62,29 +62,29 @@ export function SettingsDropdown() {
             )}
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className="bg-gray-200" />
+          <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
           {/* Authentication Section */}
           {user ? (
             <>
               {/* User Info */}
-              <div className="px-2 py-1.5 text-sm text-gray-500">
+              <div className="px-2 py-1.5 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center">
                   <User className="mr-2 h-3 w-3" />
                   <span className="truncate">{user.email}</span>
                 </div>
-                <div className="text-xs text-gray-400 ml-5">
+                <div className="text-xs text-gray-400 dark:text-gray-500 ml-5">
                   Role: {user.role}
                 </div>
               </div>
 
-              <DropdownMenuSeparator className="bg-gray-200" />
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
               {/* Admin Dashboard (if admin) */}
               {user.role === 'admin' && (
                 <DropdownMenuItem
                   onClick={handleAdminDashboard}
-                  className="cursor-pointer text-gray-900 hover:bg-gray-100"
+                  className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <Shield className="mr-2 h-4 w-4" />
                   <span>Admin Dashboard</span>
@@ -95,7 +95,7 @@ export function SettingsDropdown() {
               <DropdownMenuItem
                 onClick={handleLogout}
                 disabled={logoutMutation.isPending}
-                className="cursor-pointer text-gray-900 hover:bg-gray-100"
+                className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
@@ -105,7 +105,7 @@ export function SettingsDropdown() {
             /* Login */
             <DropdownMenuItem
               onClick={() => setIsAuthModalOpen(true)}
-              className="cursor-pointer text-gray-900 hover:bg-gray-100"
+              className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <LogIn className="mr-2 h-4 w-4" />
               <span>Login / Register</span>
