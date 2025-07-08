@@ -120,7 +120,7 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">1</div>
-          <h2 className="text-lg font-semibold text-gray-800">Take Your Photo</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Take Your Photo</h2>
         </div>
 
         <Card className="p-4">
@@ -161,19 +161,19 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
     <div className="space-y-4">
       <div className="flex items-center space-x-2 mb-4">
         <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">1</div>
-        <h2 className="text-lg font-semibold text-gray-800">Upload Your Photo</h2>
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Upload Your Photo</h2>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {/* File Upload */}
         <Card
-          className="cursor-pointer hover:border-deep-purple transition-colors touch-manipulation bg-white"
+          className="cursor-pointer hover:border-deep-purple transition-colors touch-manipulation bg-white dark:bg-gray-800"
           onClick={() => fileInputRef.current?.click()}
         >
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-            <Upload className="w-8 h-8 text-gray-400 mb-3 mx-auto" />
-            <p className="text-gray-600 font-medium mb-1">Choose from Gallery</p>
-            <p className="text-sm text-gray-500">JPG, PNG, WEBP up to 10MB</p>
+          <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center bg-gray-50 dark:bg-gray-700">
+            <Upload className="w-8 h-8 text-gray-400 dark:text-gray-300 mb-3 mx-auto" />
+            <p className="text-gray-600 dark:text-gray-300 font-medium mb-1">Choose from Gallery</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">JPG, PNG, WEBP up to 10MB</p>
           </div>
           <input
             ref={fileInputRef}

@@ -33,7 +33,7 @@ export default function Home() {
   } = useImageProcessor();
 
   return (
-    <div className="light max-w-md mx-auto bg-white min-h-screen shadow-lg">
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-900 min-h-screen shadow-lg">
       {/* Header */}
       <div className="bg-deep-purple text-white">
         <div className="p-6 pb-4">
@@ -63,7 +63,7 @@ export default function Home() {
 
       </div>
       {/* Main Content */}
-      <div className="p-6 space-y-6 pb-20">
+      <div className="p-6 space-y-6 pb-20 bg-white dark:bg-gray-900">
         {currentStep === 'upload' && (
           <UploadSection
             onImageSelect={processImage}

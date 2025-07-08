@@ -9,7 +9,7 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
   const steps = ['upload', 'preview', 'download', 'thankyou'] as const;
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-md mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4 max-w-md mx-auto">
       <div className="flex justify-center space-x-2">
         {steps.map((step, index) => {
           const isActive = currentStep === step;
@@ -23,7 +23,7 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
                   ? 'bg-green-500'
                   : isActive
                   ? 'bg-deep-purple'
-                  : 'bg-gray-300'
+                  : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               {isCompleted && (
