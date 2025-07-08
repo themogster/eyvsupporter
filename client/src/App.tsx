@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-new-auth";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AdminRoute } from "@/components/admin-route";
 import Home from "@/pages/home";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminMessages from "@/pages/admin-messages";
@@ -19,10 +20,26 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/messages" component={AdminMessages} />
-      <Route path="/admin/downloads" component={AdminDownloads} />
-      <Route path="/admin/analytics" component={AdminAnalytics} />
+      <Route path="/admin">
+        <AdminRoute>
+          <AdminDashboard />
+        </AdminRoute>
+      </Route>
+      <Route path="/admin/messages">
+        <AdminRoute>
+          <AdminMessages />
+        </AdminRoute>
+      </Route>
+      <Route path="/admin/downloads">
+        <AdminRoute>
+          <AdminDownloads />
+        </AdminRoute>
+      </Route>
+      <Route path="/admin/analytics">
+        <AdminRoute>
+          <AdminAnalytics />
+        </AdminRoute>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
