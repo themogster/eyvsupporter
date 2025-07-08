@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, MessageSquare, Download, BarChart3, User, LogOut, Settings, ChevronDown, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Download, BarChart3, Users, User, LogOut, Settings, ChevronDown, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/hooks/use-new-auth";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,11 @@ const navItems = [
     href: "/admin/analytics",
     label: "Analytics",
     icon: BarChart3,
+  },
+  {
+    href: "/admin/users",
+    label: "Users",
+    icon: Users,
   },
 ];
 
