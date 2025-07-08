@@ -6,7 +6,7 @@ import { DownloadSection } from '@/components/download-section';
 import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
 import { useImageProcessor } from '@/hooks/use-image-processor';
-import { AdminNav } from '@/components/admin-nav';
+
 import { SettingsDropdown } from '@/components/settings-dropdown';
 
 export default function Home() {
