@@ -12,6 +12,17 @@ export function AdminRoute({ children }: AdminRouteProps) {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
 
+  // Always call useEffect at the top level
+  useEffect(() => {
+    if (user && user.role !== 'admin') {
+      toast({
+        title: "Access Restricted",
+        description: "Admin access required. Contact an administrator to upgrade your account.",
+        variant: "destructive",
+      });
+    }
+  }, [user, toast]);
+
   // Show loading while checking authentication
   if (isLoading) {
     return (
@@ -26,16 +37,8 @@ export function AdminRoute({ children }: AdminRouteProps) {
     return <Redirect to="/" />;
   }
 
-  // If user doesn't have admin role, show message and redirect to main app
+  // If user doesn't have admin role, redirect to main app
   if (user.role !== 'admin') {
-    useEffect(() => {
-      toast({
-        title: "Access Restricted",
-        description: "Admin access required. Contact an administrator to upgrade your account.",
-        variant: "destructive",
-      });
-    }, [toast]);
-    
     return <Redirect to="/" />;
   }
 
