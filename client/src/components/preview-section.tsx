@@ -178,11 +178,11 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
     <div className="space-y-4">
       <div className="flex items-center space-x-2 mb-4">
         <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">2</div>
-        <h2 className="text-lg font-semibold text-gray-800">Preview & Edit</h2>
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Preview & Edit</h2>
       </div>
       {/* Canvas Preview Card */}
-      <Card className="p-6 bg-white border-gray-200">
-        <div className="bg-gray-100 rounded-lg p-6 text-center">
+      <Card className="p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
+        <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 text-center">
           <div className="relative inline-block">
             <div className="w-48 h-48 mx-auto relative">
               {processedImage ? (
@@ -199,24 +199,24 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
                   onWheel={handleWheel}
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 rounded-full animate-pulse" />
+                <div className="w-full h-full bg-gray-200 dark:bg-gray-600 rounded-full animate-pulse" />
               )}
             </div>
           </div>
           
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             <p>Optimized for Facebook (180x180px)</p>
-            <p className="text-xs mt-2 text-blue-600 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
+            <p className="text-xs mt-2 text-blue-600 dark:text-blue-400 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
           </div>
         </div>
       </Card>
 
       {/* Controls Card */}
-      <Card className="p-6 bg-white border-gray-200">
+      <Card className="p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">
 
         {/* Curved Text Selector */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">EYV Message</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">EYV Message</label>
           <Select value={curvedText} onValueChange={onCurvedTextChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Choose text option" />
@@ -241,7 +241,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         {/* Text Color Picker */}
         {curvedText && curvedText !== 'none' && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Text Color
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -265,7 +265,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         {/* Text Position Slider */}
         {curvedText && curvedText !== 'none' && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Text Position (0° = right, 90° = top, 180° = left, 270° = bottom)
             </label>
             <Slider
@@ -276,7 +276,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
               step={5}
               className="w-full"
             />
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Current: {textPosition}°
             </div>
           </div>
@@ -284,7 +284,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
 
         {/* Zoom Control */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Zoom ({(transform.scale * 100).toFixed(0)}%)
           </label>
           <Slider
@@ -311,7 +311,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
         <Button
           onClick={onStartOver}
           variant="outline"
-          className="w-full border-gray-300 hover:bg-gray-100 touch-manipulation bg-white text-gray-900 hover:text-gray-900"
+          className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 touch-manipulation bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:text-gray-900 dark:hover:text-gray-100"
           size="lg"
         >
           Upload Different Photo
