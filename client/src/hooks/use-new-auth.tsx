@@ -146,8 +146,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/admin/logout");
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/admin/logout");
+        return await res.json();
+      } catch (error) {
+        // If the request fails, still clear the user data locally
+        console.log('Logout request failed, clearing local data:', error);
+        return { success: true };
+      }
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/admin/user"], null);
