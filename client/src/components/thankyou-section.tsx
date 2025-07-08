@@ -10,7 +10,9 @@ export function ThankYouSection({ onStartOver }: ThankYouSectionProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
-        <div className="w-8 h-8 bg-deep-purple text-white rounded-full flex items-center justify-center text-sm font-semibold">4</div>
+        <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+          <Heart className="w-4 h-4 fill-current" />
+        </div>
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Thank You!</h2>
       </div>
 
