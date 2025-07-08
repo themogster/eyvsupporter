@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -140,6 +140,30 @@ export default function AdminUsersPage() {
     },
   });
 
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: UserFormData) => {
+      const res = await apiRequest("POST", "/api/admin/users", userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setIsDialogOpen(false);
+      setFormData({ email: "", role: "user", password: "" });
+      toast({
+        title: "Success",
+        description: "User created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Helper functions
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -179,6 +203,16 @@ export default function AdminUsersPage() {
     return sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />;
   };
 
+  const handleAdd = () => {
+    setEditingUser(null);
+    setFormData({
+      email: "",
+      role: "user",
+      password: ""
+    });
+    setIsDialogOpen(true);
+  };
+
   const handleEdit = (user: AdminUser) => {
     setEditingUser(user);
     setFormData({
@@ -190,21 +224,33 @@ export default function AdminUsersPage() {
   };
 
   const handleSave = () => {
-    if (!editingUser) return;
+    if (editingUser) {
+      // Editing existing user
+      const updates: Partial<UserFormData> = {
+        role: formData.role
+      };
 
-    const updates: Partial<UserFormData> = {
-      role: formData.role
-    };
+      // Only include password if it was provided
+      if (formData.password && formData.password.trim()) {
+        updates.password = formData.password;
+      }
 
-    // Only include password if it was provided
-    if (formData.password && formData.password.trim()) {
-      updates.password = formData.password;
+      updateUserMutation.mutate({
+        id: editingUser.id,
+        updates
+      });
+    } else {
+      // Creating new user
+      if (!formData.email || !formData.password) {
+        toast({
+          title: "Error",
+          description: "Email and password are required for new users",
+          variant: "destructive",
+        });
+        return;
+      }
+      createUserMutation.mutate(formData);
     }
-
-    updateUserMutation.mutate({
-      id: editingUser.id,
-      updates
-    });
   };
 
   const handleDelete = (userId: number) => {
@@ -231,7 +277,7 @@ export default function AdminUsersPage() {
                 Delete Selected ({selectedUsers.size})
               </Button>
             )}
-            <Button onClick={() => setIsDialogOpen(true)}>
+            <Button onClick={handleAdd}>
               <Plus className="w-4 h-4 mr-2" />
               Add User
             </Button>
@@ -368,11 +414,17 @@ export default function AdminUsersPage() {
           </CardContent>
         </Card>
 
-        {/* Edit User Dialog */}
+        {/* Add/Edit User Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit User</DialogTitle>
+              <DialogTitle>{editingUser ? "Edit User" : "Add New User"}</DialogTitle>
+              <DialogDescription>
+                {editingUser 
+                  ? "Modify user details and permissions. Email cannot be changed after account creation."
+                  : "Create a new user account with email and password. Choose the appropriate role for access permissions."
+                }
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -380,10 +432,14 @@ export default function AdminUsersPage() {
                 <Input
                   id="email"
                   value={formData.email}
-                  disabled
-                  className="bg-muted"
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  disabled={!!editingUser}
+                  className={editingUser ? "bg-muted" : ""}
+                  placeholder={editingUser ? "" : "Enter email address"}
                 />
-                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+                {editingUser && (
+                  <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+                )}
               </div>
 
               <div>
@@ -400,13 +456,16 @@ export default function AdminUsersPage() {
               </div>
 
               <div>
-                <Label htmlFor="password">New Password (optional)</Label>
+                <Label htmlFor="password">
+                  {editingUser ? "New Password (optional)" : "Password"}
+                  {!editingUser && <span className="text-red-500 ml-1">*</span>}
+                </Label>
                 <Input
                   id="password"
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Leave blank to keep current password"
+                  placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"}
                 />
               </div>
 
@@ -419,9 +478,12 @@ export default function AdminUsersPage() {
                 </Button>
                 <Button
                   onClick={handleSave}
-                  disabled={updateUserMutation.isPending}
+                  disabled={updateUserMutation.isPending || createUserMutation.isPending}
                 >
-                  {updateUserMutation.isPending ? "Saving..." : "Save Changes"}
+                  {updateUserMutation.isPending || createUserMutation.isPending 
+                    ? "Saving..." 
+                    : editingUser ? "Save Changes" : "Create User"
+                  }
                 </Button>
               </div>
             </div>
@@ -433,6 +495,9 @@ export default function AdminUsersPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Bulk Delete</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. All selected user accounts will be permanently removed from the system.
+              </DialogDescription>
             </DialogHeader>
             <div className="py-4">
               <p className="text-sm text-gray-600 dark:text-gray-400">

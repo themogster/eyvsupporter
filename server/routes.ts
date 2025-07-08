@@ -354,6 +354,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const userData = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getAdminUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email already exists' });
+      }
+      
+      // Hash the password
+      if (!userData.password) {
+        return res.status(400).json({ error: 'Password is required' });
+      }
+      userData.password = await hashPassword(userData.password);
+      
+      const user = await storage.createAdminUser(userData);
+      res.json(user);
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Failed to create user' });
+    }
+  });
+
   app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
