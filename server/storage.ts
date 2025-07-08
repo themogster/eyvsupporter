@@ -42,6 +42,7 @@ export interface IStorage {
   
   // Analytics methods
   getTopMessages(): Promise<any[]>;
+  getUsersCount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -178,6 +179,7 @@ export class DatabaseStorage implements IStorage {
       totalDownloads: await this.getDownloadsCount(),
       recentDownloads: (await this.getRecentDownloads(7)).length,
       todayDownloads: (await this.getTodayDownloads()).length,
+      usersCount: await this.getUsersCount(),
     };
   }
 
@@ -264,6 +266,13 @@ export class DatabaseStorage implements IStorage {
       text: item.message,
       count: item.count
     }));
+  }
+
+  async getUsersCount(): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(users);
+    return result.count;
   }
 }
 
