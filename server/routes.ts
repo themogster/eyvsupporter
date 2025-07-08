@@ -217,12 +217,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       delete req.session.pendingRegistration;
 
       // Log the user in
-      req.session.adminUser = { id: adminUser.id, email: adminUser.email };
+      req.session.adminUser = { id: adminUser.id, email: adminUser.email, role: adminUser.role };
       await storage.updateAdminUserLastLogin(adminUser.id);
 
       res.json({ 
         success: true, 
-        user: { id: adminUser.id, email: adminUser.email },
+        user: { id: adminUser.id, email: adminUser.email, role: adminUser.role },
         message: 'Registration completed successfully' 
       });
     } catch (error) {
@@ -247,11 +247,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateAdminUserLastLogin(user.id);
       
       // Log user in directly - no 2FA required for login
-      req.session.adminUser = { id: user.id, email: user.email };
+      req.session.adminUser = { id: user.id, email: user.email, role: user.role };
 
       res.json({ 
         success: true, 
-        user: { id: user.id, email: user.email },
+        user: { id: user.id, email: user.email, role: user.role },
         message: 'Login successful' 
       });
     } catch (error) {
