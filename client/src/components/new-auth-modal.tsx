@@ -68,7 +68,13 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   // Handle form submissions
   const handleLogin = async (data: AdminLogin) => {
     try {
-      await loginMutation.mutateAsync(data);
+      const result = await loginMutation.mutateAsync(data);
+      // Close modal after successful login
+      onClose();
+      // Redirect admin users to dashboard
+      if (result?.user?.role === 'admin') {
+        setLocation("/admin");
+      }
     } catch (error) {
       // Error handled by mutation
     }
@@ -92,7 +98,14 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
 
   const handleStep3 = async (data: RegisterStepThree) => {
     try {
-      await registerStep3Mutation.mutateAsync(data);
+      const result = await registerStep3Mutation.mutateAsync(data);
+      // Registration complete, user is now logged in
+      // Close modal after successful registration
+      onClose();
+      // Redirect admin users to dashboard
+      if (result?.user?.role === 'admin') {
+        setLocation("/admin");
+      }
     } catch (error) {
       // Error handled by mutation
     }
