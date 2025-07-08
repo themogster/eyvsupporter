@@ -141,6 +141,13 @@ Changelog:
   • Maintained light mode enforcement for main photo editing app while preserving admin dark mode
   • Eliminated all runtime errors from old authentication system and ensured clean component transitions
   • Successfully tested complete authentication flow: registration, login, logout, and role-based access control
+- July 07, 2025: Enhanced UX and fixed critical authentication issues:
+  • Replaced authentication modal with sleek settings dropdown menu system
+  • Added comprehensive light/dark theme switcher with proper styling throughout entire app
+  • Fixed missing role data in authentication session - login/registration now properly store and return user roles
+  • Enhanced dropdown menu with theme-appropriate styling for both light and dark modes
+  • Fixed logout crash by adding proper error handling to logout mutation
+  • Successfully implemented seamless theme switching with full dark mode support for main application
 ```
 
 ## User Preferences
