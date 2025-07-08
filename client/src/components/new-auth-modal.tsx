@@ -10,6 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import { RegisterStepOne, RegisterStepTwo, RegisterStepThree, AdminLogin, registerStepOneSchema, registerStepTwoSchema, registerStepThreeSchema, adminLoginSchema } from "@shared/schema";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
+import { z } from "zod";
 import { useAuth } from "@/hooks/use-new-auth";
 
 interface NewAuthModalProps {
@@ -20,6 +24,9 @@ interface NewAuthModalProps {
 export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   const [, setLocation] = useLocation();
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<'email' | 'verify' | 'password'>('email');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const {
     user,
     registrationStep,
@@ -52,6 +59,28 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   const step3Form = useForm<RegisterStepThree>({
     resolver: zodResolver(registerStepThreeSchema),
     defaultValues: { email: "", password: "", confirmPassword: "" },
+  });
+
+  // Forgot password forms
+  const forgotEmailForm = useForm<{ email: string }>({
+    resolver: zodResolver(z.object({ email: z.string().email("Invalid email") })),
+    defaultValues: { email: "" },
+  });
+
+  const forgotVerifyForm = useForm<{ token: string }>({
+    resolver: zodResolver(z.object({ token: z.string().min(6, "Code must be 6 digits") })),
+    defaultValues: { token: "" },
+  });
+
+  const forgotPasswordForm = useForm<{ password: string; confirmPassword: string }>({
+    resolver: zodResolver(z.object({
+      password: z.string().min(12, "Password must be at least 12 characters"),
+      confirmPassword: z.string()
+    }).refine(data => data.password === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ["confirmPassword"]
+    })),
+    defaultValues: { password: "", confirmPassword: "" },
   });
 
   // Auto-populate email in forms
@@ -111,9 +140,102 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     }
   };
 
+  // Forgot password mutations
+  const requestResetMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const res = await apiRequest("POST", "/api/admin/request-password-reset", { email });
+      return await res.json();
+    },
+    onSuccess: () => {
+      setForgotPasswordStep('verify');
+      toast({
+        title: "Reset Code Sent",
+        description: "Check your email for the verification code",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reset code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const verifyResetMutation = useMutation({
+    mutationFn: async ({ email, token }: { email: string; token: string }) => {
+      const res = await apiRequest("POST", "/api/admin/verify-password-reset", { email, token });
+      return await res.json();
+    },
+    onSuccess: () => {
+      setForgotPasswordStep('password');
+      toast({
+        title: "Code Verified",
+        description: "Now set your new password",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Invalid Code",
+        description: error.message || "Invalid or expired verification code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ email, newPassword }: { email: string; newPassword: string }) => {
+      const res = await apiRequest("POST", "/api/admin/reset-password", { email, newPassword });
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Reset",
+        description: "Your password has been successfully reset. You can now sign in.",
+      });
+      // Reset forgot password state and return to login
+      setShowForgotPassword(false);
+      setForgotPasswordStep('email');
+      setForgotPasswordEmail('');
+      forgotEmailForm.reset();
+      forgotVerifyForm.reset();
+      forgotPasswordForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset password",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Forgot password handlers
+  const handleForgotEmail = async (data: { email: string }) => {
+    setForgotPasswordEmail(data.email);
+    await requestResetMutation.mutateAsync(data.email);
+  };
+
+  const handleForgotVerify = async (data: { token: string }) => {
+    await verifyResetMutation.mutateAsync({ 
+      email: forgotPasswordEmail, 
+      token: data.token 
+    });
+  };
+
+  const handleForgotPassword = async (data: { password: string }) => {
+    await resetPasswordMutation.mutateAsync({ 
+      email: forgotPasswordEmail, 
+      newPassword: data.password 
+    });
+  };
+
   const handleModalClose = () => {
     resetRegistration();
     setIsLogin(true);
+    setShowForgotPassword(false);
+    setForgotPasswordStep('email');
+    setForgotPasswordEmail('');
     onClose();
   };
 
@@ -257,6 +379,17 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
                   {loginMutation.isPending ? "Signing in..." : "Sign In"}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
+                
+                {/* Forgot Password Link */}
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-deep-purple hover:text-purple-700 hover:underline"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
               </form>
             </Form>
           ) : (
@@ -404,16 +537,191 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
             </>
           )}
 
+          {/* Forgot Password Flow */}
+          {showForgotPassword && (
+            <div className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg p-6 z-10">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Reset Password
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {forgotPasswordStep === 'email' && "Enter your email to receive a reset code"}
+                    {forgotPasswordStep === 'verify' && "Enter the verification code sent to your email"}
+                    {forgotPasswordStep === 'password' && "Create your new password"}
+                  </p>
+                </div>
+
+                {forgotPasswordStep === 'email' && (
+                  <Form {...forgotEmailForm}>
+                    <form onSubmit={forgotEmailForm.handleSubmit(handleForgotEmail)} className="space-y-4">
+                      <FormField
+                        control={forgotEmailForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  placeholder="Enter your email"
+                                  className="pl-10"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="w-full bg-deep-purple hover:bg-purple-700"
+                        disabled={requestResetMutation.isPending}
+                      >
+                        {requestResetMutation.isPending ? "Sending..." : "Send Reset Code"}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </form>
+                  </Form>
+                )}
+
+                {forgotPasswordStep === 'verify' && (
+                  <Form {...forgotVerifyForm}>
+                    <form onSubmit={forgotVerifyForm.handleSubmit(handleForgotVerify)} className="space-y-4">
+                      <FormField
+                        control={forgotVerifyForm.control}
+                        name="token"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Verification Code</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Enter 6-digit code"
+                                className="text-center text-lg tracking-widest"
+                                maxLength={6}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => requestResetMutation.mutate(forgotPasswordEmail)}
+                          disabled={requestResetMutation.isPending}
+                          className="flex-1"
+                        >
+                          Resend Code
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1 bg-deep-purple hover:bg-purple-700"
+                          disabled={verifyResetMutation.isPending}
+                        >
+                          {verifyResetMutation.isPending ? "Verifying..." : "Verify"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                )}
+
+                {forgotPasswordStep === 'password' && (
+                  <Form {...forgotPasswordForm}>
+                    <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-4">
+                      <FormField
+                        control={forgotPasswordForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  placeholder="Enter new password"
+                                  className="pl-10"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={forgotPasswordForm.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  placeholder="Confirm new password"
+                                  className="pl-10"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Password must be at least 12 characters with uppercase, lowercase, number, and symbol.
+                      </div>
+                      <Button
+                        type="submit"
+                        className="w-full bg-deep-purple hover:bg-purple-700"
+                        disabled={resetPasswordMutation.isPending}
+                      >
+                        {resetPasswordMutation.isPending ? "Resetting..." : "Reset Password"}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </form>
+                  </Form>
+                )}
+
+                {/* Back to Login */}
+                <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setForgotPasswordStep('email');
+                      setForgotPasswordEmail('');
+                      forgotEmailForm.reset();
+                      forgotVerifyForm.reset();
+                      forgotPasswordForm.reset();
+                    }}
+                    className="text-sm text-deep-purple hover:underline flex items-center justify-center"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Back to Sign In
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Switch between login and registration */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
-            {isLogin ? (
+            {isLogin && !showForgotPassword ? (
               <button
                 onClick={switchToRegistration}
                 className="text-sm text-deep-purple hover:underline"
               >
                 Don't have an account? Sign up
               </button>
-            ) : (
+            ) : !showForgotPassword ? (
               <button
                 onClick={switchToLogin}
                 className="text-sm text-deep-purple hover:underline flex items-center"
@@ -421,7 +729,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Sign In
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </DialogContent>

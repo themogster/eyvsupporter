@@ -397,6 +397,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Request password reset (unauthenticated - for forgot password)
+  app.post("/api/admin/request-password-reset", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      // Check if user exists
+      const user = await storage.getAdminUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists or not for security
+        return res.json({ success: true, message: 'If an account with that email exists, a reset code has been sent' });
+      }
+
+      // Create 2FA token for password reset
+      const token = await createTwoFactorToken(email, 'password_reset');
+      
+      res.json({ success: true, message: 'Reset code sent to your email' });
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      res.status(500).json({ error: 'Failed to send reset code' });
+    }
+  });
+
+  // Verify password reset token
+  app.post("/api/admin/verify-password-reset", async (req, res) => {
+    try {
+      const { email, token } = req.body;
+      
+      if (!email || !token) {
+        return res.status(400).json({ error: 'Email and token are required' });
+      }
+
+      const isValid = await verifyTwoFactorToken(email, token, 'password_reset');
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      res.json({ success: true, message: 'Verification successful' });
+    } catch (error) {
+      console.error('Password reset verification error:', error);
+      res.status(400).json({ error: 'Verification failed' });
+    }
+  });
+
+  // Reset password (final step - unauthenticated)
+  app.post("/api/admin/reset-password", async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: 'Email and new password are required' });
+      }
+
+      // Check if user exists
+      const user = await storage.getAdminUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ error: 'User not found' });
+      }
+
+      // Validate password strength on server side
+      if (newPassword.length < 12) {
+        return res.status(400).json({ error: 'Password must be at least 12 characters long' });
+      }
+
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      const hasLowercase = /[a-z]/.test(newPassword);
+      const hasNumber = /\d/.test(newPassword);
+      const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword);
+
+      if (!hasUppercase || !hasLowercase || !hasNumber || !hasSymbol) {
+        return res.status(400).json({ 
+          error: 'Password must contain uppercase, lowercase, number, and symbol characters' 
+        });
+      }
+
+      // Hash the new password
+      const hashedPassword = await hashPassword(newPassword);
+
+      // Update user password
+      await storage.updateAdminUser(user.id, { 
+        password: hashedPassword 
+      });
+
+      res.json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      res.status(500).json({ error: 'Failed to reset password' });
+    }
+  });
+
   // Admin dashboard data (protected route - admin role required)
   app.get("/api/admin/dashboard", requireAdmin, async (req, res) => {
     try {
