@@ -2,11 +2,7 @@ import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
+
 
 export const downloads = pgTable("downloads", {
   id: serial("id").primaryKey(),
@@ -46,10 +42,7 @@ export const twoFactorTokens = pgTable("two_factor_tokens", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+
 
 export const insertDownloadSchema = createInsertSchema(downloads).pick({
   profileImage: true,
@@ -130,8 +123,7 @@ export const verifyTwoFactorSchema = z.object({
   type: z.enum(['registration', 'password_reset', 'login']),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+
 export type InsertDownload = z.infer<typeof insertDownloadSchema>;
 export type Download = typeof downloads.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
