@@ -33,7 +33,8 @@ export default function Home() {
   } = useImageProcessor();
 
   return (
-    <div className="max-w-md mx-auto bg-white dark:bg-gray-900 min-h-screen shadow-lg">
+    <div className="min-h-screen bg-gray-100 dark:bg-black lg:bg-gray-100 lg:dark:bg-black">
+      <div className="max-w-md mx-auto bg-white dark:bg-gray-900 min-h-screen shadow-lg lg:shadow-xl">
       {/* Header */}
       <div className="bg-deep-purple text-white">
         <div className="p-6 pb-4">
@@ -106,8 +107,7 @@ export default function Home() {
       </div>
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} />
-
-
+      </div>
     </div>
   );
 }
