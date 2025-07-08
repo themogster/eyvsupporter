@@ -314,6 +314,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, message: 'Logged out successfully' });
   });
 
+  // Request password change (sends 2FA)
+  app.post("/api/admin/request-password-change", requireAuth, async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      // Verify user is requesting change for their own account
+      if (!req.session.adminUser || req.session.adminUser.email !== email) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      // Create 2FA token for password reset
+      const token = await createTwoFactorToken(email, 'password_reset');
+      
+      res.json({ success: true, message: '2FA code sent to your email' });
+    } catch (error) {
+      console.error('Password change request error:', error);
+      res.status(500).json({ error: 'Failed to send verification code' });
+    }
+  });
+
+  // Verify 2FA token for password change
+  app.post("/api/admin/verify-password-change", requireAuth, async (req, res) => {
+    try {
+      const { email, token } = req.body;
+      
+      // Verify user is changing their own password
+      if (!req.session.adminUser || req.session.adminUser.email !== email) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      const isValid = await verifyTwoFactorToken(email, token, 'password_reset');
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid or expired verification code' });
+      }
+
+      res.json({ success: true, message: 'Verification successful' });
+    } catch (error) {
+      console.error('Password verification error:', error);
+      res.status(400).json({ error: 'Verification failed' });
+    }
+  });
+
+  // Change password
+  app.post("/api/admin/change-password", requireAuth, async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      
+      // Verify user is changing their own password
+      if (!req.session.adminUser || req.session.adminUser.email !== email) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      // Validate password strength on server side
+      if (!newPassword || newPassword.length < 12) {
+        return res.status(400).json({ error: 'Password must be at least 12 characters long' });
+      }
+
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      const hasLowercase = /[a-z]/.test(newPassword);
+      const hasNumber = /\d/.test(newPassword);
+      const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword);
+
+      if (!hasUppercase || !hasLowercase || !hasNumber || !hasSymbol) {
+        return res.status(400).json({ 
+          error: 'Password must contain uppercase, lowercase, number, and symbol characters' 
+        });
+      }
+
+      // Hash the new password
+      const hashedPassword = await hashPassword(newPassword);
+
+      // Update user password
+      await storage.updateAdminUser(req.session.adminUser.id, { 
+        password: hashedPassword 
+      });
+
+      res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+      console.error('Password change error:', error);
+      res.status(500).json({ error: 'Failed to change password' });
+    }
+  });
+
   // Admin dashboard data (protected route - admin role required)
   app.get("/api/admin/dashboard", requireAdmin, async (req, res) => {
     try {

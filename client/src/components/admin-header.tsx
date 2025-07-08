@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, MessageSquare, Download, BarChart3, Users, User, LogOut, Settings, ChevronDown, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Download, BarChart3, Users, User, LogOut, Settings, ChevronDown, Sun, Moon, Key } from "lucide-react";
 import { useAuth } from "@/hooks/use-new-auth";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChangePasswordModal } from "./change-password-modal";
 
 const navItems = [
   {
@@ -44,6 +46,7 @@ export function AdminHeader() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
   const { theme, setTheme } = useTheme();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -95,6 +98,20 @@ export function AdminHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <div className="px-2 py-1.5 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center">
+                    <User className="mr-2 h-3 w-3" />
+                    <span className="truncate">{user?.email}</span>
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 ml-5">
+                    Role: {user?.role}
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setIsChangePasswordOpen(true)}>
+                  <Key className="w-4 h-4 mr-2" />
+                  Change Password
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
@@ -121,6 +138,15 @@ export function AdminHeader() {
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {user && (
+        <ChangePasswordModal
+          isOpen={isChangePasswordOpen}
+          onClose={() => setIsChangePasswordOpen(false)}
+          userEmail={user.email}
+        />
+      )}
     </div>
   );
 }

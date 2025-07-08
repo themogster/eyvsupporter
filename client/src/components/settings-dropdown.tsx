@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Moon, Sun, LogIn, LogOut, User, Shield } from "lucide-react";
+import { Settings, Moon, Sun, LogIn, LogOut, User, Shield, Key } from "lucide-react";
 import { useLocation } from "wouter";
 import {
   DropdownMenu,
@@ -12,12 +12,14 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-new-auth";
 import { NewAuthModal } from "./new-auth-modal";
+import { ChangePasswordModal } from "./change-password-modal";
 
 export function SettingsDropdown() {
   const [, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
   const { user, logoutMutation } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const handleThemeToggle = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -80,6 +82,15 @@ export function SettingsDropdown() {
 
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
 
+              {/* Change Password */}
+              <DropdownMenuItem
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <Key className="mr-2 h-4 w-4" />
+                <span>Change Password</span>
+              </DropdownMenuItem>
+
               {/* Admin Dashboard (if admin) */}
               {user.role === 'admin' && (
                 <DropdownMenuItem
@@ -119,6 +130,15 @@ export function SettingsDropdown() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
+
+      {/* Change Password Modal */}
+      {user && (
+        <ChangePasswordModal
+          isOpen={isChangePasswordOpen}
+          onClose={() => setIsChangePasswordOpen(false)}
+          userEmail={user.email}
+        />
+      )}
     </>
   );
 }
