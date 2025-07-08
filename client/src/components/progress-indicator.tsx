@@ -1,5 +1,5 @@
 import { Step } from '@/hooks/use-image-processor';
-import { Check } from 'lucide-react';
+import { Check, Heart } from 'lucide-react';
 
 interface ProgressIndicatorProps {
   currentStep: Step;
@@ -14,21 +14,27 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
         {steps.map((step, index) => {
           const isActive = currentStep === step;
           const isCompleted = steps.indexOf(currentStep) > index;
+          const isThankYouStage = step === 'thankyou';
+          const isThankYouCompleted = currentStep === 'thankyou' && isActive;
           
           return (
             <div
               key={step}
               className={`w-3 h-3 rounded-full transition-colors ${
-                isCompleted
+                isThankYouCompleted
+                  ? 'bg-red-500'
+                  : isCompleted
                   ? 'bg-green-500'
                   : isActive
                   ? 'bg-deep-purple'
                   : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
-              {isCompleted && (
+              {isThankYouCompleted ? (
+                <Heart className="w-2 h-2 text-white m-0.5 fill-current" strokeWidth={0} />
+              ) : isCompleted ? (
                 <Check className="w-2 h-2 text-white m-0.5" strokeWidth={3} />
-              )}
+              ) : null}
             </div>
           );
         })}
