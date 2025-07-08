@@ -28,6 +28,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     registerStep2Mutation,
     registerStep3Mutation,
     loginMutation,
+    logoutMutation,
     resetRegistration,
     setRegistrationStep,
   } = useAuth();
@@ -61,16 +62,8 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     }
   }, [pendingEmail, step2Form, step3Form]);
 
-  // Close modal and redirect when authenticated
-  useEffect(() => {
-    if (user) {
-      onClose();
-      // Only redirect to admin if user has admin role
-      if (user.role === 'admin') {
-        setLocation("/admin");
-      }
-    }
-  }, [user, onClose, setLocation]);
+  // Only close modal after successful login/registration actions
+  // Don't auto-close just because user exists - show user profile instead
 
   // Handle form submissions
   const handleLogin = async (data: AdminLogin) => {
@@ -126,6 +119,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   };
 
   const getTitle = () => {
+    if (user) return "Account";
     if (isLogin) return "Sign In";
     switch (registrationStep) {
       case 1: return "Enter Email";
@@ -136,6 +130,7 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
   };
 
   const getDescription = () => {
+    if (user) return "Manage your account settings";
     if (isLogin) return "Sign in to access your account";
     switch (registrationStep) {
       case 1: return "We'll send you a verification code";
@@ -159,7 +154,43 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
         </DialogHeader>
 
         <div className="space-y-4">
-          {isLogin ? (
+          {user ? (
+            // User Profile - Already Logged In
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center w-16 h-16 bg-deep-purple/10 rounded-full mx-auto">
+                <User className="w-8 h-8 text-deep-purple" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Welcome back!</h3>
+                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-xs text-gray-400 mt-1">Role: {user.role}</p>
+              </div>
+              <div className="space-y-2">
+                {user.role === 'admin' && (
+                  <Button
+                    onClick={() => {
+                      setLocation("/admin");
+                      onClose();
+                    }}
+                    className="w-full bg-deep-purple hover:bg-purple-700"
+                  >
+                    Go to Admin Dashboard
+                  </Button>
+                )}
+                <Button
+                  onClick={() => {
+                    logoutMutation.mutate();
+                    onClose();
+                  }}
+                  variant="outline"
+                  className="w-full"
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                </Button>
+              </div>
+            </div>
+          ) : isLogin ? (
             // Login Form
             <Form {...loginForm}>
               <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
