@@ -322,6 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const recentDownloads = await storage.getRecentDownloads(7); // Last 7 days
       const todayDownloads = await storage.getTodayDownloads();
       const topMessages = await storage.getTopMessages();
+      const usersCount = await storage.getUsersCount();
       
       res.json({
         success: true,
@@ -331,6 +332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           recentDownloads: recentDownloads.slice(0, 10),
           todayDownloads: todayDownloads.length,
           weekDownloads: recentDownloads.length,
+          usersCount,
           messages,
           topMessages,
         }

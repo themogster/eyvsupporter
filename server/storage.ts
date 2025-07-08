@@ -271,7 +271,7 @@ export class DatabaseStorage implements IStorage {
   async getUsersCount(): Promise<number> {
     const [result] = await db
       .select({ count: sql<number>`COUNT(*)` })
-      .from(users);
+      .from(adminUsers);
     return result.count;
   }
 }
