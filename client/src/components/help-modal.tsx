@@ -65,7 +65,7 @@ const walkthroughSteps: WalkthroughStep[] = [
     image: step4Image,
     tips: [
       "The image is perfectly sized for Facebook profile pictures",
-      "EYV logo is automatically included in the corner",
+      "Profile picture is downloaded to the 'Downloads' section of your browser",
       "Click 'Create Another' to make more profile pictures"
     ]
   },
