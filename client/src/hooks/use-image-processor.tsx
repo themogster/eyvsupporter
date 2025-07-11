@@ -48,6 +48,39 @@ export function useImageProcessor() {
       const result = await processor.processImage(file, { transform, curvedText, textColor, textPosition });
       setOriginalImage(file);
       setProcessedImage(result);
+      
+      // Log to database and create shareable URL immediately
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(result.blob);
+      });
+      
+      const base64Image = await base64Promise;
+      
+      // Log to database
+      const response = await fetch('/api/downloads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profileImage: base64Image,
+          eyvMessage: curvedText || "none",
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Download response:', data);
+        if (data.shareUrl) {
+          console.log('Setting share URL:', data.shareUrl);
+          setShareUrl(data.shareUrl);
+        }
+      } else {
+        console.error('Failed to log to database');
+      }
+      
       setCurrentStep('preview');
       
       toast({
@@ -63,7 +96,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [toast]);
+  }, [toast, processor, transform, curvedText, textColor, textPosition]);
 
   const proceedToDownload = useCallback(() => {
     setCurrentStep('download');
@@ -75,54 +108,12 @@ export function useImageProcessor() {
 
   const downloadProcessedImage = useCallback(async () => {
     if (processedImage) {
-      try {
-        // Convert blob to base64 for database storage
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve) => {
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(processedImage.blob);
-        });
-        
-        const base64Image = await base64Promise;
-        
-        // Log download to database
-        const response = await fetch('/api/downloads', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            profileImage: base64Image,
-            eyvMessage: curvedText || "none",
-          }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Download response:', data);
-          if (data.shareUrl) {
-            console.log('Setting share URL:', data.shareUrl);
-            setShareUrl(data.shareUrl);
-          }
-        } else {
-          console.error('Failed to log download to database');
-        }
-        
-        // Proceed with download
-        downloadImage(processedImage.blob, 'eyv-profile-picture.png');
-        toast({
-          title: "Download Started",
-          description: "Your EYV profile picture is being downloaded!",
-        });
-      } catch (error) {
-        console.error('Error during download:', error);
-        // Still allow download even if logging fails
-        downloadImage(processedImage.blob, 'eyv-profile-picture.png');
-        toast({
-          title: "Download Started",
-          description: "Your EYV profile picture is being downloaded!",
-        });
-      }
+      // Simply download the image - database logging already happened during processing
+      downloadImage(processedImage.blob, 'eyv-profile-picture.png');
+      toast({
+        title: "Download Started",
+        description: "Your EYV profile picture is being downloaded!",
+      });
     }
   }, [processedImage, toast]);
 
