@@ -168,6 +168,7 @@ Changelog:
   • Built server API endpoints for unauthenticated password reset operations
   • Enhanced admin dashboard with refresh button allowing real-time stats updates
   • Added visual feedback with spinning icon during refresh operations and success/error toast notifications
+  • Set light mode as default theme for new users (previously defaulted to system preference)
 ```
 
 ## User Preferences
