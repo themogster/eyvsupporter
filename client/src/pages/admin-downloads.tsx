@@ -6,19 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, Search, Filter, Calendar, Eye } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Download, Search, Filter, Calendar, Eye, Copy, Check, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import type { Download as DownloadType } from "@shared/schema";
 import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminDownloads() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
   const [messageFilter, setMessageFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [copiedUrls, setCopiedUrls] = useState<Set<string>>(new Set());
 
   const { data: downloadsData, isLoading } = useQuery({
     queryKey: ["/api/admin/downloads", page, limit],
@@ -52,6 +55,30 @@ export default function AdminDownloads() {
   const handleViewImage = (imageData: string) => {
     setSelectedImage(imageData);
     setIsModalOpen(true);
+  };
+
+  const handleCopyUrl = async (uniqueId: string, shareUrl: string) => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedUrls(prev => new Set([...prev, uniqueId]));
+      toast({
+        title: "URL Copied!",
+        description: "Share URL has been copied to clipboard",
+      });
+      setTimeout(() => {
+        setCopiedUrls(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(uniqueId);
+          return newSet;
+        });
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy URL to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -149,39 +176,76 @@ export default function AdminDownloads() {
           ) : (
             <div className="space-y-4">
               {filteredDownloads.map((download: DownloadType) => (
-                <div key={download.id} className="flex items-center justify-between p-2 sm:p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center space-x-2 sm:space-x-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 relative">
-                      <img
-                        src={download.profileImage}
-                        alt="Profile"
-                        className="w-full h-full object-cover rounded-full cursor-pointer"
-                        onClick={() => handleViewImage(download.profileImage)}
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium">IP: {download.ipAddress}</span>
-                        {download.eyvMessage && (
-                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                            {messages.find((m: any) => m.key === download.eyvMessage)?.displayText || download.eyvMessage}
-                          </span>
-                        )}
+                <div key={download.id} className="p-2 sm:p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 relative">
+                        <img
+                          src={download.profileImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover rounded-full cursor-pointer"
+                          onClick={() => handleViewImage(download.profileImage)}
+                        />
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {format(new Date(download.createdAt), "MMM dd, yyyy 'at' HH:mm")}
+                      <div>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="font-medium">IP: {download.ipAddress}</span>
+                          {download.eyvMessage && (
+                            <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                              {messages.find((m: any) => m.key === download.eyvMessage)?.displayText || download.eyvMessage}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {format(new Date(download.createdAt), "MMM dd, yyyy 'at' HH:mm")}
+                        </div>
                       </div>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewImage(download.profileImage)}
+                      title="View full size image"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleViewImage(download.profileImage)}
-                    title="View full size image"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
+                  
+                  {download.uniqueId && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <ExternalLink className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm font-medium text-blue-800 dark:text-blue-300">Shareable URL</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={`${window.location.origin}/image/${download.uniqueId}`}
+                          readOnly
+                          className="flex-1 text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded px-2 py-1"
+                        />
+                        <Button
+                          onClick={() => handleCopyUrl(download.uniqueId!, `${window.location.origin}/image/${download.uniqueId}`)}
+                          variant="outline"
+                          size="sm"
+                          className="px-2 py-1 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-800"
+                        >
+                          {copiedUrls.has(download.uniqueId!) ? (
+                            <>
+                              <Check className="w-3 h-3 mr-1" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
