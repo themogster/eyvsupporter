@@ -6,6 +6,7 @@ import { z } from "zod";
 
 export const downloads = pgTable("downloads", {
   id: serial("id").primaryKey(),
+  uniqueId: text("unique_id").notNull().unique(),
   profileImage: text("profile_image").notNull(),
   ipAddress: text("ip_address").notNull(),
   eyvMessage: text("eyv_message"),

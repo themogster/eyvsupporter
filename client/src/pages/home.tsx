@@ -25,6 +25,7 @@ export default function Home() {
     curvedText,
     textColor,
     textPosition,
+    shareUrl,
     processImage,
     proceedToDownload,
     proceedToThankYou,
@@ -97,6 +98,7 @@ export default function Home() {
         {currentStep === 'download' && (
           <DownloadSection
             processedImage={processedImage}
+            shareUrl={shareUrl}
             onDownload={downloadProcessedImage}
             onShare={shareImage}
             onStartOver={startOver}

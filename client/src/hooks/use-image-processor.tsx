@@ -14,6 +14,7 @@ export function useImageProcessor() {
   const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Create a stable processor instance
@@ -96,7 +97,12 @@ export function useImageProcessor() {
           }),
         });
         
-        if (!response.ok) {
+        if (response.ok) {
+          const data = await response.json();
+          if (data.shareUrl) {
+            setShareUrl(data.shareUrl);
+          }
+        } else {
           console.error('Failed to log download to database');
         }
         
@@ -249,6 +255,7 @@ export function useImageProcessor() {
     setCurvedText('none');
     setTextColor('#ffffff');
     setTextPosition(30);
+    setShareUrl(null);
   }, []);
 
   return {
@@ -260,6 +267,7 @@ export function useImageProcessor() {
     curvedText,
     textColor,
     textPosition,
+    shareUrl,
     processImage,
     proceedToDownload,
     proceedToThankYou,

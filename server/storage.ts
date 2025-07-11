@@ -6,12 +6,14 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, asc, and, gt, desc, gte, sql, isNotNull } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
   logDownload(download: InsertDownload): Promise<Download>;
+  getDownloadByUniqueId(uniqueId: string): Promise<Download | undefined>;
   getMessages(): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   updateMessage(id: number, message: Partial<InsertMessage>): Promise<Message>;
@@ -47,11 +49,20 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async logDownload(insertDownload: InsertDownload): Promise<Download> {
+    const uniqueId = nanoid(12); // Generate 12-character unique ID
     const [download] = await db
       .insert(downloads)
-      .values(insertDownload)
+      .values({ ...insertDownload, uniqueId })
       .returning();
     return download;
+  }
+
+  async getDownloadByUniqueId(uniqueId: string): Promise<Download | undefined> {
+    const [download] = await db
+      .select()
+      .from(downloads)
+      .where(eq(downloads.uniqueId, uniqueId));
+    return download || undefined;
   }
 
   async getMessages(): Promise<Message[]> {

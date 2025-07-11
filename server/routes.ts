@@ -59,10 +59,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertDownloadSchema.parse(downloadData);
       const download = await storage.logDownload(validatedData);
       
-      res.json({ success: true, id: download.id });
+      res.json({ 
+        success: true, 
+        id: download.id, 
+        uniqueId: download.uniqueId,
+        shareUrl: `${req.protocol}://${req.get('host')}/image/${download.uniqueId}` 
+      });
     } catch (error) {
       console.error('Error logging download:', error);
       res.status(400).json({ error: 'Failed to log download' });
+    }
+  });
+
+  // Serve image by unique ID
+  app.get("/image/:uniqueId", async (req, res) => {
+    try {
+      const { uniqueId } = req.params;
+      
+      if (!uniqueId) {
+        return res.status(400).json({ error: 'Unique ID is required' });
+      }
+      
+      const download = await storage.getDownloadByUniqueId(uniqueId);
+      
+      if (!download) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      // Extract base64 image data
+      const base64Data = download.profileImage.replace(/^data:image\/[a-z]+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      
+      // Set appropriate headers for image
+      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Length', imageBuffer.length);
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      res.setHeader('Content-Disposition', 'inline; filename="eyv-profile-picture.png"');
+      
+      // Send the image buffer
+      res.send(imageBuffer);
+    } catch (error) {
+      console.error('Error serving image:', error);
+      res.status(500).json({ error: 'Failed to serve image' });
     }
   });
 
