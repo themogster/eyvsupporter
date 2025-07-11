@@ -11,7 +11,7 @@ export function useImageProcessor() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [transform, setTransform] = useState<ImageTransform>({ scale: 1, offsetX: 0, offsetY: 0 });
 
-  const [curvedText, setCurvedText] = useState<CurvedTextOption>('none');
+  const [curvedText, setCurvedText] = useState<CurvedTextOption>('supporting');
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -245,9 +245,9 @@ export function useImageProcessor() {
     setProcessedImage(null);
     setIsProcessing(false);
     setTransform({ scale: 1, offsetX: 0, offsetY: 0 });
-    setCurvedText('none');
+    setCurvedText('supporting');
     setTextColor('#ffffff');
-    setTextPosition(30);
+    setTextPosition(270);
     setShareUrl(null);
   }, []);
 
