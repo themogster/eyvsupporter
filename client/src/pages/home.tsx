@@ -1,16 +1,21 @@
 // Remove UserCircle import as we're using the logo image
 import { useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 import { UploadSection } from '@/components/upload-section';
 import { PreviewSection } from '@/components/preview-section';
 import { DownloadSection } from '@/components/download-section';
 import { ThankYouSection } from '@/components/thankyou-section';
 import { ProgressIndicator } from '@/components/progress-indicator';
 import { useImageProcessor } from '@/hooks/use-image-processor';
+import { Button } from '@/components/ui/button';
+import { HelpModal } from '@/components/help-modal';
 
 import { SettingsDropdown } from '@/components/settings-dropdown';
 
 export default function Home() {
   console.log('Home component rendering');
+  
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   
   const {
     currentStep,
@@ -104,9 +109,27 @@ export default function Home() {
             onStartOver={startOver}
           />
         )}
+
+        {/* Help Button */}
+        <div className="flex justify-center pt-8">
+          <Button
+            variant="outline"
+            onClick={() => setIsHelpModalOpen(true)}
+            className="flex items-center gap-2 text-purple-600 border-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-900/20"
+          >
+            <HelpCircle className="h-4 w-4" />
+            How to Use
+          </Button>
+        </div>
       </div>
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} />
+      
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+      />
       </div>
     </div>
   );
