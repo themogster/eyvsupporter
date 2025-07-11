@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Moon, Sun, LogIn, LogOut, User, Shield, Key } from "lucide-react";
+import { Settings, Moon, Sun, LogIn, LogOut, User, Shield, Key, HelpCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/use-new-auth";
 import { NewAuthModal } from "./new-auth-modal";
 import { ChangePasswordModal } from "./change-password-modal";
+import { HelpModal } from "./help-modal";
 
 export function SettingsDropdown() {
   const [, setLocation] = useLocation();
@@ -20,6 +21,7 @@ export function SettingsDropdown() {
   const { user, logoutMutation } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const handleThemeToggle = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -62,6 +64,15 @@ export function SettingsDropdown() {
                 <span>Light mode</span>
               </>
             )}
+          </DropdownMenuItem>
+
+          {/* Help */}
+          <DropdownMenuItem
+            onClick={() => setIsHelpModalOpen(true)}
+            className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <HelpCircle className="mr-2 h-4 w-4" />
+            <span>How to Use</span>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
@@ -139,6 +150,12 @@ export function SettingsDropdown() {
           userEmail={user.email}
         />
       )}
+
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+      />
     </>
   );
 }

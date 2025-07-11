@@ -169,6 +169,8 @@ Changelog:
   • Enhanced admin dashboard with refresh button allowing real-time stats updates
   • Added visual feedback with spinning icon during refresh operations and success/error toast notifications
   • Set light mode as default theme for new users (previously defaulted to system preference)
+  • Created comprehensive help walkthrough feature using 5 screenshot guides showing complete user journey from upload to thank you stage
+  • Added "How to Use" option in settings dropdown menu with step-by-step visual instructions and helpful tips for each stage
 ```
 
 ## User Preferences
