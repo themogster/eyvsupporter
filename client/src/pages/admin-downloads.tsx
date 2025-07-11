@@ -21,6 +21,7 @@ export default function AdminDownloads() {
   const [searchTerm, setSearchTerm] = useState("");
   const [messageFilter, setMessageFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedDownload, setSelectedDownload] = useState<DownloadType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copiedUrls, setCopiedUrls] = useState<Set<string>>(new Set());
 
@@ -53,8 +54,9 @@ export default function AdminDownloads() {
     return matchesSearch && matchesMessageFilter;
   });
 
-  const handleViewImage = (imageData: string) => {
-    setSelectedImage(imageData);
+  const handleViewImage = (download: DownloadType) => {
+    setSelectedImage(download.profileImage);
+    setSelectedDownload(download);
     setIsModalOpen(true);
   };
 
@@ -211,7 +213,7 @@ export default function AdminDownloads() {
                           src={download.profileImage}
                           alt="Profile"
                           className="w-full h-full object-cover rounded-full cursor-pointer"
-                          onClick={() => handleViewImage(download.profileImage)}
+                          onClick={() => handleViewImage(download)}
                         />
                       </div>
                       <div className="flex-1">
@@ -252,7 +254,7 @@ export default function AdminDownloads() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleViewImage(download.profileImage)}
+                        onClick={() => handleViewImage(download)}
                         title="View full size image"
                       >
                         <Eye className="w-4 h-4" />
@@ -295,6 +297,30 @@ export default function AdminDownloads() {
               />
             )}
           </div>
+          {selectedDownload?.uniqueId && (
+            <div className="flex justify-center pb-4">
+              <div className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-md">
+                <ExternalLink className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <input
+                  type="text"
+                  value={`${window.location.origin}/image/${selectedDownload.uniqueId}`}
+                  readOnly
+                  className="flex-1 text-sm text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none font-mono"
+                />
+                <button
+                  onClick={() => handleCopyUrl(selectedDownload.uniqueId!, `${window.location.origin}/image/${selectedDownload.uniqueId}`)}
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                  title="Copy URL"
+                >
+                  {copiedUrls.has(selectedDownload.uniqueId!) ? (
+                    <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
