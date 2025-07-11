@@ -161,6 +161,13 @@ Changelog:
   • Fixed getUsersCount() to query correct adminUsers table showing accurate user count
   • Removed AdminNav component from main photo editing app (admin navigation only appears in admin section)
   • Admin navigation now properly displays: Dashboard, Messages, Downloads, Analytics, Users
+- July 11, 2025: Enhanced authentication system with comprehensive password management:
+  • Created detailed Authentication Guide documenting all signin, signup, forgot password, and change password flows
+  • Implemented complete forgot password functionality with 3-step process: email → 2FA verification → new password
+  • Added "Forgot Password?" link to login modal triggering secure reset flow
+  • Built server API endpoints for unauthenticated password reset operations
+  • Enhanced admin dashboard with refresh button allowing real-time stats updates
+  • Added visual feedback with spinning icon during refresh operations and success/error toast notifications
 ```
 
 ## User Preferences

@@ -2,16 +2,19 @@ import { useAuth } from "@/hooks/use-new-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, Download, MessageSquare, TrendingUp, Calendar, Clock } from "lucide-react";
+import { Users, Download, MessageSquare, TrendingUp, Calendar, Clock, RotateCcw } from "lucide-react";
 import { Link } from "wouter";
 import { AdminHeader } from "@/components/admin-header";
 import { format } from "date-fns";
+import { queryClient } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
 
-  const { data: dashboardData, isLoading, error } = useQuery({
+  const { data: dashboardData, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/admin/dashboard"],
     queryFn: async () => {
       const res = await fetch("/api/admin/dashboard", {
@@ -25,6 +28,25 @@ export default function AdminDashboard() {
     },
     enabled: !!user, // Only run query if user is authenticated
   });
+
+  const handleRefresh = async () => {
+    try {
+      // Invalidate and refetch dashboard data
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
+      await refetch();
+      
+      toast({
+        title: "Dashboard Updated",
+        description: "All statistics have been refreshed successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Refresh Failed", 
+        description: "Failed to update dashboard data",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!user) {
     return null;
@@ -75,8 +97,22 @@ export default function AdminDashboard() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Overview of your EYV admin panel</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-400">Overview of your EYV admin panel</p>
+            </div>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={isLoading}
+            >
+              <RotateCcw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
