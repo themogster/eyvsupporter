@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Import the walkthrough screenshots
 import step1Image from "@assets/Screenshot 2025-07-11 130854_1752236038790.png";
@@ -106,37 +106,13 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <DialogHeader className="pb-4">
           <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             How to Use EYV Profile Creator
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-6 w-6 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Step indicators */}
-          <div className="flex justify-center space-x-2">
-            {walkthroughSteps.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToStep(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentStep
-                    ? 'bg-purple-600'
-                    : index < currentStep
-                    ? 'bg-purple-300'
-                    : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
 
           {/* Current step content */}
           <div className="text-center space-y-4">
