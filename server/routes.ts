@@ -710,6 +710,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete download record
+  app.delete("/api/admin/downloads/:id", async (req, res) => {
+    if (!req.session.adminUser) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    try {
+      const downloadId = parseInt(req.params.id);
+      if (isNaN(downloadId)) {
+        return res.status(400).json({ error: 'Invalid download ID' });
+      }
+
+      await storage.deleteDownload(downloadId);
+      res.json({ success: true, message: 'Download deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting download:', error);
+      res.status(500).json({ error: 'Failed to delete download' });
+    }
+  });
+
   // Admin analytics
   app.get("/api/admin/analytics", async (req, res) => {
     if (!req.session.adminUser) {

@@ -26,6 +26,7 @@ export interface IStorage {
   getRecentDownloads(days: number): Promise<Download[]>;
   getTodayDownloads(): Promise<Download[]>;
   getAnalytics(): Promise<any>;
+  deleteDownload(id: number): Promise<void>;
   
   // Admin user methods
   getAdminUser(id: number): Promise<AdminUser | undefined>;
@@ -174,6 +175,10 @@ export class DatabaseStorage implements IStorage {
       todayDownloads: (await this.getTodayDownloads()).length,
       usersCount: await this.getUsersCount(),
     };
+  }
+
+  async deleteDownload(id: number): Promise<void> {
+    await db.delete(downloads).where(eq(downloads.id, id));
   }
 
   // Admin user methods
