@@ -25,7 +25,6 @@ function getColorName(color: TextColor): string {
 
 interface PreviewSectionProps {
   processedImage: ProcessedImage | null;
-  shareUrl: string | null;
   transform: ImageTransform;
   curvedText: CurvedTextOption;
   textColor: TextColor;
@@ -39,7 +38,7 @@ interface PreviewSectionProps {
   isProcessing: boolean;
 }
 
-export function PreviewSection({ processedImage, shareUrl, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, onStartOver, isProcessing }: PreviewSectionProps) {
+export function PreviewSection({ processedImage, transform, curvedText, textColor, textPosition, onTransformChange, onCurvedTextChange, onTextColorChange, onTextPositionChange, onProceedToDownload, onStartOver, isProcessing }: PreviewSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -235,49 +234,6 @@ export function PreviewSection({ processedImage, shareUrl, transform, curvedText
           </div>
         </div>
       </Card>
-      
-      {shareUrl && (
-        <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <ExternalLink className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <p className="text-blue-800 dark:text-blue-300 font-medium">Shareable URL Created!</p>
-            </div>
-            <p className="text-blue-700 dark:text-blue-400 text-sm">
-              Your profile picture is now available at a unique URL that you can share with others:
-            </p>
-            <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
-              <input
-                type="text"
-                value={shareUrl}
-                readOnly
-                className="flex-1 text-sm text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none"
-              />
-              <Button
-                onClick={handleCopyUrl}
-                variant="outline"
-                size="sm"
-                className="ml-2 px-3 py-1 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-800"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 mr-1" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            <p className="text-blue-600 dark:text-blue-400 text-xs">
-              Anyone with this URL can view and download your profile picture
-            </p>
-          </div>
-        </Card>
-      )}
       
       {/* Controls Card */}
       <Card className="p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600">

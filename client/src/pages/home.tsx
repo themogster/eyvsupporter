@@ -81,7 +81,6 @@ export default function Home() {
         {currentStep === 'preview' && (
           <PreviewSection
             processedImage={processedImage}
-            shareUrl={shareUrl}
             transform={transform}
             curvedText={curvedText}
             textColor={textColor}
