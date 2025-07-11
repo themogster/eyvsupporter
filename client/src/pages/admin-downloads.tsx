@@ -203,7 +203,7 @@ export default function AdminDownloads() {
           ) : (
             <div className="space-y-4">
               {filteredDownloads.map((download: DownloadType) => (
-                <div key={download.id} className="p-2 sm:p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+                <div key={download.id} className="p-2 sm:p-4 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-4">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 relative">
