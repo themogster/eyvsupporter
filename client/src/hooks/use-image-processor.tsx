@@ -99,7 +99,9 @@ export function useImageProcessor() {
         
         if (response.ok) {
           const data = await response.json();
+          console.log('Download response:', data);
           if (data.shareUrl) {
+            console.log('Setting share URL:', data.shareUrl);
             setShareUrl(data.shareUrl);
           }
         } else {
