@@ -253,7 +253,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
                 messages
                   .filter(message => message.key !== 'none') // Exclude the 'none' option from database
                   .map((message) => (
-                    <SelectItem key={message.id} value={message.messageText}>
+                    <SelectItem key={message.id} value={message.key}>
                       {message.displayText}
                     </SelectItem>
                   ))
