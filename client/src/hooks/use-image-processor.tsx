@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo } from 'react';
 import { ImageProcessor, ProcessedImage, ImageTransform, ProcessingOptions, CurvedTextOption, TextColor, validateImageFile, downloadImage } from '@/lib/image-utils';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { Message } from '@shared/schema';
 
 export type Step = 'upload' | 'preview' | 'download' | 'thankyou';
 
@@ -16,6 +18,25 @@ export function useImageProcessor() {
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Fetch messages to resolve keys to actual text
+  const { data: messages = [] } = useQuery<Message[]>({
+    queryKey: ['/api/messages'],
+    queryFn: async () => {
+      const response = await fetch('/api/messages');
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      return response.json();
+    },
+  });
+
+  // Helper function to resolve curved text key to actual message text
+  const resolveMessageText = useCallback((key: string): string => {
+    if (key === 'none') return 'none';
+    const message = messages.find(m => m.key === key);
+    return message ? message.messageText : key;
+  }, [messages]);
 
   // Create a stable processor instance
   const processor = useMemo(() => {
@@ -45,7 +66,8 @@ export function useImageProcessor() {
 
     setIsProcessing(true);
     try {
-      const result = await processor.processImage(file, { transform, curvedText, textColor, textPosition });
+      const actualMessageText = resolveMessageText(curvedText);
+      const result = await processor.processImage(file, { transform, curvedText: actualMessageText, textColor, textPosition });
       setOriginalImage(file);
       setProcessedImage(result);
       
@@ -153,8 +175,8 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
-
-        const result = await processor.processImage(originalImage, { transform, curvedText: option, textColor, textPosition });
+        const actualMessageText = resolveMessageText(option);
+        const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition });
         setProcessedImage(result);
       } catch (error) {
         console.error('Failed to reprocess with curved text:', error);
@@ -167,7 +189,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast]);
+  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast, resolveMessageText]);
 
   const setTextColorOption = useCallback(async (color: TextColor) => {
     setTextColor(color);
@@ -176,7 +198,8 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
-        const result = await processor.processImage(originalImage, { transform, curvedText, textColor: color, textPosition });
+        const actualMessageText = resolveMessageText(curvedText);
+        const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor: color, textPosition });
         setProcessedImage(result);
       } catch (error) {
         console.error('Failed to reprocess with text color:', error);
@@ -189,7 +212,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast, resolveMessageText]);
 
   const setTextPositionOption = useCallback(async (position: number) => {
     setTextPosition(position);
@@ -198,7 +221,8 @@ export function useImageProcessor() {
     if (originalImage && processedImage) {
       setIsProcessing(true);
       try {
-        const result = await processor.processImage(originalImage, { transform, curvedText, textColor, textPosition: position });
+        const actualMessageText = resolveMessageText(curvedText);
+        const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition: position });
         setProcessedImage(result);
       } catch (error) {
         console.error('Failed to reprocess with text position:', error);
@@ -211,7 +235,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast, resolveMessageText]);
 
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
     if (!originalImage) {
@@ -225,7 +249,8 @@ export function useImageProcessor() {
 
     setIsProcessing(true);
     try {
-      const result = await processor.reprocessWithTransform(newTransform, { curvedText, textColor, textPosition });
+      const actualMessageText = resolveMessageText(curvedText);
+      const result = await processor.reprocessWithTransform(newTransform, { curvedText: actualMessageText, textColor, textPosition });
       setProcessedImage(result);
       setTransform(newTransform);
     } catch (error) {
