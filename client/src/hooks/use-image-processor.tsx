@@ -35,7 +35,9 @@ export function useImageProcessor() {
   const resolveMessageText = useCallback((key: string): string => {
     if (key === 'none') return 'none';
     const message = messages.find(m => m.key === key);
-    return message ? message.messageText : key;
+    const resolvedText = message ? message.messageText : key;
+    console.log('Resolving message key:', key, 'to text:', resolvedText, 'from messages:', messages.length);
+    return resolvedText;
   }, [messages]);
 
   // Create a stable processor instance
@@ -67,6 +69,7 @@ export function useImageProcessor() {
     setIsProcessing(true);
     try {
       const actualMessageText = resolveMessageText(curvedText);
+      console.log('Processing image with resolved text:', actualMessageText);
       const result = await processor.processImage(file, { transform, curvedText: actualMessageText, textColor, textPosition });
       setOriginalImage(file);
       setProcessedImage(result);
