@@ -51,7 +51,7 @@ export function DownloadSection({ processedImage, shareUrl, onDownload, onShare,
     if (processedImage && canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, 180, 180);
+        ctx.clearRect(0, 0, 400, 400);
         ctx.drawImage(processedImage.canvas, 0, 0);
       }
     }
@@ -73,8 +73,8 @@ export function DownloadSection({ processedImage, shareUrl, onDownload, onShare,
               {processedImage ? (
                 <canvas
                   ref={canvasRef}
-                  width={180}
-                  height={180}
+                  width={400}
+                  height={400}
                   className="w-full h-full rounded-full shadow-lg"
                   style={{ imageRendering: 'crisp-edges' }}
                 />

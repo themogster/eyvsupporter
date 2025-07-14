@@ -275,8 +275,8 @@ export class ImageProcessor {
     const img = this.originalImage;
     return new Promise((resolve, reject) => {
       try {
-        // Clear canvas
-        this.ctx.clearRect(0, 0, 180, 180);
+        // Clear canvas (scaled for 400x400)
+        this.ctx.clearRect(0, 0, 400, 400);
         
         // Use transform values
         const scale = transform.scale;
@@ -296,54 +296,54 @@ export class ImageProcessor {
         // Save context for clipping
         this.ctx.save();
         
-        // Create circular clipping path
+        // Create circular clipping path (scaled for 400x400)
         this.ctx.beginPath();
-        this.ctx.arc(90, 90, 78, 0, Math.PI * 2);
+        this.ctx.arc(200, 200, 182, 0, Math.PI * 2);
         this.ctx.clip();
         
-        // Draw the image with transforms applied
+        // Draw the image with transforms applied (scaled for 400x400)
         this.ctx.drawImage(
           img,
           sourceX, sourceY, sourceSize, sourceSize,  // Source rectangle (transformed)
-          12, 12, 156, 156                           // Destination rectangle (leave space for border)
+          18, 18, 364, 364                           // Destination rectangle (leave space for border)
         );
         
         // Restore context to remove clipping
         this.ctx.restore();
           
-        // Draw circular border - thicker to eliminate transparent ring
+        // Draw circular border - thicker to eliminate transparent ring (scaled for 400x400)
         this.ctx.beginPath();
-        this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+        this.ctx.arc(200, 200, 182, 0, Math.PI * 2);
         this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
-        this.ctx.lineWidth = 12;
+        this.ctx.lineWidth = 27;
         this.ctx.stroke();
         
-        // Draw logo background circle - positioned more inward and larger
+        // Draw logo background circle - positioned more inward and larger (scaled for 400x400)
         this.ctx.beginPath();
-        this.ctx.arc(138, 138, 24, 0, Math.PI * 2);
+        this.ctx.arc(306, 306, 53, 0, Math.PI * 2);
         this.ctx.fillStyle = 'white';
         this.ctx.fill();
         this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 4;
         this.ctx.stroke();
         
         // Draw logo image or fallback text
         if (this.logoImage) {
-          // Draw PNG logo in the white circle - larger and more inward
+          // Draw PNG logo in the white circle - larger and more inward (scaled for 400x400)
           this.ctx.save();
           this.ctx.beginPath();
-          this.ctx.arc(138, 138, 22, 0, Math.PI * 2);
+          this.ctx.arc(306, 306, 49, 0, Math.PI * 2);
           this.ctx.clip();
-          // Center the logo in the circle - larger size (44x44 instead of 32x32)
-          this.ctx.drawImage(this.logoImage, 116, 116, 44, 44);
+          // Center the logo in the circle - larger size (scaled 44x44 to 98x98)
+          this.ctx.drawImage(this.logoImage, 257, 257, 98, 98);
           this.ctx.restore();
         } else {
-          // Fallback to EYV text
-          this.ctx.font = 'bold 14px Inter, sans-serif';
+          // Fallback to EYV text (scaled font)
+          this.ctx.font = 'bold 31px Inter, sans-serif';
           this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
           this.ctx.textAlign = 'center';
           this.ctx.textBaseline = 'middle';
-          this.ctx.fillText('EYV', 138, 138);
+          this.ctx.fillText('EYV', 306, 306);
         }
         
         // Draw curved text if specified
@@ -356,7 +356,7 @@ export class ImageProcessor {
           
           if (curvedText && curvedText !== 'none') {
             console.log('reprocessWithTransform - Drawing curved text:', curvedText);
-            this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition);
+            this.drawCurvedText(curvedText, 200, 200, 144, textColor, textPosition);
           }
         } else {
           console.log('reprocessWithTransform - No options provided, skipping text');

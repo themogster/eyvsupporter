@@ -61,7 +61,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
     if (processedImage && canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, 180, 180);
+        ctx.clearRect(0, 0, 400, 400);
         ctx.drawImage(processedImage.canvas, 0, 0);
       }
     }
@@ -212,8 +212,8 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
               {processedImage ? (
                 <canvas
                   ref={canvasRef}
-                  width={180}
-                  height={180}
+                  width={400}
+                  height={400}
                   className={`w-full h-full rounded-full shadow-lg cursor-move select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                   style={{ imageRendering: 'crisp-edges', touchAction: 'none' }}
                   onMouseDown={handleMouseDown}
