@@ -20,7 +20,7 @@ export function useImageProcessor() {
   const { toast } = useToast();
 
   // Fetch messages to resolve keys to actual text
-  const { data: messages = [] } = useQuery<Message[]>({
+  const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
     queryKey: ['/api/messages'],
     queryFn: async () => {
       const response = await fetch('/api/messages');
@@ -101,6 +101,16 @@ export function useImageProcessor() {
       return;
     }
 
+    // Wait for messages to load before processing
+    if (messagesLoading) {
+      toast({
+        title: "Please Wait",
+        description: "Loading message options...",
+        variant: "default",
+      });
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const actualMessageText = resolveMessageText(curvedText);
@@ -127,7 +137,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [toast, processor, transform, curvedText, textColor, textPosition, logToDatabase]);
+  }, [toast, processor, transform, curvedText, textColor, textPosition, logToDatabase, resolveMessageText, messagesLoading]);
 
   const proceedToDownload = useCallback(() => {
     setCurrentStep('download');
