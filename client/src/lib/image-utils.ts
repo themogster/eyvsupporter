@@ -63,7 +63,7 @@ export class ImageProcessor {
   }
 
   private drawCurvedText(text: string, centerX: number, centerY: number, radius: number, color: TextColor = '#ffffff', startPosition: number = 30): void {
-    const fontSize = 22;
+    const fontSize = 18;
     this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     this.ctx.fillStyle = color;
     this.ctx.textAlign = 'center';
@@ -74,8 +74,8 @@ export class ImageProcessor {
     const totalChars = chars.length;
     
     // Position text around the circle - adjust arc based on text length for better spacing
-    const baseArcAngle = Math.PI * 0.67; // 120 degrees base
-    const spacingMultiplier = totalChars > 15 ? 1.4 : 1.0; // More spacing for longer text
+    const baseArcAngle = Math.PI * 0.8; // 144 degrees base (more spread for larger canvas)
+    const spacingMultiplier = totalChars > 15 ? 1.2 : 1.0; // Less aggressive spacing for larger canvas
     const totalArcAngle = baseArcAngle * spacingMultiplier;
     const angleStep = totalArcAngle / (totalChars - 1);
     // Convert startPosition from degrees to radians and adjust for circle coordinate system
