@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query";
 import { AdminLogin, AdminRegisterEmail, AdminSetPassword, VerifyTwoFactor } from "@shared/schema";
 import { apiRequest, queryClient } from "../lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 import { useLocation } from "wouter";
 
 type AdminUser = {
@@ -31,7 +31,6 @@ type AdminAuthContextType = {
 export const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const { toast } = useToast();
   const [, navigate] = useLocation();
   
   const {
@@ -68,18 +67,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (data) => {
       if (data.user) {
         queryClient.setQueryData(["/api/admin/user"], data.user);
-        toast({
-          title: "Login successful",
-          description: data.message,
-        });
       }
     },
     onError: (error: Error) => {
-      toast({
-        title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -92,17 +82,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return data;
     },
     onSuccess: (data) => {
-      toast({
-        title: "Verification code sent",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Registration failed",
-        description: error.message,
-        variant: "destructive",
-      });
       setIsRegistrationPending(false);
     },
   });
@@ -117,17 +98,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setPendingEmail(null);
       setIsRegistrationPending(false);
       setIsEmailVerified(false);
-      toast({
-        title: "Registration Complete",
-        description: "Your admin account has been created successfully.",
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Password setup failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -140,17 +112,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/admin/user"], data.user);
       setPendingEmail(null);
       setIsLoginPending(false);
-      toast({
-        title: "Login successful",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Verification failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -161,17 +124,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data) => {
       setIsEmailVerified(true);
-      toast({
-        title: "Email verified",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Verification failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -185,18 +139,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setPendingEmail(null);
       setIsLoginPending(false);
       setIsRegistrationPending(false);
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out",
-      });
       navigate("/");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Logout failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 

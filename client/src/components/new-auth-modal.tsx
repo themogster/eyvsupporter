@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { RegisterStepOne, RegisterStepTwo, RegisterStepThree, AdminLogin, registerStepOneSchema, registerStepTwoSchema, registerStepThreeSchema, adminLoginSchema } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
+
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-new-auth";
 
@@ -148,17 +148,8 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     },
     onSuccess: () => {
       setForgotPasswordStep('verify');
-      toast({
-        title: "Reset Code Sent",
-        description: "Check your email for the verification code",
-      });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send reset code",
-        variant: "destructive",
-      });
     },
   });
 
@@ -169,17 +160,8 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
     },
     onSuccess: () => {
       setForgotPasswordStep('password');
-      toast({
-        title: "Code Verified",
-        description: "Now set your new password",
-      });
     },
     onError: (error: any) => {
-      toast({
-        title: "Invalid Code",
-        description: error.message || "Invalid or expired verification code",
-        variant: "destructive",
-      });
     },
   });
 
@@ -189,10 +171,6 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
       return await res.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Password Reset",
-        description: "Your password has been successfully reset. You can now sign in.",
-      });
       // Reset forgot password state and return to login
       setShowForgotPassword(false);
       setForgotPasswordStep('email');
@@ -202,11 +180,6 @@ export function NewAuthModal({ isOpen, onClose }: NewAuthModalProps) {
       forgotPasswordForm.reset();
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to reset password",
-        variant: "destructive",
-      });
     },
   });
 

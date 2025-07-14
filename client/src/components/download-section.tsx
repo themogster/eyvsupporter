@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, RotateCcw, CheckCircle, Copy, Check, ExternalLink } from 'lucide-react';
 import { ProcessedImage } from '@/lib/image-utils';
-import { useToast } from '@/hooks/use-toast';
+
 
 interface DownloadSectionProps {
   processedImage: ProcessedImage | null;
@@ -17,7 +17,6 @@ interface DownloadSectionProps {
 export function DownloadSection({ processedImage, shareUrl, onDownload, onShare, onStartOver, onProceedToThankYou }: DownloadSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
   
   const handleDownload = () => {
     onDownload();
@@ -32,17 +31,9 @@ export function DownloadSection({ processedImage, shareUrl, onDownload, onShare,
       try {
         await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
-        toast({
-          title: "URL Copied!",
-          description: "Share URL has been copied to clipboard",
-        });
         setTimeout(() => setCopied(false), 2000);
       } catch (error) {
-        toast({
-          title: "Copy Failed",
-          description: "Unable to copy URL to clipboard",
-          variant: "destructive",
-        });
+        console.error('Unable to copy URL to clipboard:', error);
       }
     }
   };

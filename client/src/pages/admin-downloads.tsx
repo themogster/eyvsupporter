@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+
 import { Download, Search, Filter, Calendar, Eye, Copy, Check, ExternalLink, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import type { Download as DownloadType } from "@shared/schema";
@@ -14,7 +14,6 @@ import { AdminHeader } from "@/components/admin-header";
 
 export default function AdminDownloads() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
@@ -64,10 +63,6 @@ export default function AdminDownloads() {
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopiedUrls(prev => new Set([...prev, uniqueId]));
-      toast({
-        title: "URL Copied!",
-        description: "Share URL has been copied to clipboard",
-      });
       setTimeout(() => {
         setCopiedUrls(prev => {
           const newSet = new Set(prev);
@@ -76,11 +71,6 @@ export default function AdminDownloads() {
         });
       }, 2000);
     } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Unable to copy URL to clipboard",
-        variant: "destructive",
-      });
     }
   };
 
@@ -91,10 +81,6 @@ export default function AdminDownloads() {
       });
       
       if (response.ok) {
-        toast({
-          title: "Download Deleted",
-          description: "Download record has been removed",
-        });
         // Refetch the data
         queryClient.invalidateQueries({ queryKey: ["/api/admin/downloads"] });
         queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
@@ -102,11 +88,6 @@ export default function AdminDownloads() {
         throw new Error('Failed to delete download');
       }
     } catch (error) {
-      toast({
-        title: "Delete Failed",
-        description: "Unable to delete download record",
-        variant: "destructive",
-      });
     }
   };
 

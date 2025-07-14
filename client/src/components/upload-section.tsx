@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload } from 'lucide-react';
 import { getCameraStream, captureImageFromVideo } from '@/lib/image-utils';
-import { useToast } from '@/hooks/use-toast';
+
 
 interface UploadSectionProps {
   onImageSelect: (file: File) => void;
@@ -16,7 +16,6 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const { toast } = useToast();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,21 +35,12 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       setShowCamera(true);
     } catch (error) {
       console.error('Camera start error:', error);
-      toast({
-        title: "Camera Error",
-        description: error instanceof Error ? error.message : "Could not access camera",
-        variant: "destructive",
-      });
     }
   };
 
   const capturePhoto = async () => {
     if (!videoRef.current || !cameraStream) {
-      toast({
-        title: "Capture Failed",
-        description: "Camera not ready",
-        variant: "destructive",
-      });
+      console.error('Camera not ready');
       return;
     }
 
@@ -60,11 +50,6 @@ export function UploadSection({ onImageSelect, isProcessing }: UploadSectionProp
       stopCamera();
     } catch (error) {
       console.error('Camera capture error:', error);
-      toast({
-        title: "Capture Failed",
-        description: error instanceof Error ? error.message : "Failed to capture photo from camera",
-        variant: "destructive",
-      });
     }
   };
 

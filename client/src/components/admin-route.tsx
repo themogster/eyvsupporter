@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-new-auth";
 import { Redirect } from "wouter";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+
 import { useEffect } from "react";
 
 interface AdminRouteProps {
@@ -10,18 +10,13 @@ interface AdminRouteProps {
 
 export function AdminRoute({ children }: AdminRouteProps) {
   const { user, isLoading } = useAuth();
-  const { toast } = useToast();
 
   // Always call useEffect at the top level
   useEffect(() => {
     if (user && user.role !== 'admin') {
-      toast({
-        title: "Access Restricted",
-        description: "Admin access required. Contact an administrator to upgrade your account.",
-        variant: "destructive",
-      });
+      console.error('Access restricted: Admin access required');
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Show loading while checking authentication
   if (isLoading) {

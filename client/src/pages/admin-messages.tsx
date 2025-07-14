@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Edit2, Trash2, Save, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Message, InsertMessage } from "@shared/schema";
 import { AdminHeader } from "@/components/admin-header";
@@ -18,7 +18,6 @@ interface EditingMessage extends Partial<InsertMessage> {
 
 export default function AdminMessages() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -39,10 +38,9 @@ export default function AdminMessages() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
       setIsCreating(false);
       setEditingMessage(null);
-      toast({ title: "Message created successfully" });
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to create message", description: error.message, variant: "destructive" });
+      console.error('Failed to create message:', error.message);
     },
   });
 
@@ -55,10 +53,9 @@ export default function AdminMessages() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/messages"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
       setEditingMessage(null);
-      toast({ title: "Message updated successfully" });
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to update message", description: error.message, variant: "destructive" });
+      console.error('Failed to update message:', error.message);
     },
   });
 
@@ -70,10 +67,9 @@ export default function AdminMessages() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/messages"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
-      toast({ title: "Message deleted successfully" });
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to delete message", description: error.message, variant: "destructive" });
+      console.error('Failed to delete message:', error.message);
     },
   });
 

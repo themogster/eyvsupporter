@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Eye, EyeOff, Check, X, Mail, Lock, Shield } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+
 import { apiRequest } from "@/lib/queryClient";
 
 interface ChangePasswordModalProps {
@@ -45,17 +45,9 @@ export function ChangePasswordModal({ isOpen, onClose, userEmail }: ChangePasswo
     },
     onSuccess: () => {
       setStep('verify');
-      toast({
-        title: "Verification Code Sent",
-        description: "Check your email for the verification code",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error:', error.message);
     },
   });
 
@@ -70,17 +62,9 @@ export function ChangePasswordModal({ isOpen, onClose, userEmail }: ChangePasswo
     },
     onSuccess: () => {
       setStep('password');
-      toast({
-        title: "Code Verified",
-        description: "Now set your new password",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Invalid Code",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Invalid Code:', error.message);
     },
   });
 
@@ -94,18 +78,10 @@ export function ChangePasswordModal({ isOpen, onClose, userEmail }: ChangePasswo
       return await res.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Password Changed",
-        description: "Your password has been successfully updated",
-      });
       handleClose();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error:', error.message);
     },
   });
 
@@ -142,11 +118,7 @@ export function ChangePasswordModal({ isOpen, onClose, userEmail }: ChangePasswo
 
   const handleVerifyCode = () => {
     if (!verificationCode.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter the verification code",
-        variant: "destructive",
-      });
+      console.error('Verification code required');
       return;
     }
     verify2FAMutation.mutate(verificationCode);
@@ -154,20 +126,12 @@ export function ChangePasswordModal({ isOpen, onClose, userEmail }: ChangePasswo
 
   const handleChangePassword = () => {
     if (!isPasswordStrong) {
-      toast({
-        title: "Weak Password",
-        description: "Please ensure your password meets all security requirements",
-        variant: "destructive",
-      });
+      console.error('Password does not meet security requirements');
       return;
     }
 
     if (!passwordsMatch) {
-      toast({
-        title: "Passwords Don't Match",
-        description: "Please ensure both password fields match",
-        variant: "destructive",
-      });
+      console.error('Passwords do not match');
       return;
     }
 

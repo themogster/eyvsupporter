@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { ProcessedImage, ImageTransform, CurvedTextOption, TextColor } from '@/lib/image-utils';
 import type { Message } from '@shared/schema';
 import { Copy, Check, ExternalLink } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+
 
 function getColorName(color: TextColor): string {
   const colorNames: Record<TextColor, string> = {
@@ -43,7 +43,6 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   // Fetch messages from the database
   const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
@@ -183,17 +182,8 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
       try {
         await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
-        toast({
-          title: "URL Copied!",
-          description: "Share URL has been copied to clipboard",
-        });
         setTimeout(() => setCopied(false), 2000);
       } catch (error) {
-        toast({
-          title: "Copy Failed",
-          description: "Unable to copy URL to clipboard",
-          variant: "destructive",
-        });
       }
     }
   };

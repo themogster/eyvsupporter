@@ -177,7 +177,7 @@ Changelog:
   • Added automatic URL regeneration after any image modification (text, color, position, scale)
   • Fixed initialization error in logToDatabase function and improved dependency management
   • Resolved initial text rendering bug where message keys appeared instead of actual text by adding loading checks
-  • Removed success toast notification after image upload for smoother user experience
+  • Removed ALL toast notifications from main app for smoother user experience (errors now logged to console instead)
 ```
 
 ## User Preferences

@@ -9,7 +9,7 @@ import { Link } from "wouter";
 import { AdminHeader } from "@/components/admin-header";
 import { format } from "date-fns";
 import { queryClient } from "@/lib/queryClient";
-import { toast } from "@/hooks/use-toast";
+
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -35,16 +35,8 @@ export default function AdminDashboard() {
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
       await refetch();
       
-      toast({
-        title: "Dashboard Updated",
-        description: "All statistics have been refreshed successfully",
-      });
     } catch (error) {
-      toast({
-        title: "Refresh Failed", 
-        description: "Failed to update dashboard data",
-        variant: "destructive",
-      });
+      console.error('Failed to update dashboard data');
     }
   };
 

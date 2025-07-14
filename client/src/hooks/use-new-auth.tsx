@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { RegisterStepOne, RegisterStepTwo, RegisterStepThree, AdminLogin, AdminUser } from "@shared/schema";
 import { apiRequest, queryClient } from "../lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+
 
 type AuthContextType = {
   user: AdminUser | null;
@@ -41,7 +41,6 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { toast } = useToast();
   const [registrationStep, setRegistrationStep] = useState(0);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
@@ -66,17 +65,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (data, variables) => {
       setPendingEmail(variables.email);
       setRegistrationStep(2);
-      toast({
-        title: "Code sent",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Registration failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Registration failed:', error.message);
     },
   });
 
@@ -87,17 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data) => {
       setRegistrationStep(3);
-      toast({
-        title: "Email verified",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Verification failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Verification failed:', error.message);
     },
   });
 
@@ -109,17 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/admin/user"], data.user);
       resetRegistration();
-      toast({
-        title: "Registration complete",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Registration failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Registration failed:', error.message);
     },
   });
 
@@ -130,17 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/admin/user"], data.user);
-      toast({
-        title: "Login successful",
-        description: data.message,
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Login failed:', error.message);
     },
   });
 
@@ -158,17 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: () => {
       queryClient.setQueryData(["/api/admin/user"], null);
       resetRegistration();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out",
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Logout failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Logout failed:', error.message);
     },
   });
 

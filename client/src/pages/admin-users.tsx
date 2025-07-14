@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Edit, Plus, User, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { AdminUser } from "@shared/schema";
 
@@ -80,17 +80,9 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       setIsDialogOpen(false);
       setEditingUser(null);
-      toast({
-        title: "Success",
-        description: "User updated successfully",
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error updating user:', error.message);
     },
   });
 
@@ -102,17 +94,9 @@ export default function AdminUsersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({
-        title: "Success",
-        description: "User deleted successfully",
-      });
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error", 
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error deleting user:', error.message);
     },
   });
 
@@ -126,17 +110,9 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       setSelectedUsers(new Set());
       setIsDeleteDialogOpen(false);
-      toast({
-        title: "Users deleted",
-        description: `${selectedUsers.size} users have been successfully deleted`,
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error deleting users:', error.message);
     },
   });
 
@@ -150,17 +126,9 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       setIsDialogOpen(false);
       setFormData({ email: "", role: "user", password: "" });
-      toast({
-        title: "Success",
-        description: "User created successfully",
-      });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error('Error creating user:', error.message);
     },
   });
 
@@ -242,11 +210,6 @@ export default function AdminUsersPage() {
     } else {
       // Creating new user
       if (!formData.email || !formData.password) {
-        toast({
-          title: "Error",
-          description: "Email and password are required for new users",
-          variant: "destructive",
-        });
         return;
       }
       createUserMutation.mutate(formData);

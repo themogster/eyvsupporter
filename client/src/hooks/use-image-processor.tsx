@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { ImageProcessor, ProcessedImage, ImageTransform, ProcessingOptions, CurvedTextOption, TextColor, validateImageFile, downloadImage } from '@/lib/image-utils';
-import { useToast } from '@/hooks/use-toast';
+
 import { useQuery } from '@tanstack/react-query';
 import { Message } from '@shared/schema';
 
@@ -17,7 +17,6 @@ export function useImageProcessor() {
   const [textColor, setTextColor] = useState<TextColor>('#ffffff');
   const [textPosition, setTextPosition] = useState<number>(270); // 270 degrees = top of circle
   const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const { toast } = useToast();
 
   // Fetch messages to resolve keys to actual text
   const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
@@ -93,21 +92,13 @@ export function useImageProcessor() {
   const processImage = useCallback(async (file: File) => {
     const validation = validateImageFile(file);
     if (!validation.valid) {
-      toast({
-        title: "Invalid File",
-        description: validation.error,
-        variant: "destructive",
-      });
+      console.error('Invalid file:', validation.error);
       return;
     }
 
     // Wait for messages to load before processing
     if (messagesLoading) {
-      toast({
-        title: "Please Wait",
-        description: "Loading message options...",
-        variant: "default",
-      });
+      console.log('Waiting for messages to load...');
       return;
     }
 
@@ -124,15 +115,11 @@ export function useImageProcessor() {
       
       setCurrentStep('preview');
     } catch (error) {
-      toast({
-        title: "Processing Failed",
-        description: error instanceof Error ? error.message : "Failed to process image",
-        variant: "destructive",
-      });
+      console.error('Failed to process image:', error);
     } finally {
       setIsProcessing(false);
     }
-  }, [toast, processor, transform, curvedText, textColor, textPosition, logToDatabase, resolveMessageText, messagesLoading]);
+  }, [processor, transform, curvedText, textColor, textPosition, logToDatabase, resolveMessageText, messagesLoading]);
 
   const proceedToDownload = useCallback(() => {
     setCurrentStep('download');
@@ -146,12 +133,8 @@ export function useImageProcessor() {
     if (processedImage) {
       // Simply download the image - database logging already happened during processing
       downloadImage(processedImage.blob, 'eyv-profile-picture.png');
-      toast({
-        title: "Download Started",
-        description: "Your EYV profile picture is being downloaded!",
-      });
     }
-  }, [processedImage, toast]);
+  }, [processedImage]);
 
   const shareImage = useCallback(async () => {
     if (!processedImage) return;
@@ -197,16 +180,11 @@ export function useImageProcessor() {
         await logToDatabase(result.blob, option);
       } catch (error) {
         console.error('Failed to reprocess with curved text:', error);
-        toast({
-          title: "Processing Failed",
-          description: "Failed to update the image with curved text",
-          variant: "destructive",
-        });
       } finally {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast, resolveMessageText, logToDatabase]);
+  }, [originalImage, processedImage, processor, transform, textColor, textPosition, resolveMessageText, logToDatabase]);
 
   const setTextColorOption = useCallback(async (color: TextColor) => {
     setTextColor(color);
@@ -223,16 +201,11 @@ export function useImageProcessor() {
         await logToDatabase(result.blob, curvedText);
       } catch (error) {
         console.error('Failed to reprocess with text color:', error);
-        toast({
-          title: "Processing Failed",
-          description: "Failed to update the image with new text color",
-          variant: "destructive",
-        });
       } finally {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast, resolveMessageText, logToDatabase]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, resolveMessageText, logToDatabase]);
 
   const setTextPositionOption = useCallback(async (position: number) => {
     setTextPosition(position);
@@ -249,24 +222,15 @@ export function useImageProcessor() {
         await logToDatabase(result.blob, curvedText);
       } catch (error) {
         console.error('Failed to reprocess with text position:', error);
-        toast({
-          title: "Processing Failed",
-          description: "Failed to update the image with new text position",
-          variant: "destructive",
-        });
       } finally {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast, resolveMessageText, logToDatabase]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textColor, resolveMessageText, logToDatabase]);
 
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
     if (!originalImage) {
-      toast({
-        title: "Transform Failed",
-        description: "No original image available for reprocessing",
-        variant: "destructive",
-      });
+      console.error('No original image available for reprocessing');
       return;
     }
 
@@ -280,15 +244,11 @@ export function useImageProcessor() {
       // Regenerate shareable URL with updated image
       await logToDatabase(result.blob, curvedText);
     } catch (error) {
-      toast({
-        title: "Transform Failed",
-        description: error instanceof Error ? error.message : "Failed to apply transform",
-        variant: "destructive",
-      });
+      console.error('Failed to apply transform:', error);
     } finally {
       setIsProcessing(false);
     }
-  }, [originalImage, processor, toast, curvedText, textColor, textPosition, logToDatabase]);
+  }, [originalImage, processor, curvedText, textColor, textPosition, logToDatabase, resolveMessageText]);
 
   const startOver = useCallback(() => {
     setCurrentStep('upload');
