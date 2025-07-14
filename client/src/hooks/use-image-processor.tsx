@@ -53,7 +53,42 @@ export function useImageProcessor() {
     }
   }, []);
 
-
+  // Helper function to log to database and create shareable URL
+  const logToDatabase = useCallback(async (blob: Blob, messageKey: CurvedTextOption) => {
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+      
+      const base64Image = await base64Promise;
+      
+      const response = await fetch('/api/downloads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profileImage: base64Image,
+          eyvMessage: messageKey || "none",
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Download response:', data);
+        if (data.shareUrl) {
+          console.log('Setting share URL:', data.shareUrl);
+          setShareUrl(data.shareUrl);
+        }
+      } else {
+        console.error('Failed to log to database');
+      }
+    } catch (error) {
+      console.error('Database logging error:', error);
+    }
+  }, []);
 
   const processImage = useCallback(async (file: File) => {
     const validation = validateImageFile(file);
@@ -75,36 +110,7 @@ export function useImageProcessor() {
       setProcessedImage(result);
       
       // Log to database and create shareable URL immediately
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(result.blob);
-      });
-      
-      const base64Image = await base64Promise;
-      
-      // Log to database
-      const response = await fetch('/api/downloads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          profileImage: base64Image,
-          eyvMessage: curvedText || "none",
-        }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Download response:', data);
-        if (data.shareUrl) {
-          console.log('Setting share URL:', data.shareUrl);
-          setShareUrl(data.shareUrl);
-        }
-      } else {
-        console.error('Failed to log to database');
-      }
+      await logToDatabase(result.blob, curvedText);
       
       setCurrentStep('preview');
       
@@ -121,7 +127,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [toast, processor, transform, curvedText, textColor, textPosition]);
+  }, [toast, processor, transform, curvedText, textColor, textPosition, logToDatabase]);
 
   const proceedToDownload = useCallback(() => {
     setCurrentStep('download');
@@ -181,6 +187,9 @@ export function useImageProcessor() {
         const actualMessageText = resolveMessageText(option);
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition });
         setProcessedImage(result);
+        
+        // Regenerate shareable URL with updated image
+        await logToDatabase(result.blob, option);
       } catch (error) {
         console.error('Failed to reprocess with curved text:', error);
         toast({
@@ -192,7 +201,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast, resolveMessageText]);
+  }, [originalImage, processedImage, processor, transform, textColor, textPosition, toast, resolveMessageText, logToDatabase]);
 
   const setTextColorOption = useCallback(async (color: TextColor) => {
     setTextColor(color);
@@ -204,6 +213,9 @@ export function useImageProcessor() {
         const actualMessageText = resolveMessageText(curvedText);
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor: color, textPosition });
         setProcessedImage(result);
+        
+        // Regenerate shareable URL with updated image
+        await logToDatabase(result.blob, curvedText);
       } catch (error) {
         console.error('Failed to reprocess with text color:', error);
         toast({
@@ -215,7 +227,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast, resolveMessageText]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textPosition, toast, resolveMessageText, logToDatabase]);
 
   const setTextPositionOption = useCallback(async (position: number) => {
     setTextPosition(position);
@@ -227,6 +239,9 @@ export function useImageProcessor() {
         const actualMessageText = resolveMessageText(curvedText);
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition: position });
         setProcessedImage(result);
+        
+        // Regenerate shareable URL with updated image
+        await logToDatabase(result.blob, curvedText);
       } catch (error) {
         console.error('Failed to reprocess with text position:', error);
         toast({
@@ -238,7 +253,7 @@ export function useImageProcessor() {
         setIsProcessing(false);
       }
     }
-  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast, resolveMessageText]);
+  }, [originalImage, processedImage, processor, transform, curvedText, textColor, toast, resolveMessageText, logToDatabase]);
 
   const updateTransform = useCallback(async (newTransform: ImageTransform) => {
     if (!originalImage) {
@@ -256,6 +271,9 @@ export function useImageProcessor() {
       const result = await processor.reprocessWithTransform(newTransform, { curvedText: actualMessageText, textColor, textPosition });
       setProcessedImage(result);
       setTransform(newTransform);
+      
+      // Regenerate shareable URL with updated image
+      await logToDatabase(result.blob, curvedText);
     } catch (error) {
       toast({
         title: "Transform Failed",
@@ -265,7 +283,7 @@ export function useImageProcessor() {
     } finally {
       setIsProcessing(false);
     }
-  }, [originalImage, processor, toast, curvedText, textColor, textPosition]);
+  }, [originalImage, processor, toast, curvedText, textColor, textPosition, logToDatabase]);
 
   const startOver = useCallback(() => {
     setCurrentStep('upload');
