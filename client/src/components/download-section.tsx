@@ -86,7 +86,7 @@ export function DownloadSection({ processedImage, shareUrl, onDownload, onShare,
           
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             <p>Perfect for Facebook profile picture!</p>
-            <p className="text-xs mt-1">180x180px • EYV branding included</p>
+            <p className="text-xs mt-1">400x400px • EYV branding included</p>
           </div>
         </div>
       </Card>

@@ -229,7 +229,7 @@ export function PreviewSection({ processedImage, transform, curvedText, textColo
           </div>
           
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            <p>Optimized for Facebook (180x180px)</p>
+            <p>Optimized for Facebook (400x400px)</p>
             <p className="text-xs mt-2 text-blue-600 dark:text-blue-400 font-medium">💡 Drag the image to reposition • Pinch or scroll to zoom</p>
           </div>
         </div>

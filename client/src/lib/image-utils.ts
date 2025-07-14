@@ -30,8 +30,8 @@ export class ImageProcessor {
   constructor() {
     console.log('ImageProcessor constructor called');
     this.canvas = document.createElement('canvas');
-    this.canvas.width = 180;
-    this.canvas.height = 180;
+    this.canvas.width = 400;
+    this.canvas.height = 400;
     this.ctx = this.canvas.getContext('2d')!;
     
     // Start loading the logo immediately
@@ -63,7 +63,7 @@ export class ImageProcessor {
   }
 
   private drawCurvedText(text: string, centerX: number, centerY: number, radius: number, color: TextColor = '#ffffff', startPosition: number = 30): void {
-    const fontSize = 10;
+    const fontSize = 22;
     this.ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     this.ctx.fillStyle = color;
     this.ctx.textAlign = 'center';
@@ -137,7 +137,7 @@ export class ImageProcessor {
           this.originalImage = img;
           
           // Clear canvas
-          this.ctx.clearRect(0, 0, 180, 180);
+          this.ctx.clearRect(0, 0, 400, 400);
           
           // Extract transform and curved text options
           const imageTransform = options?.transform || { scale: 1, offsetX: 0, offsetY: 0 };
@@ -163,64 +163,64 @@ export class ImageProcessor {
           // Save context for clipping
           this.ctx.save();
           
-          // Create circular clipping path
+          // Create circular clipping path (scaled for 400x400)
           this.ctx.beginPath();
-          this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+          this.ctx.arc(200, 200, 182, 0, Math.PI * 2);
           this.ctx.clip();
           
-          // Draw the image with transforms applied
+          // Draw the image with transforms applied (scaled for 400x400)
           this.ctx.drawImage(
             img,
             sourceX, sourceY, sourceSize, sourceSize,  // Source rectangle (transformed)
-            8, 8, 164, 164                             // Destination rectangle (leave space for border)
+            18, 18, 364, 364                           // Destination rectangle (leave space for border)
           );
           
           // Restore context to remove clipping
           this.ctx.restore();
           
-          // Draw circular border - thicker to eliminate transparent ring
+          // Draw circular border - thicker to eliminate transparent ring (scaled for 400x400)
           this.ctx.beginPath();
-          this.ctx.arc(90, 90, 82, 0, Math.PI * 2);
+          this.ctx.arc(200, 200, 182, 0, Math.PI * 2);
           this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
-          this.ctx.lineWidth = 12;
+          this.ctx.lineWidth = 27;
           this.ctx.stroke();
           
-          // Draw logo background circle - positioned more inward and larger
+          // Draw logo background circle - positioned more inward and larger (scaled for 400x400)
           this.ctx.beginPath();
-          this.ctx.arc(138, 138, 24, 0, Math.PI * 2);
+          this.ctx.arc(306, 306, 53, 0, Math.PI * 2);
           this.ctx.fillStyle = 'white';
           this.ctx.fill();
           this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
-          this.ctx.lineWidth = 2;
+          this.ctx.lineWidth = 4;
           this.ctx.stroke();
           
           // Draw logo image or fallback text
           console.log('About to draw logo, logoImage exists:', !!this.logoImage);
           if (this.logoImage) {
             console.log('Drawing PNG logo in circle');
-            // Draw PNG logo in the white circle - larger and more inward
+            // Draw PNG logo in the white circle - larger and more inward (scaled for 400x400)
             this.ctx.save();
             this.ctx.beginPath();
-            this.ctx.arc(138, 138, 22, 0, Math.PI * 2);
+            this.ctx.arc(306, 306, 49, 0, Math.PI * 2);
             this.ctx.clip();
-            // Center the logo in the circle - larger size (44x44 instead of 32x32)
-            this.ctx.drawImage(this.logoImage, 116, 116, 44, 44);
+            // Center the logo in the circle - larger size (scaled 44x44 to 98x98)
+            this.ctx.drawImage(this.logoImage, 257, 257, 98, 98);
             this.ctx.restore();
             console.log('PNG logo drawn successfully');
           } else {
             console.log('logoImage is null, drawing fallback text');
-            // Fallback to EYV text
-            this.ctx.font = 'bold 14px Inter, sans-serif';
+            // Fallback to EYV text (scaled font)
+            this.ctx.font = 'bold 31px Inter, sans-serif';
             this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--deep-purple') || '#502185';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
-            this.ctx.fillText('EYV', 138, 138);
+            this.ctx.fillText('EYV', 306, 306);
           }
           
           // Draw curved text if specified
           if (curvedText && curvedText !== 'none') {
             console.log('Drawing curved text:', curvedText);
-            this.drawCurvedText(curvedText, 90, 90, 65, textColor, textPosition); // Center at 90,90 with radius 65
+            this.drawCurvedText(curvedText, 200, 200, 144, textColor, textPosition); // Center at 200,200 with radius 144
           }
           
           // Convert to blob
