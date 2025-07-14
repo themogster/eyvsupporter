@@ -171,6 +171,13 @@ Changelog:
   • Set light mode as default theme for new users (previously defaulted to system preference)
   • Created comprehensive help walkthrough feature using 5 screenshot guides showing complete user journey from upload to thank you stage
   • Added "How to Use" option in settings dropdown menu with step-by-step visual instructions and helpful tips for each stage
+- July 14, 2025: Fixed critical image processing and URL generation issues:
+  • Resolved image rescaling problem when changing text by updating all canvas coordinates from 180x180 to 400x400 dimensions
+  • Fixed shareable URL timing issue where URLs displayed wrong text until manual resave
+  • Added automatic URL regeneration after any image modification (text, color, position, scale)
+  • Fixed initialization error in logToDatabase function and improved dependency management
+  • Resolved initial text rendering bug where message keys appeared instead of actual text by adding loading checks
+  • Removed success toast notification after image upload for smoother user experience
 ```
 
 ## User Preferences

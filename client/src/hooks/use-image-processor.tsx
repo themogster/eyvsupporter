@@ -123,11 +123,6 @@ export function useImageProcessor() {
       await logToDatabase(result.blob, curvedText);
       
       setCurrentStep('preview');
-      
-      toast({
-        title: "Image Processed",
-        description: "Your profile picture has been created successfully!",
-      });
     } catch (error) {
       toast({
         title: "Processing Failed",
