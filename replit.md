@@ -186,11 +186,11 @@ Changelog:
   • Fixed download tracking bug - database logging now only occurs when user clicks "Continue to Download" button
   • Eliminated unwanted database entries during preview parameter changes (text, color, position, zoom)
   • Successfully migrated all essential data to Supabase:
-    - Populated 11 EYV campaign messages in messages table
-    - Created admin user account: ian@the-morgans.biz with password "hello"
+    - Populated 11 authentic EYV campaign messages from original database in messages table
+    - Created admin user account: ian@the-morgans.biz with password "password123"
     - Added 12 sample download records for admin analytics functionality
     - All API endpoints functioning correctly with Supabase database
-    - Admin authentication system fully operational
+    - Admin authentication system fully operational with correct password hash
 ```
 
 ## User Preferences
