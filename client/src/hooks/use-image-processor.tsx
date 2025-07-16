@@ -110,20 +110,22 @@ export function useImageProcessor() {
       setOriginalImage(file);
       setProcessedImage(result);
       
-      // Log to database and create shareable URL immediately
-      await logToDatabase(result.blob, curvedText);
-      
+      // Note: Database logging moved to proceedToDownload function
       setCurrentStep('preview');
     } catch (error) {
       console.error('Failed to process image:', error);
     } finally {
       setIsProcessing(false);
     }
-  }, [processor, transform, curvedText, textColor, textPosition, logToDatabase, resolveMessageText, messagesLoading]);
+  }, [processor, transform, curvedText, textColor, textPosition, resolveMessageText, messagesLoading]);
 
-  const proceedToDownload = useCallback(() => {
+  const proceedToDownload = useCallback(async () => {
+    // Log to database only when user clicks "Continue to Download"
+    if (processedImage) {
+      await logToDatabase(processedImage.blob, curvedText);
+    }
     setCurrentStep('download');
-  }, []);
+  }, [processedImage, curvedText, logToDatabase]);
 
   const proceedToThankYou = useCallback(() => {
     setCurrentStep('thankyou');
@@ -176,8 +178,7 @@ export function useImageProcessor() {
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition });
         setProcessedImage(result);
         
-        // Regenerate shareable URL with updated image
-        await logToDatabase(result.blob, option);
+        // Note: Database logging only happens when user clicks "Continue to Download"
       } catch (error) {
         console.error('Failed to reprocess with curved text:', error);
       } finally {
@@ -197,8 +198,7 @@ export function useImageProcessor() {
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor: color, textPosition });
         setProcessedImage(result);
         
-        // Regenerate shareable URL with updated image
-        await logToDatabase(result.blob, curvedText);
+        // Note: Database logging only happens when user clicks "Continue to Download"
       } catch (error) {
         console.error('Failed to reprocess with text color:', error);
       } finally {
@@ -218,8 +218,7 @@ export function useImageProcessor() {
         const result = await processor.processImage(originalImage, { transform, curvedText: actualMessageText, textColor, textPosition: position });
         setProcessedImage(result);
         
-        // Regenerate shareable URL with updated image
-        await logToDatabase(result.blob, curvedText);
+        // Note: Database logging only happens when user clicks "Continue to Download"
       } catch (error) {
         console.error('Failed to reprocess with text position:', error);
       } finally {
@@ -241,8 +240,7 @@ export function useImageProcessor() {
       setProcessedImage(result);
       setTransform(newTransform);
       
-      // Regenerate shareable URL with updated image
-      await logToDatabase(result.blob, curvedText);
+      // Note: Database logging only happens when user clicks "Continue to Download"
     } catch (error) {
       console.error('Failed to apply transform:', error);
     } finally {
