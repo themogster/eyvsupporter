@@ -56,7 +56,7 @@ The application primarily operates client-side for image processing, reducing se
 ## External Dependencies
 
 ### Core Dependencies
-- **@neondatabase/serverless**: PostgreSQL connection for Neon Database
+- **pg**: Standard PostgreSQL client for Supabase Database
 - **@radix-ui/***: Comprehensive UI primitive components
 - **@tanstack/react-query**: Server state management
 - **drizzle-orm**: Type-safe database ORM
@@ -91,7 +91,7 @@ The application is configured for deployment on Replit with the following build 
 ### Database Management
 - **Migrations**: Handled through Drizzle Kit with `npm run db:push`
 - **Schema**: Defined in `shared/schema.ts` for type safety across client/server
-- **Connection**: Uses Neon serverless PostgreSQL for scalability
+- **Connection**: Uses Supabase PostgreSQL with standard pg client for compatibility
 
 ## Changelog
 
@@ -178,6 +178,13 @@ Changelog:
   • Fixed initialization error in logToDatabase function and improved dependency management
   • Resolved initial text rendering bug where message keys appeared instead of actual text by adding loading checks
   • Removed ALL toast notifications from main app for smoother user experience (errors now logged to console instead)
+- July 16, 2025: Completed database migration from Neon to Supabase:
+  • Removed @neondatabase/serverless package and Neon-specific WebSocket configuration
+  • Added standard PostgreSQL client (pg) for Supabase compatibility
+  • Updated database connection to use drizzle-orm/node-postgres instead of neon-serverless
+  • Added SSL configuration for production Supabase connections
+  • Fixed download tracking bug - database logging now only occurs when user clicks "Continue to Download" button
+  • Eliminated unwanted database entries during preview parameter changes (text, color, position, zoom)
 ```
 
 ## User Preferences
